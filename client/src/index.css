@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-charcoal: #121212;
+  --color-off-white: #F9F9F9;
+  --color-gold: #D4AF37;
+  --color-soft-white: #E0E0E0;
+  --color-crimson: #dc143c;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-charcoal);
+    color: var(--color-soft-white);
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  body.light-mode {
+    background-color: var(--color-off-white);
+    color: var(--color-charcoal);
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gold text-charcoal px-6 py-3 rounded-md font-bold transition-all;
+  }
+  .btn-primary:hover {
+    @apply opacity-90;
+  }
+
+  .btn-secondary {
+    @apply bg-crimson text-white px-6 py-3 rounded-md font-bold transition-all;
+  }
+  .btn-secondary:hover {
+    @apply opacity-90;
+  }
+}
+
+@keyframes slide-in {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out forwards;
+}
