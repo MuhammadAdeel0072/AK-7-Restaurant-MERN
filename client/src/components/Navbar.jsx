@@ -76,13 +76,13 @@ const Navbar = () => {
           </SignedIn>
 
           <SignedOut>
-            <button 
-              onClick={() => setShowAuthModal(true)}
+            <Link 
+              to="/sign-in"
               className="flex items-center gap-2 bg-gold text-charcoal px-6 py-2.5 rounded-full font-black text-xs uppercase tracking-widest shadow-lg shadow-gold/20 hover:shadow-gold/40 hover:scale-105 active:scale-95 transition-all"
             >
               <LogIn size={16} />
               <span>Sign In</span>
-            </button>
+            </Link>
           </SignedOut>
         </div>
         
@@ -91,9 +91,8 @@ const Navbar = () => {
         </button>
       </div>
 
-      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
-    </nav>
-  );
+      </nav>
+    );
 };
 
 export default Navbar;

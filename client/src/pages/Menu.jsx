@@ -16,14 +16,35 @@ const Menu = () => {
   const { dispatch } = useCart();
   const { profile, isSignedIn } = useProfile();
 
+const fallbackItems = [
+    // Drinks
+    { _id: 'd1', name: 'Mint Margarita', category: 'Drinks', price: 250, description: 'Cool and refreshing mint drink', image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500', preparationTime: 5, isVegetarian: true },
+    { _id: 'd2', name: 'Cold Coffee', category: 'Drinks', price: 350, description: 'Creamy coffee with ice cream', image: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=500', preparationTime: 8, isVegetarian: true },
+    { _id: 'd3', name: 'Fresh Orange Juice', category: 'Drinks', price: 300, description: 'Freshly squeezed oranges', image: 'https://images.unsplash.com/photo-1624517452488-04869289c4ca?w=500', preparationTime: 5, isVegetarian: true },
+    // Foods
+    { _id: 'f1', name: 'Zinger Burger', category: 'Food', price: 450, description: 'Crispy chicken burger with cheese', image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500', preparationTime: 15, isVegetarian: false, isBestSeller: true },
+    { _id: 'f2', name: 'Chicken Sandwich', category: 'Food', price: 350, description: 'Grilled chicken with fresh salad', image: 'https://images.unsplash.com/photo-1521390188846-e2a3a97453a0?w=500', preparationTime: 10, isVegetarian: false },
+    // Sweets
+    { _id: 's1', name: 'Chocolate Cake', category: 'Sweets', price: 400, description: 'Rich and moist chocolate delight', image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500', preparationTime: 5, isVegetarian: true },
+    { _id: 's2', name: 'Brownie', category: 'Sweets', price: 300, description: 'Warm fudgy brownie with nuts', image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=500', preparationTime: 5, isVegetarian: true },
+    // Dishes
+    { _id: 'di1', name: 'Chicken Karahi', category: 'Dishes', price: 1200, description: 'Spicy traditional chicken curry', image: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=500', preparationTime: 25, isVegetarian: false },
+    { _id: 'di2', name: 'Biryani', category: 'Dishes', price: 600, description: 'Fragrant rice with spicy chicken', image: 'https://images.unsplash.com/photo-1563379091339-03b21bc4a4f8?w=500', preparationTime: 20, isVegetarian: false, isSpecial: true },
+];
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
         const data = await getProducts();
-        setProducts(data);
+        if (data && data.length > 0) {
+            setProducts(data);
+        } else {
+            setProducts(fallbackItems);
+        }
       } catch (error) {
-        toast.error('Failed to load menu items');
+        console.error('API Error, using fallback menu');
+        setProducts(fallbackItems);
       } finally {
         setLoading(false);
       }
@@ -193,7 +214,7 @@ const Menu = () => {
                   </div>
 
                   <div className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5 group-hover:border-gold/20 transition-all">
-                    <span className="text-[8px] font-black uppercase tracking-widest text-white/30">Executive Choice</span>
+                    <span className="text-[8px] font-black uppercase tracking-widest text-white/30">Freshly Made</span>
                     <ShoppingCart className="w-5 h-5 text-gold/40 group-hover:text-gold transition-colors" />
                   </div>
                 </div>
@@ -204,13 +225,13 @@ const Menu = () => {
       ) : (
         <div className="text-center py-24 bg-white/5 rounded-[3rem] border border-white/5">
             <Filter className="w-16 h-16 text-gold/20 mx-auto mb-6" />
-            <h2 className="text-2xl font-serif text-white mb-2">No delicacies found</h2>
-            <p className="text-gray-500">Try adjusting your filters or search terms</p>
+            <h2 className="text-2xl font-serif text-white mb-2">No food found</h2>
+            <p className="text-gray-500">Try searching for something else</p>
             <button
                 onClick={() => {setActiveCategory('All'); setSearchQuery('');}}
                 className="mt-6 text-gold underline underline-offset-4 hover:text-white transition-colors"
             >
-                Reset all filters
+                Clear search
             </button>
         </div>
       )}
@@ -283,16 +304,16 @@ const Menu = () => {
                     className="w-full bg-gold text-charcoal font-black py-6 rounded-[2rem] flex items-center justify-center gap-4 text-xl shadow-[0_20px_40px_rgba(212,175,55,0.3)] hover:scale-[1.02] active:scale-95 transition-all group"
                   >
                     <ShoppingCart className="w-6 h-6 group-hover:rotate-12 transition-transform" />
-                    ADD TO COLLECTION
+                    ADD TO CART
                   </button>
                   
                   <div className="flex justify-center gap-8 text-[10px] items-center">
                     <div className="flex items-center gap-2 text-gray-500 font-black uppercase tracking-widest">
-                        <Clock className="w-3 h-3" /> {selectedProduct.preparationTime || 25} MINS PREP
+                        <Clock className="w-3 h-3" /> {selectedProduct.preparationTime || 25} MINS READY
                     </div>
                     <div className="w-1.5 h-1.5 rounded-full bg-white/10"></div>
                     <div className="flex items-center gap-2 text-gray-500 font-black uppercase tracking-widest">
-                        <Package className="w-3 h-3" /> GOURMET PACKAGING
+                        <Package className="w-3 h-3" /> SAFE PACKING
                     </div>
                   </div>
                 </div>

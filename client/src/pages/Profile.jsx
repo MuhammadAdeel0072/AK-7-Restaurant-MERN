@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 
 const Profile = () => {
   const { profile, updateProfile, loading } = useProfile();
+  const [activeTab, setActiveTab] = useState('info');
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: profile?.firstName || '',
@@ -22,7 +23,12 @@ const Profile = () => {
     }
   };
 
-  if (loading) return <div className="text-center py-24 text-gold animate-pulse">Refining your profile...</div>;
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center py-32 space-y-4">
+        <div className="w-12 h-12 border-4 border-gold/20 border-t-gold rounded-full animate-spin"></div>
+        <p className="text-gold font-medium">Loading your profile...</p>
+    </div>
+  );
 
   const tierStats = {
     Silver: { color: 'text-gray-300', next: 'Gold', target: 500 },
@@ -44,48 +50,61 @@ const Profile = () => {
 
   return (
     <div className="container mx-auto px-6 py-12 max-w-6xl">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* Left: User Info */}
-        <div className="lg:col-span-1 space-y-8">
-          <div className="bg-white/[0.02] backdrop-blur-3xl border border-white/5 p-10 rounded-[3rem] text-center relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-gold/10 to-transparent"></div>
-            <div className="w-32 h-32 bg-charcoal border-4 border-gold rounded-full flex items-center justify-center mx-auto mb-6 relative z-10 shadow-2xl">
-              <User className="w-16 h-16 text-gold" />
+      {/* Profile Header & Stats */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-12">
+        <div className="lg:col-span-1 bg-white/[0.02] backdrop-blur-3xl border border-white/5 p-8 rounded-[3rem] text-center relative overflow-hidden">
+            <div className="w-24 h-24 bg-charcoal border-4 border-gold rounded-full flex items-center justify-center mx-auto mb-4 relative z-10 shadow-2xl">
+              <User className="w-12 h-12 text-gold" />
             </div>
-            <h2 className="text-3xl font-serif font-bold text-white mb-2">{profile?.firstName} {profile?.lastName}</h2>
-            <p className="text-gray-500 text-sm mb-6">{profile?.email}</p>
-            
-            <div className={`inline-flex items-center gap-3 px-6 py-2 rounded-full border ${tierStats[currentTier]?.color} border-current bg-white/5 text-xs font-black uppercase tracking-widest`}>
-              <Award className="w-4 h-4" /> {currentTier} Member
+            <h2 className="text-2xl font-serif font-bold text-white mb-1">{profile?.firstName}</h2>
+            <p className="text-gray-500 text-xs mb-4">{profile?.email}</p>
+            <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border ${tierStats[currentTier]?.color} border-current bg-white/5 text-[8px] font-black uppercase tracking-widest`}>
+              <Award className="w-3 h-3" /> {currentTier} Member
             </div>
-          </div>
-
-          <div className="bg-white/[0.02] border border-white/5 p-10 rounded-[3rem]">
-            <h3 className="text-xs font-black uppercase tracking-widest text-gold/40 mb-8">Loyalty Program</h3>
-            <div className="flex justify-between items-end mb-4">
-                <div>
-                    <span className="text-4xl font-serif font-bold text-white">{profile?.loyaltyPoints || 0}</span>
-                    <span className="text-gold/60 text-xs ml-2 uppercase font-black">Points</span>
-                </div>
-                <div className="text-right">
-                    <p className="text-[10px] text-gray-500 uppercase font-black mb-1">Next Tier: {tierStats[currentTier]?.next}</p>
-                    <p className="text-white text-xs font-bold">{tierStats[currentTier]?.target - (profile?.loyaltyPoints || 0)} pts needed</p>
-                </div>
-            </div>
-            <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full bg-gold transition-all duration-1000" style={{ width: `${progress}%` }}></div>
-            </div>
-          </div>
         </div>
 
-        {/* Right: Management */}
-        <div className="lg:col-span-2 space-y-8">
+        <div className="lg:col-span-3 grid grid-cols-3 gap-6">
+            <div className="bg-white/[0.02] border border-white/5 p-8 rounded-[3rem] flex flex-col items-center justify-center">
+                <span className="text-4xl font-serif font-bold text-white mb-1">{profile?.totalOrders || 0}</span>
+                <span className="text-gold/60 text-[10px] uppercase font-black tracking-widest">Total Orders</span>
+            </div>
+            <div className="bg-white/[0.02] border border-white/5 p-8 rounded-[3rem] flex flex-col items-center justify-center">
+                <span className="text-4xl font-serif font-bold text-white mb-1">Rs. {profile?.totalSpent || 0}</span>
+                <span className="text-gold/60 text-[10px] uppercase font-black tracking-widest">Money Spent</span>
+            </div>
+            <div className="bg-white/[0.02] border border-white/5 p-8 rounded-[3rem] flex flex-col items-center justify-center">
+                <span className="text-4xl font-serif font-bold text-white mb-1">{profile?.loyaltyPoints || 0}</span>
+                <span className="text-gold/60 text-[10px] uppercase font-black tracking-widest">Reward Points</span>
+            </div>
+        </div>
+      </div>
+
+      {/* Tabs Navigation */}
+      <div className="flex gap-4 mb-8 justify-center">
+          {['info', 'addresses', 'favorites'].map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all ${
+                    activeTab === tab 
+                    ? 'bg-gold text-charcoal shadow-lg shadow-gold/20 scale-105' 
+                    : 'bg-white/5 text-gray-500 hover:text-white'
+                }`}
+              >
+                  {tab === 'info' ? 'My Details' : tab === 'addresses' ? 'My Addresses' : 'Favorites'}
+              </button>
+          ))}
+      </div>
+
+      {/* Tab Content */}
+      <div className="max-w-4xl mx-auto">
+          {activeTab === 'info' && (
             <div className="bg-white/[0.02] border border-white/5 p-10 rounded-[3rem]">
                 <div className="flex justify-between items-center mb-10">
-                    <h3 className="text-2xl font-serif font-bold text-white">Personal Artifacts</h3>
+                    <h3 className="text-2xl font-serif font-bold text-white">Profile Details</h3>
                     {!isEditing ? (
                         <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 text-gold hover:text-white transition-all text-xs font-black uppercase tracking-widest">
-                            <Edit3 className="w-4 h-4" /> Edit Profile
+                            <Edit3 className="w-4 h-4" /> Edit
                         </button>
                     ) : (
                         <div className="flex gap-4">
@@ -101,7 +120,7 @@ const Profile = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-600 ml-1">First Name</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gold/40 ml-1">First Name</label>
                         <input 
                             disabled={!isEditing}
                             className={`w-full bg-white/5 border rounded-2xl p-4 outline-none transition-all ${isEditing ? 'border-gold/30 focus:border-gold text-white' : 'border-white/5 text-gray-500'}`}
@@ -110,7 +129,7 @@ const Profile = () => {
                         />
                     </div>
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-600 ml-1">Last Name</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gold/40 ml-1">Last Name</label>
                         <input 
                             disabled={!isEditing}
                             className={`w-full bg-white/5 border rounded-2xl p-4 outline-none transition-all ${isEditing ? 'border-gold/30 focus:border-gold text-white' : 'border-white/5 text-gray-500'}`}
@@ -120,47 +139,42 @@ const Profile = () => {
                     </div>
                 </div>
             </div>
+          )}
 
+          {activeTab === 'addresses' && (
             <div className="bg-white/[0.02] border border-white/5 p-10 rounded-[3rem]">
-                <h3 className="text-2xl font-serif font-bold text-white mb-8 flex items-center gap-3">
-                    <MapPin className="w-6 h-6 text-gold" /> Deliverance Addresses
-                </h3>
+                <h3 className="text-2xl font-serif font-bold text-white mb-8">Delivery Locations</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {profile?.addresses?.length > 0 ? profile.addresses.map((addr, i) => (
                         <div key={i} className="bg-white/5 border border-white/10 p-6 rounded-2xl relative group hover:border-gold transition-all">
                             <p className="text-white font-bold mb-1">{addr.address}</p>
-                            <p className="text-gray-500 text-xs">{addr.city}, {addr.postalCode}</p>
+                            <p className="text-gray-500 text-xs">{addr.city}</p>
                             <button 
                                 onClick={() => deleteAddress(i)}
-                                className="absolute top-4 right-4 text-gray-600 hover:text-crimson opacity-0 group-hover:opacity-100 transition-all p-2 rounded-lg hover:bg-crimson/10"
+                                className="absolute top-4 right-4 text-gray-600 hover:text-crimson opacity-0 group-hover:opacity-100 transition-all p-2 rounded-lg"
                             >
                                 <Trash2 className="w-4 h-4" />
                             </button>
                         </div>
                     )) : (
                         <div className="md:col-span-2 text-center py-12 border-2 border-dashed border-white/5 rounded-[2.5rem]">
-                            <p className="text-gray-500 italic mb-4">No addresses registered to your legacy</p>
-                            <button className="text-gold font-bold text-xs uppercase tracking-widest hover:text-white">+ Add New Address</button>
+                            <p className="text-gray-500 italic mb-4">You haven't added any addresses yet</p>
+                            <button className="text-gold font-bold text-xs uppercase tracking-widest">+ Add New</button>
                         </div>
                     )}
                 </div>
             </div>
-            
+          )}
+
+          {activeTab === 'favorites' && (
             <div className="bg-white/[0.02] border border-white/5 p-10 rounded-[3rem]">
-                <h3 className="text-2xl font-serif font-bold text-white mb-8 flex items-center gap-3">
-                    <Heart className="w-6 h-6 text-crimson" /> Culinary Favorites
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {profile?.favorites?.length > 0 ? (
-                        <p className="text-gray-500 italic">Implemented via separate Favorities component</p>
-                    ) : (
-                        <div className="col-span-4 text-center py-12">
-                             <p className="text-gray-500 italic">Your heart hasn't chosen a favorite delicacy yet</p>
-                        </div>
-                    )}
+                <h3 className="text-2xl font-serif font-bold text-white mb-8">My Favorite Foods</h3>
+                <div className="text-center py-12">
+                     <Heart className="w-12 h-12 text-crimson/20 mx-auto mb-4" />
+                     <p className="text-gray-500 italic">Save your favorite dishes from the menu to see them here.</p>
                 </div>
             </div>
-        </div>
+          )}
       </div>
     </div>
   );

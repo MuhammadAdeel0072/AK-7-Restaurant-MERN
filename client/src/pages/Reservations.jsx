@@ -12,7 +12,9 @@ const Reservations = () => {
     date: '',
     time: '19:00',
     numberOfPeople: 2,
-    occasion: 'Dinner',
+    occasion: '',
+    phone: '',
+    paymentMethod: 'EasyPaisa'
   });
 
   const fetchReservations = async () => {
@@ -35,11 +37,19 @@ const Reservations = () => {
     e.preventDefault();
     setIsBooking(true);
     try {
-      await createReservation(formData);
-      toast.success('Reservation secured');
+      await createReservation({
+          ...formData,
+          numberOfGuests: formData.numberOfPeople, // Sync with backend field name if needed
+          reservationDate: formData.date,
+          reservationTime: formData.time
+      });
+      toast.success('Table booked! Please pay Rs. 1000 advance.', {
+          icon: '💳',
+          duration: 5000
+      });
       fetchReservations();
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to book table');
+      toast.error(error.response?.data?.message || 'Something went wrong. Please try again.');
     } finally {
       setIsBooking(false);
     }
@@ -49,8 +59,8 @@ const Reservations = () => {
     <div className="container mx-auto px-6 py-12 max-w-6xl">
       <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
         <div>
-          <h1 className="text-5xl font-serif font-bold text-white mb-2">Table Reservations</h1>
-          <p className="text-gold/60 font-medium tracking-widest uppercase text-xs">Secure your spot for a midnight feast</p>
+          <h1 className="text-5xl font-serif font-bold text-white mb-2">Book a Table</h1>
+          <p className="text-gold/60 font-medium tracking-widest uppercase text-xs">Save your spot for a great meal</p>
         </div>
       </div>
 
@@ -58,7 +68,7 @@ const Reservations = () => {
         {/* Reservation Form */}
         <div className="lg:col-span-1">
           <div className="bg-white/[0.02] backdrop-blur-3xl border border-white/5 p-10 rounded-[3rem] sticky top-28">
-            <h3 className="text-2xl font-serif font-bold text-white mb-8">Book a Table</h3>
+            <h3 className="text-2xl font-serif font-bold text-white mb-8">Reservation Details</h3>
             <form onSubmit={handleBooking} className="space-y-6">
                 <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-widest text-gold/60 ml-1">Date</label>
@@ -99,13 +109,41 @@ const Reservations = () => {
                     </div>
                 </div>
                 <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-gold/60 ml-1">Occasion</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gold/60 ml-1">Phone Number</label>
                     <input 
-                        placeholder="Dinner, Birthday, etc."
+                        type="tel"
+                        required
+                        placeholder="03xx xxxxxxx"
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 focus:border-gold outline-none text-white transition-all"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    />
+                </div>
+                <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gold/60 ml-1">Reason (Optional)</label>
+                    <input 
+                        placeholder="Birthday, Anniversary, etc."
                         className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 focus:border-gold outline-none text-white transition-all"
                         value={formData.occasion}
                         onChange={(e) => setFormData({...formData, occasion: e.target.value})}
                     />
+                </div>
+                <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gold/60 ml-1">Pay Advance (Rs. 1000)</label>
+                    <select 
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 focus:border-gold outline-none text-white transition-all"
+                        value={formData.paymentMethod}
+                        onChange={(e) => setFormData({...formData, paymentMethod: e.target.value})}
+                    >
+                        <option value="EasyPaisa">EasyPaisa</option>
+                        <option value="JazzCash">JazzCash</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                    </select>
+                </div>
+                <div className="bg-gold/10 border border-gold/20 p-4 rounded-2xl">
+                    <p className="text-[10px] text-gold font-bold leading-relaxed">
+                        Note: Rs. 1000 will be adjusted in your final bill. If you don't show up, it will not be refunded.
+                    </p>
                 </div>
                 <button 
                     type="submit"
@@ -120,7 +158,7 @@ const Reservations = () => {
 
         {/* Reservations List */}
         <div className="lg:col-span-2 space-y-8">
-            <h3 className="text-2xl font-serif font-bold text-white mb-8">My Legacy Bookings</h3>
+            <h3 className="text-2xl font-serif font-bold text-white mb-8">My Bookings</h3>
             {loading ? (
                 <div className="space-y-6">
                     {[...Array(2)].map((_, i) => (
@@ -130,7 +168,7 @@ const Reservations = () => {
             ) : reservations.length === 0 ? (
                 <div className="bg-white/[0.02] border border-white/5 p-20 rounded-[3rem] text-center backdrop-blur-xl">
                     <Calendar className="w-12 h-12 text-gold/20 mx-auto mb-6" />
-                    <p className="text-gray-500 italic">No future feasts secured in our scrolls.</p>
+                    <p className="text-gray-500 italic">No bookings found yet.</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 gap-6">

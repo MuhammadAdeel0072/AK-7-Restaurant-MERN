@@ -16,6 +16,8 @@ import OrderSuccess from './pages/OrderSuccess';
 import AdminDashboard from './pages/AdminDashboard';
 import AuthGuard from './components/AuthGuard';
 import Orders from './pages/Orders';
+import SignIn from './pages/SignIn';
+import SignUp from './pages/SignUp';
 
 const AuthRedirect = () => {
     const { profile, loading } = useProfile();
@@ -44,6 +46,8 @@ function App() {
               <Toaster position="top-right" />
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/sign-in" element={<SignIn />} />
+                <Route path="/sign-up" element={<SignUp />} />
                 <Route path="/menu" element={<Menu />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={

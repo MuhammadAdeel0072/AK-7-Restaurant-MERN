@@ -37,8 +37,8 @@ const Orders = () => {
     <div className="container mx-auto px-6 py-12 max-w-6xl">
       <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
         <div>
-          <h1 className="text-5xl font-serif font-bold text-white mb-2">My History</h1>
-          <p className="text-gold/60 font-medium tracking-widest uppercase text-xs">A log of your gourmet journey</p>
+          <h1 className="text-5xl font-serif font-bold text-white mb-2">My Orders</h1>
+          <p className="text-gold/60 font-medium tracking-widest uppercase text-xs">View your previous orders</p>
         </div>
       </div>
 
@@ -53,7 +53,7 @@ const Orders = () => {
           <div className="w-20 h-20 bg-gold/10 rounded-full flex items-center justify-center mx-auto mb-6">
             <Package className="w-10 h-10 text-gold/40" />
           </div>
-          <p className="text-xl text-white font-serif mb-6">You haven't embarked on a gourmet adventure yet.</p>
+          <p className="text-xl text-white font-serif mb-6">You haven't placed an order yet.</p>
           <Link to="/menu" className="text-gold font-bold underline underline-offset-8 decoration-gold/30 hover:decoration-gold transition-all">
             Browse the Menu
           </Link>
@@ -83,7 +83,7 @@ const Orders = () => {
                     <span className="text-gray-400">{order.orderItems.length} Items</span>
                   </div>
                   <div className="font-bold text-white">
-                    Total: <span className="text-gold">₹{order.totalPrice.toFixed(0)}</span>
+                    Total: <span className="text-gold">Rs. {order.totalPrice.toFixed(0)}</span>
                   </div>
                 </div>
               </div>
@@ -93,7 +93,7 @@ const Orders = () => {
                   to={`/track/${order._id}`}
                   className="flex-1 md:flex-none bg-white/5 hover:bg-gold hover:text-charcoal border border-white/10 hover:border-gold px-8 py-3.5 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 group/btn"
                 >
-                  Details <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                  View Details <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                 </Link>
               </div>
             </div>
