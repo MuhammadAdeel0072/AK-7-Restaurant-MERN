@@ -34,6 +34,7 @@ import OrderTracker from './pages/OrderTracker';
 import Profile from './pages/Profile';
 
 import Reservations from './pages/Reservations';
+import Settings from './pages/Settings';
 
 function App() {
   return (
@@ -78,6 +79,11 @@ function App() {
                 <Route path="/track/:id" element={
                   <AuthGuard>
                     <OrderTracker />
+                  </AuthGuard>
+                } />
+                <Route path="/settings" element={
+                  <AuthGuard>
+                    <Settings />
                   </AuthGuard>
                 } />
                 <Route path="/admin" element={<AdminDashboard />} />

@@ -5,7 +5,33 @@ const Reservation = require('../models/Reservation');
 // @route   POST /api/reservations
 // @access  Private
 const createReservation = asyncHandler(async (req, res) => {
-  const { reservationDate, reservationTime, numberOfGuests, specialRequests, occasion, phone, paymentMethod } = req.body;
+  const { 
+    reservationDate, 
+    reservationTime, 
+    numberOfGuests, 
+    specialRequests, 
+    occasion, 
+    phone, 
+    paymentMethod,
+    paymentReference 
+  } = req.body;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const maxDate = new Date();
+  maxDate.setDate(today.getDate() + 7);
+  
+  const resDate = new Date(reservationDate);
+
+  if (resDate < today) {
+    res.status(400);
+    throw new Error('You cannot book for a past date');
+  }
+
+  if (resDate > maxDate) {
+    res.status(400);
+    throw new Error('You can only book for the next 7 days');
+  }
 
   const reservation = new Reservation({
     user: req.user._id,
@@ -16,8 +42,10 @@ const createReservation = asyncHandler(async (req, res) => {
     occasion,
     phone,
     paymentMethod,
-    paymentStatus: 'Pending',
-    status: 'Pending'
+    paymentReference,
+    paymentStatus: paymentReference ? 'Paid' : 'Pending',
+    status: 'Pending',
+    advanceAmount: 1000
   });
 
   const createdReservation = await reservation.save();

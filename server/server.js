@@ -51,6 +51,8 @@ const userRoutes = require('./routes/userRoutes');
 const reservationRoutes = require('./routes/reservationRoutes');
 const loyaltyRoutes = require('./routes/loyaltyRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
+const cartRoutes = require('./routes/cartRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
@@ -58,6 +60,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/loyalty', loyaltyRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/payments', paymentRoutes);
 
 app.get('/', (req, res) => {
   res.send('AK-7 REST API is running...');

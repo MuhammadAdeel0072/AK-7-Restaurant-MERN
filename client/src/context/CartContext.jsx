@@ -68,43 +68,24 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('cartItems', JSON.stringify(state.cartItems));
   }, [state.cartItems]);
 
-  // Sync with Backend for signed-in users
+  // Clear cart on sign-in or sign-out
   useEffect(() => {
-    const syncCart = async () => {
+    const resetCart = async () => {
+      // 1. Clear local state
+      dispatch({ type: 'CLEAR_CART' });
+      
+      // 2. Clear backend if we have a session
       if (isSignedIn) {
         try {
-          // Fetch backend cart on login
-          const { data } = await apiClient.get('/users/cart');
-          if (data && data.length > 0) {
-            dispatch({ type: 'SET_CART', payload: data });
-          } else if (state.cartItems.length > 0) {
-            // If backend empty but local has items, push local to backend
-            await apiClient.put('/users/cart', { cartItems: state.cartItems });
-          }
+          await apiClient.delete('/cart');
         } catch (error) {
-          console.error('Error syncing cart with backend', error);
+          console.error('Failed to clear backend cart on auth change', error);
         }
       }
     };
-    syncCart();
-  }, [isSignedIn]);
 
-  // Push updates to backend
-  useEffect(() => {
-    const pushCart = async () => {
-      if (isSignedIn && state.cartItems.length > 0) {
-        try {
-          await apiClient.put('/users/cart', { cartItems: state.cartItems });
-        } catch (error) {
-          console.error('Error pushing cart to backend', error);
-        }
-      }
-    };
-    
-    // Debounce push to avoid excessive API calls
-    const timeout = setTimeout(pushCart, 2000);
-    return () => clearTimeout(timeout);
-  }, [state.cartItems, isSignedIn]);
+    resetCart();
+  }, [isSignedIn]);
 
   return (
     <CartContext.Provider value={{ state, dispatch }}>

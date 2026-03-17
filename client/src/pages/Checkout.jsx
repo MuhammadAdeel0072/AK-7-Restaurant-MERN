@@ -3,7 +3,8 @@ import { useCart } from '../context/CartContext';
 import { useProfile } from '../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { createOrder, createPaymentIntent } from '../services/orderService';
-import { Truck, CreditCard, CheckCircle, ChevronRight, ChevronLeft, MapPin, Loader2 } from 'lucide-react';
+import { getPaymentConfig } from '../services/paymentService';
+import { Truck, CreditCard, CheckCircle, ChevronRight, ChevronLeft, MapPin, Loader2, Smartphone, Landmark, ExternalLink, HelpCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -21,8 +22,23 @@ const Checkout = () => {
     country: 'USA',
   });
 
-  const [paymentMethod, setPaymentMethod] = useState('Stripe');
+  const [paymentMethod, setPaymentMethod] = useState('EasyPaisa');
+  const [paymentConfig, setPaymentConfig] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasPaid, setHasPaid] = useState(false);
+  const [paymentRef, setPaymentRef] = useState('');
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const data = await getPaymentConfig();
+        setPaymentConfig(data);
+      } catch (error) {
+        console.error('Failed to load payment config', error);
+      }
+    };
+    fetchConfig();
+  }, []);
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.qty * item.price, 0);
   const tax = subtotal * 0.1;
@@ -53,6 +69,8 @@ const Checkout = () => {
         })),
         shippingAddress,
         paymentMethod,
+        paymentReference: paymentRef,
+        isPaid: hasPaid,
         itemsPrice: subtotal,
         taxPrice: tax,
         shippingPrice: deliveryFee,
@@ -162,29 +180,124 @@ const Checkout = () => {
               >
                 <div className="bg-white/[0.02] border border-white/5 p-10 rounded-[2.5rem] backdrop-blur-xl">
                   <h2 className="text-3xl font-serif font-bold text-white mb-8">Payment Selection</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div 
-                        onClick={() => setPaymentMethod('Stripe')}
-                        className={`p-6 rounded-3xl border-2 transition-all cursor-pointer ${paymentMethod === 'Stripe' ? 'border-gold bg-gold/5' : 'border-white/5 hover:border-gold/20'}`}
+                        onClick={() => { setPaymentMethod('EasyPaisa'); setHasPaid(false); }}
+                        className={`p-6 rounded-3xl border-2 transition-all cursor-pointer ${paymentMethod === 'EasyPaisa' ? 'border-gold bg-gold/5' : 'border-white/5 hover:border-gold/20'}`}
                     >
-                        <CreditCard className={`w-8 h-8 mb-4 ${paymentMethod === 'Stripe' ? 'text-gold' : 'text-gray-500'}`} />
-                        <h3 className="font-bold text-lg">Secure Credit Card</h3>
-                        <p className="text-gray-500 text-xs">Fast & Secure via Stripe</p>
+                        <Smartphone className={`w-8 h-8 mb-4 ${paymentMethod === 'EasyPaisa' ? 'text-gold' : 'text-gray-500'}`} />
+                        <h3 className="font-bold text-lg">EasyPaisa</h3>
+                        <p className="text-gray-500 text-[10px] uppercase font-black">Mobile Wallet</p>
                     </div>
                     <div 
-                        onClick={() => setPaymentMethod('Cash')}
-                        className={`p-6 rounded-3xl border-2 transition-all cursor-pointer ${paymentMethod === 'Cash' ? 'border-gold bg-gold/5' : 'border-white/5 hover:border-gold/20'}`}
+                        onClick={() => { setPaymentMethod('JazzCash'); setHasPaid(false); }}
+                        className={`p-6 rounded-3xl border-2 transition-all cursor-pointer ${paymentMethod === 'JazzCash' ? 'border-gold bg-gold/5' : 'border-white/5 hover:border-gold/20'}`}
                     >
-                        <Truck className={`w-8 h-8 mb-4 ${paymentMethod === 'Cash' ? 'text-gold' : 'text-gray-500'}`} />
-                        <h3 className="font-bold text-lg">Pay on Delivery</h3>
-                        <p className="text-gray-500 text-xs">Cash or Card at door</p>
+                        <Smartphone className={`w-8 h-8 mb-4 ${paymentMethod === 'JazzCash' ? 'text-gold' : 'text-gray-500'}`} />
+                        <h3 className="font-bold text-lg">JazzCash</h3>
+                        <p className="text-gray-500 text-[10px] uppercase font-black">Mobile Wallet</p>
+                    </div>
+                    <div 
+                        onClick={() => { setPaymentMethod('Bank Transfer'); setHasPaid(false); }}
+                        className={`p-6 rounded-3xl border-2 transition-all cursor-pointer ${paymentMethod === 'Bank Transfer' ? 'border-gold bg-gold/5' : 'border-white/5 hover:border-gold/20'}`}
+                    >
+                        <Landmark className={`w-8 h-8 mb-4 ${paymentMethod === 'Bank Transfer' ? 'text-gold' : 'text-gray-500'}`} />
+                        <h3 className="font-bold text-lg">Bank</h3>
+                        <p className="text-gray-500 text-[10px] uppercase font-black">Direct Transfer</p>
                     </div>
                   </div>
-                  <div className="flex gap-4 mt-10">
+
+                  {/* Payment Instructions Simulation */}
+                  <div className="mt-8 p-8 bg-gold/5 border border-gold/20 rounded-[2rem] animate-in fade-in slide-in-from-bottom-4">
+                    <h4 className="text-white font-serif font-bold text-lg mb-4 flex items-center gap-2">
+                      <HelpCircle className="w-5 h-5 text-gold" />
+                      Payment Instructions
+                    </h4>
+                    
+                    {paymentMethod === 'EasyPaisa' && (
+                      <div className="space-y-4">
+                        <p className="text-gray-400 text-sm">Send <span className="text-white font-bold">Rs. {total.toFixed(0)}</span> to the EasyPaisa number below:</p>
+                        <div className="text-2xl font-black text-gold tracking-widest bg-charcoal/50 p-4 rounded-xl border border-white/5 text-center">
+                          {paymentConfig?.easypaisaNumber || '0300 1234567'}
+                        </div>
+                        <button 
+                          onClick={() => window.open('https://easypaisa.com.pk')}
+                          className="w-full flex items-center justify-center gap-2 bg-gold/10 hover:bg-gold/20 text-gold py-3 rounded-xl border border-gold/20 transition-all text-xs font-black uppercase tracking-widest"
+                        >
+                          <ExternalLink className="w-4 h-4" /> Open EasyPaisa
+                        </button>
+                      </div>
+                    )}
+
+                    {paymentMethod === 'JazzCash' && (
+                      <div className="space-y-4">
+                        <p className="text-gray-400 text-sm">Send <span className="text-white font-bold">Rs. {total.toFixed(0)}</span> to the JazzCash number below:</p>
+                        <div className="text-2xl font-black text-gold tracking-widest bg-charcoal/50 p-4 rounded-xl border border-white/5 text-center">
+                          {paymentConfig?.jazzcashNumber || '0300 7654321'}
+                        </div>
+                        <button 
+                          onClick={() => window.open('https://jazzcash.com.pk')}
+                          className="w-full flex items-center justify-center gap-2 bg-gold/10 hover:bg-gold/20 text-gold py-3 rounded-xl border border-gold/20 transition-all text-xs font-black uppercase tracking-widest"
+                        >
+                          <ExternalLink className="w-4 h-4" /> Open JazzCash
+                        </button>
+                      </div>
+                    )}
+
+                    {paymentMethod === 'Bank Transfer' && (
+                      <div className="space-y-4">
+                        <p className="text-gray-400 text-sm">Transfer <span className="text-white font-bold">Rs. {total.toFixed(0)}</span> to the following bank account:</p>
+                        <div className="bg-charcoal/50 p-6 rounded-xl border border-white/5 space-y-3">
+                          <div className="flex justify-between">
+                            <span className="text-gray-500 text-[10px] font-black uppercase">Bank</span>
+                            <span className="text-white font-bold text-sm">{paymentConfig?.bankName || 'Habib Bank Limited (HBL)'}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-500 text-[10px] font-black uppercase">Account #</span>
+                            <span className="text-gold font-bold text-sm">{paymentConfig?.bankAccount || '1234567890123456'}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-500 text-[10px] font-black uppercase">Account Title</span>
+                            <span className="text-white font-bold text-sm">{paymentConfig?.accountTitle || 'AK-7 RESTAURANT'}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="mt-6 pt-6 border-t border-white/5">
+                      <p className="text-gray-500 text-xs mb-4">After payment, please enter your transaction ID or reference below:</p>
+                      <input 
+                        type="text"
+                        placeholder="TRX-123456789"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl p-3 focus:border-gold outline-none text-white transition-all text-sm mb-4"
+                        value={paymentRef}
+                        onChange={(e) => setPaymentRef(e.target.value)}
+                      />
+                      <button 
+                        onClick={() => {
+                          if (!paymentRef.trim()) {
+                            toast.error('Please enter payment reference');
+                            return;
+                          }
+                          setHasPaid(true);
+                          toast.success('Payment recorded! You can now proceed.', { icon: '💰' });
+                        }}
+                        className={`w-full py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${hasPaid ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-gold text-charcoal shadow-lg shadow-gold/10'}`}
+                      >
+                        {hasPaid ? '✓ Reference Recorded' : 'I have paid'}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 mt-6">
                     <button onClick={prevStep} className="flex-1 bg-white/5 text-white font-bold py-4 rounded-2xl border border-white/10 flex items-center justify-center gap-2">
                         <ChevronLeft className="w-4 h-4" /> Back
                     </button>
-                    <button onClick={nextStep} className="flex-[2] bg-white/5 hover:bg-white/10 text-white font-bold py-4 rounded-2xl border border-white/10 flex items-center justify-center gap-2">
+                    <button 
+                      onClick={nextStep} 
+                      disabled={!hasPaid}
+                      className="flex-[2] bg-white/5 hover:bg-white/10 text-white font-bold py-4 rounded-2xl border border-white/10 flex items-center justify-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
                         Review Order <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>

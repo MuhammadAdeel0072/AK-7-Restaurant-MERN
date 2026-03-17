@@ -33,6 +33,8 @@ const orderSchema = new mongoose.Schema({
         country: { type: String, required: true },
     },
     paymentMethod: { type: String, required: true },
+    paymentReference: { type: String },
+    paymentScreenshot: { type: String }, // URL to screenshot
     paymentResult: {
         id: String,
         status: String,

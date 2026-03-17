@@ -17,6 +17,8 @@ const addOrderItems = asyncHandler(async (req, res) => {
     taxPrice,
     shippingPrice,
     totalPrice,
+    paymentReference,
+    isPaid
   } = req.body;
 
   if (orderItems && orderItems.length === 0) {
@@ -37,6 +39,9 @@ const addOrderItems = asyncHandler(async (req, res) => {
       taxPrice,
       shippingPrice,
       totalPrice,
+      paymentReference,
+      isPaid: isPaid || false,
+      paidAt: isPaid ? Date.now() : null,
       orderNumber,
       loyaltyPointsEarned: pointsEarned,
       statusHistory: [{ status: 'placed' }]

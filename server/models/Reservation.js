@@ -41,6 +41,8 @@ const reservationSchema = new mongoose.Schema({
         enum: ['EasyPaisa', 'JazzCash', 'Bank Transfer'],
         default: 'EasyPaisa'
     },
+    paymentReference: { type: String },
+    paymentScreenshot: { type: String },
     advanceAmount: {
         type: Number,
         default: 1000
