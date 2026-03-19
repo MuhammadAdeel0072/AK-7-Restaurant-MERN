@@ -1,6 +1,7 @@
 import React from 'react';
 import { ClerkProvider, SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import ErrorBoundary from './components/ErrorBoundary';
 import AdminLayout from './components/AdminLayout';
 import Dashboard from './pages/Dashboard';
 import MenuManagement from './pages/MenuManagement';
@@ -17,25 +18,27 @@ if (!CLERK_PUBLISHABLE_KEY) {
 
 function App() {
   return (
-    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
-      <BrowserRouter>
-        <SignedIn>
-          <Routes>
-            <Route element={<AdminLayout />}>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/menu" element={<MenuManagement />} />
-              <Route path="/orders" element={<OrderManagement />} />
-              <Route path="/reservations" element={<ReservationManagement />} />
-              <Route path="/payments" element={<PaymentManagement />} />
-              <Route path="/users" element={<UserManagement />} />
-            </Route>
-          </Routes>
-        </SignedIn>
-        <SignedOut>
-          <RedirectToSignIn />
-        </SignedOut>
-      </BrowserRouter>
-    </ClerkProvider>
+    <ErrorBoundary>
+      <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
+        <BrowserRouter>
+          <SignedIn>
+            <Routes>
+              <Route element={<AdminLayout />}>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/menu" element={<MenuManagement />} />
+                <Route path="/orders" element={<OrderManagement />} />
+                <Route path="/reservations" element={<ReservationManagement />} />
+                <Route path="/payments" element={<PaymentManagement />} />
+                <Route path="/users" element={<UserManagement />} />
+              </Route>
+            </Routes>
+          </SignedIn>
+          <SignedOut>
+            <RedirectToSignIn />
+          </SignedOut>
+        </BrowserRouter>
+      </ClerkProvider>
+    </ErrorBoundary>
   );
 }
 

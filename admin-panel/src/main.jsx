@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+console.log("ADMIN PANEL LOADED");
 import './index.css'
 import App from './App.jsx'
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import api, { socket } from '../services/api';
 import { ShoppingBag, DollarSign, Users, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -18,7 +18,19 @@ const Dashboard = () => {
         setLoading(false);
       }
     };
+    
     fetchStats();
+    
+    // Listen for real-time updates to refresh analytics
+    socket.on('orderUpdate', fetchStats);
+    socket.on('incomingOrder', fetchStats);
+    socket.on('reservationUpdated', fetchStats);
+    
+    return () => {
+      socket.off('orderUpdate');
+      socket.off('incomingOrder');
+      socket.off('reservationUpdated');
+    };
   }, []);
 
   if (loading) return (

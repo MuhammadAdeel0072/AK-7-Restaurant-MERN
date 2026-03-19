@@ -49,6 +49,12 @@ const createProduct = asyncHandler(async (req, res) => {
   });
 
   const createdProduct = await product.save();
+  
+  if (req.io) {
+    req.io.emit('menuUpdated');
+    req.io.emit('adminAction', { type: 'menuUpdate' });
+  }
+
   res.status(201).json(createdProduct);
 });
 
@@ -72,6 +78,12 @@ const updateProduct = asyncHandler(async (req, res) => {
     product.customizations = customizations || product.customizations;
 
     const updatedProduct = await product.save();
+
+    if (req.io) {
+      req.io.emit('menuUpdated');
+      req.io.emit('adminAction', { type: 'menuUpdate' });
+    }
+
     res.json(updatedProduct);
   } else {
     res.status(404);
@@ -87,6 +99,12 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
   if (product) {
     await Product.deleteOne({ _id: product._id });
+
+    if (req.io) {
+      req.io.emit('menuUpdated');
+      req.io.emit('adminAction', { type: 'menuUpdate' });
+    }
+
     res.json({ message: 'Product removed' });
   } else {
     res.status(404);
