@@ -75,8 +75,6 @@ const adminRoutes = require('./routes/adminRoutes');
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const reservationRoutes = require('./routes/reservationRoutes');
-const loyaltyRoutes = require('./routes/loyaltyRoutes');
-const cartRoutes = require('./routes/cartRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 
 app.use('/api/auth', authRoutes);
@@ -84,8 +82,6 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/reservations', reservationRoutes);
-app.use('/api/loyalty', loyaltyRoutes);
-app.use('/api/cart', cartRoutes);
 app.use('/api/payments', paymentRoutes);
 
 // ======================
