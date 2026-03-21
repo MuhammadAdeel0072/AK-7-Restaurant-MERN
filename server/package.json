@@ -15,6 +15,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "node-cache": "^5.1.2",
     "@clerk/clerk-sdk-node": "^4.13.23",
     "axios": "^1.13.6",
     "bcryptjs": "^3.0.3",
@@ -28,14 +29,15 @@
     "express-validator": "^7.2.1",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.3.0",
     "morgan": "^1.10.0",
+    "node-cache": "^5.1.2",
     "nodemailer": "^6.10.1",
     "pdfkit": "^0.16.0",
     "socket.io": "^4.8.1",
-    "svix": "^1.88.0",
-    "winston": "^3.17.0",
     "stripe": "^17.7.0",
-    "mongoose": "^9.3.0"
+    "svix": "^1.88.0",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.27",
