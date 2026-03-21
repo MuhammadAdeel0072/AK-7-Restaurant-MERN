@@ -1,6 +1,3 @@
-const jwt = require('jsonwebtoken');
-
-const protect = async (req, res, next) => {
 const { ClerkExpressRequireAuth } = require('@clerk/clerk-sdk-node');
 const User = require('../models/User');
 const asyncHandler = require('express-async-handler');
