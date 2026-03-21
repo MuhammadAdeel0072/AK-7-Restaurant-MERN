@@ -1,0 +1,13 @@
+{
+  "name": "ak7-restaurant",
+  "version": "1.0.0",
+  "description": "AK-7 Restaurant MERN Root",
+  "scripts": {
+    "start": "cd server && node server.js",
+    "build": "cd server && npm install",
+    "dev": "cd server && npm run dev"
+  },
+  "dependencies": {
+    "express-async-handler": "^1.2.0"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "buildCommand": "npm install",
+  "startCommand": "node server.js",
+  "installCommand": "npm install",
+  "framework": null,
+  "rootDirectory": "server"
+}
