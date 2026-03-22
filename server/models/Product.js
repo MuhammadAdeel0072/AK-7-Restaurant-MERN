@@ -7,7 +7,7 @@ const productSchema = new mongoose.Schema({
     category: { 
         type: String, 
         required: true,
-        enum: ['Food', 'Dishes', 'Sweets', 'Drinks']
+        enum: ['Food', 'Dishes', 'Sweets', 'Drinks', 'Burgers', 'Pizzas']
     },
     price: { type: Number, required: true, default: 0 },
     countInStock: { type: Number, required: true, default: 0 },

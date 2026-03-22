@@ -20,7 +20,13 @@ const getProducts = asyncHandler(async (req, res) => {
   if (isSpecial) query.isSpecial = isSpecial === 'true';
   if (dietary) query.dietaryInfo = { $in: dietary.split(',') };
 
-  const products = await Product.find(query).lean();
+  let products = await Product.find(query).lean();
+  
+  // Safety check for empty results or missing image URLs
+  products = (products || []).map(product => ({
+    ...product,
+    image: product.image || '/images/sample.jpg'
+  }));
   
   // Set cache if no filters
   if (!category && !isSpecial && !dietary) {
