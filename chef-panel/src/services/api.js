@@ -10,8 +10,18 @@ export const getActiveOrders = async () => {
     return data;
 };
 
+export const getReadyOrders = async () => {
+    const { data } = await api.get('/chef/ready-orders');
+    return data;
+};
+
 export const updateOrderStatus = async (id, status) => {
-    const { data } = await api.put(`/chef/orders/${id}/status`, { status });
+    const { data } = await api.patch('/chef/order/status', { id, status });
+    return data;
+};
+
+export const updateItemStatus = async (orderId, itemId, status) => {
+    const { data } = await api.patch('/chef/order/item-status', { orderId, itemId, status });
     return data;
 };
 

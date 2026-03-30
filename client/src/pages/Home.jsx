@@ -1,6 +1,5 @@
-import React from 'react';
-import { ArrowRight, Utensils, Coffee, Pizza, Cake } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { ArrowRight, Coffee, Utensils, Pizza, Cake } from 'lucide-react';
 
 const Home = () => {
   return (
@@ -16,12 +15,12 @@ const Home = () => {
             Exquisite Taste, <br />
             <span className="text-gold">Premium Experience</span>
           </h1>
-          <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2x mx-auto">
-            Discover the finest selection of dishes, drinks, and sweets crafted by our award-winning chefs.
+          <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">
+            Order your favorite food easily and quickly.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/menu" className="btn-primary flex items-center justify-center gap-2 text-lg">
-              Explore Menu <ArrowRight className="w-5 h-5" />
+              Menu <ArrowRight className="w-5 h-5" />
             </Link>
             <Link to="/cart" className="bg-white/10 backdrop-blur-md text-white px-6 py-3 rounded-md font-bold hover:bg-white/20 transition-all border border-white/20">
               Order Now
@@ -30,7 +29,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Categories (Hick's Law) */}
+      {/* Categories */}
       <section className="py-20 bg-charcoal px-6">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl md:text-5xl font-bold text-center mb-16 underline decoration-gold underline-offset-8">

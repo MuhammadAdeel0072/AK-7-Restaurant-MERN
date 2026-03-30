@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Utensils, LogOut, X, Clock } from 'lucide-react';
+import { 
+  LayoutDashboard, 
+  Utensils, 
+  LogOut, 
+  X, 
+  CheckCircle, 
+  Bell,
+  Settings
+} from 'lucide-react';
 import { SignOutButton } from '@clerk/clerk-react';
 import { motion } from 'framer-motion';
 
@@ -16,8 +24,11 @@ const Sidebar = ({ isOpen, onClose }) => {
   const isDesktop = windowWidth >= 1024;
 
   const menuItems = [
-    { title: 'Kitchen Stats', path: '/', icon: LayoutDashboard },
-    { title: 'Live Orders', path: '/orders', icon: Utensils },
+    { title: 'Dashboard', path: '/', icon: LayoutDashboard },
+    { title: 'Live Queue', path: '/orders', icon: Utensils },
+    { title: 'Ready Queue', path: '/ready', icon: CheckCircle },
+    { title: 'Alerts', path: '/alerts', icon: Bell },
+    { title: 'Settings', path: '/settings', icon: Settings },
   ];
 
   return (
@@ -39,7 +50,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           <h1 className="text-2xl md:text-3xl font-serif font-black tracking-tighter italic">
             <span className="text-gold">AK-7</span> <span className="text-crimson ml-1">REST</span>
           </h1>
-          <span className="text-[8px] font-black uppercase tracking-[0.3em] text-gold/40 mt-1">KITCHEN PRO</span>
+          <span className="text-[8px] font-black uppercase tracking-[0.3em] text-gold/40 mt-1 uppercase italic">PRO KITCHEN STATION</span>
         </div>
         <button 
           onClick={onClose}
@@ -63,8 +74,8 @@ const Sidebar = ({ isOpen, onClose }) => {
               }`
             }
           >
-            {item?.icon && <item.icon className={`w-5 h-5 transition-transform duration-300 group-hover:scale-110`} />}
-            <span className="font-semibold tracking-wide uppercase text-[10px] tracking-[0.1em]">{item?.title || 'Unknown Page'}</span>
+            {item?.icon && <item.icon className="w-5 h-5 mr-4 ml-0 transition-transform duration-300 group-hover:scale-110" />}
+            <span className="font-bold tracking-wide uppercase text-sm tracking-[0.05em]">{item?.title || 'Unknown Page'}</span>
           </NavLink>
         ))}
       </nav>
@@ -72,8 +83,8 @@ const Sidebar = ({ isOpen, onClose }) => {
       <div className="p-6 border-t border-white/5">
         <SignOutButton>
           <button className="flex items-center space-x-4 w-full px-5 py-4 text-crimson hover:bg-crimson/5 rounded-xl transition-all duration-300 group border border-transparent hover:border-crimson/20">
-            <LogOut className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            <span className="font-bold tracking-wider text-[10px]">SIGN OUT</span>
+            <LogOut className="w-5 h-5 mr-4 group-hover:translate-x-1 transition-transform" />
+            <span className="font-bold tracking-wider text-sm">Sign Out</span>
           </button>
         </SignOutButton>
       </div>

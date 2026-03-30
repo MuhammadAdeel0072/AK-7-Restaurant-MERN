@@ -51,6 +51,11 @@ const AuthGuard = ({ children }) => {
   return children;
 };
 
+import ReadyQueue from "./pages/ReadyQueue";
+import Alerts from "./pages/Alerts";
+
+import Settings from "./pages/Settings";
+
 function App() {
   return (
     <Routes>
@@ -58,6 +63,9 @@ function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/orders" element={<ActiveOrders />} />
         <Route path="/orders/:id" element={<OrderDetails />} />
+        <Route path="/ready" element={<ReadyQueue />} />
+        <Route path="/alerts" element={<Alerts />} />
+        <Route path="/settings" element={<Settings />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

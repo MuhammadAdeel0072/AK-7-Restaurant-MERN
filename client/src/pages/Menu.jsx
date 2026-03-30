@@ -3,7 +3,7 @@ import { getProducts } from '../services/menuService';
 import { useCart } from '../context/CartContext';
 import { useProfile } from '../context/UserContext';
 import { useSocket } from '../context/SocketContext';
-import { ShoppingCart, Heart, Search, Filter, Plus, Minus, X, Package, Clock, Flame, Leaf } from 'lucide-react';
+import { ShoppingCart, Heart, Search, Filter, Plus, Minus, X, Package, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fallbackItems } from '../data/menuData';
@@ -18,6 +18,7 @@ const Menu = () => {
   const { dispatch } = useCart();
   const { profile, isSignedIn } = useProfile();
   const { siteUpdate } = useSocket();
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -58,7 +59,7 @@ const Menu = () => {
         customizations: []
       },
     });
-    toast.success(`${product.name} added to cart!`, {
+    toast.success(`${product.name} added!`, {
       icon: '🛒',
       duration: 3000,
     });
@@ -71,14 +72,20 @@ const Menu = () => {
   const toggleFavoriteHandler = async (productId, e) => {
     if (e) e.stopPropagation();
     if (!isSignedIn) {
-      toast.error('Please sign in to save favourites');
+      toast.error('Sign in to save favorites');
       return;
     }
     const isFavorite = profile?.favorites?.includes(productId);
-    toast.success(isFavorite ? 'Removed from favourites' : 'Added to favourites', { icon: '❤️' });
+    toast.success(isFavorite ? 'Removed' : 'Added', { icon: '❤️' });
   };
 
-  const categories = ['All', 'Food', 'Dishes', 'Sweets', 'Drinks'];
+  const categories = [
+    { id: 'All', label: 'All' },
+    { id: 'Food', label: 'Food' },
+    { id: 'Dishes', label: 'Dishes' },
+    { id: 'Sweets', label: 'Sweets' },
+    { id: 'Drinks', label: 'Drinks' }
+  ];
 
   const filteredProducts = products.filter(p => {
     const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
@@ -90,33 +97,31 @@ const Menu = () => {
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-8 md:py-12">
-      {/* Search & Filter */}
       <div className="flex flex-col lg:flex-row gap-6 mb-8 md:mb-12 items-center justify-between">
         <div className="relative w-full lg:max-w-md">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gold/50 w-5 h-5" />
           <input
             type="text"
-            placeholder="Search for food or drinks..."
+            placeholder="Search food or drinks..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-white/5 border border-gold/20 rounded-2xl py-3.5 md:py-4 pl-12 pr-6 focus:border-gold outline-none text-white transition-all placeholder:text-gray-500 shadow-inner text-sm md:text-base"
           />
         </div>
 
-        {/* Categories - Scrollable on mobile */}
         <div className="w-full lg:w-auto overflow-x-auto no-scrollbar scroll-smooth">
           <div className="flex flex-nowrap lg:flex-wrap gap-2 md:gap-3 pb-2 lg:pb-0 justify-start lg:justify-center min-w-max lg:min-w-0">
             {categories.map(cat => (
               <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
                 className={`px-6 md:px-8 py-2.5 md:py-3 rounded-2xl transition-all font-black text-[10px] md:text-xs uppercase tracking-widest whitespace-nowrap ${
-                  activeCategory === cat
+                  activeCategory === cat.id
                     ? 'bg-gold text-charcoal shadow-[0_0_20px_rgba(212,175,55,0.4)] scale-105'
                     : 'bg-white/5 text-gray-400 hover:text-gold border border-white/5 hover:border-gold/30'
                 }`}
               >
-                {cat}
+                {cat.label}
               </button>
             ))}
           </div>
@@ -141,7 +146,6 @@ const Menu = () => {
                   <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
                   <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-transparent to-transparent opacity-80"></div>
 
-                  {/* Favourite button */}
                   <button
                     onClick={(e) => toggleFavoriteHandler(product._id, e)}
                     className={`absolute top-4 left-4 p-2.5 rounded-2xl backdrop-blur-xl transition-all duration-300 ${
@@ -151,7 +155,6 @@ const Menu = () => {
                     <Heart className={`w-4 h-4 ${isFav ? 'fill-current' : ''}`} />
                   </button>
 
-                  {/* Badges */}
                   <div className="absolute top-4 right-4 flex flex-col gap-2">
                     {product.isBestSeller && (
                       <div className="bg-crimson text-white px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest shadow-lg border border-white/10">
@@ -165,7 +168,6 @@ const Menu = () => {
                     )}
                   </div>
 
-                  {/* Veg indicator + prep time */}
                   <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
                     <div className={`w-3 h-3 border-2 rounded-sm flex items-center justify-center ${product.isVegetarian ? 'border-green-500' : 'border-red-500'}`}>
                       <div className={`w-1.5 h-1.5 rounded-full ${product.isVegetarian ? 'bg-green-500' : 'bg-red-500'}`}></div>
@@ -174,15 +176,13 @@ const Menu = () => {
                   </div>
                 </div>
 
-                {/* Card body */}
                 <div className="p-6 flex flex-col flex-grow">
                   <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-lg font-serif font-bold text-white group-hover:text-gold transition-colors leading-tight pr-2">{product.name}</h3>
+                    <h3 className="text-lg font-serif font-bold text-white group-hover:text-gold transition-colors leading-tight">{product.name}</h3>
                     <span className="text-gold font-black text-base tracking-tighter shrink-0">Rs. {product.price}</span>
                   </div>
                   <p className="text-gray-500 text-xs mb-4 line-clamp-2 leading-relaxed font-medium italic">"{product.description}"</p>
 
-                  {/* Dietary tags */}
                   <div className="flex flex-wrap gap-1.5 mb-4">
                     {product.dietaryInfo?.map(info => (
                       <span key={info} className="px-2 py-0.5 bg-gold/10 border border-gold/20 text-gold text-[8px] font-black uppercase tracking-widest rounded-md">
@@ -191,7 +191,6 @@ const Menu = () => {
                     ))}
                   </div>
 
-                  {/* Add to Cart button — actual button at bottom */}
                   <button
                     onClick={(e) => addToCartHandler(product, 1, e)}
                     className="mt-auto w-full flex items-center justify-between bg-white/5 hover:bg-gold/10 border border-white/5 group-hover:border-gold/30 hover:border-gold/50 px-5 py-3.5 rounded-2xl transition-all duration-300 group/btn"
@@ -208,7 +207,7 @@ const Menu = () => {
         <div className="text-center py-24 bg-white/5 rounded-[3rem] border border-white/5">
           <Filter className="w-16 h-16 text-gold/20 mx-auto mb-6" />
           <h2 className="text-2xl font-serif text-white mb-2">No food found</h2>
-          <p className="text-gray-500">Try a different search</p>
+          <p className="text-gray-500">Try searching something else</p>
           <button
             onClick={() => { setActiveCategory('All'); setSearchQuery(''); }}
             className="mt-6 text-gold underline underline-offset-4 hover:text-white transition-colors"
@@ -218,7 +217,7 @@ const Menu = () => {
         </div>
       )}
 
-      {/* Product Detail Modal */}
+      {/* Modal - Simplified view for details */}
       <AnimatePresence>
         {selectedProduct && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-charcoal/80 backdrop-blur-xl">
@@ -244,18 +243,6 @@ const Menu = () => {
                   <div className="flex items-center gap-3 mb-4">
                     <span className="text-gold font-black text-xs uppercase tracking-widest">{selectedProduct.category}</span>
                     <div className="w-1 h-1 rounded-full bg-white/20"></div>
-                    <div className="flex gap-2">
-                      <div className={`w-3 h-3 border-2 rounded-sm flex items-center justify-center ${selectedProduct.isVegetarian ? 'border-green-500' : 'border-red-500'}`}>
-                        <div className={`w-1.5 h-1.5 rounded-full ${selectedProduct.isVegetarian ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                      </div>
-                      {selectedProduct.spicyLevel > 0 && (
-                        <div className="flex gap-0.5">
-                          {[...Array(3)].map((_, i) => (
-                            <div key={i} className={`w-2 h-2 rotate-45 ${i < selectedProduct.spicyLevel ? 'bg-crimson shadow-[0_0_10px_rgba(220,20,60,0.5)]' : 'bg-white/10'}`}></div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
                   </div>
                   <h2 className="text-4xl font-serif font-black text-white mb-4 leading-tight">{selectedProduct.name}</h2>
                   <p className="text-gray-400 text-base italic leading-relaxed mb-6 font-medium">"{selectedProduct.description}"</p>
@@ -264,7 +251,7 @@ const Menu = () => {
 
                 <div className="mt-auto space-y-6">
                   <div className="flex items-center justify-between bg-white/5 p-4 rounded-3xl border border-white/10">
-                    <span className="text-xs font-black uppercase tracking-widest text-gold/60 ml-2">Portions</span>
+                    <span className="text-xs font-black uppercase tracking-widest text-gold/60">Portions</span>
                     <div className="flex items-center gap-6">
                       <button
                         onClick={(e) => { e.stopPropagation(); setQty(Math.max(1, qty - 1)); }}
@@ -292,7 +279,7 @@ const Menu = () => {
 
                   <div className="flex justify-center gap-8 text-[10px] items-center">
                     <div className="flex items-center gap-2 text-gray-500 font-black uppercase tracking-widest">
-                      <Clock className="w-3 h-3" /> {selectedProduct.preparationTime || 25} MINS READY
+                      <Clock className="w-3 h-3" /> {selectedProduct.preparationTime || 25} READY
                     </div>
                     <div className="w-1.5 h-1.5 rounded-full bg-white/10"></div>
                     <div className="flex items-center gap-2 text-gray-500 font-black uppercase tracking-widest">
@@ -310,32 +297,14 @@ const Menu = () => {
 };
 
 const SkeletonCard = () => (
-  <div className="bg-white/[0.03] border border-white/5 rounded-[2rem] overflow-hidden">
-    <div className="h-64 relative bg-white/[0.05] overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
+    <div className="bg-white/[0.03] border border-white/5 rounded-[2rem] overflow-hidden">
+        <div className="h-64 bg-white/[0.05]" />
+        <div className="p-6 space-y-4">
+            <div className="h-5 bg-white/[0.05] rounded-lg w-1/2" />
+            <div className="h-4 bg-white/[0.05] rounded-lg w-full" />
+            <div className="h-12 bg-white/[0.05] rounded-2xl w-full mt-4" />
+        </div>
     </div>
-    <div className="p-6 space-y-4">
-      <div className="flex justify-between">
-        <div className="h-5 bg-white/[0.05] rounded-lg w-1/2 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite_0.1s]"></div>
-        </div>
-        <div className="h-5 bg-white/[0.05] rounded-lg w-1/4 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite_0.2s]"></div>
-        </div>
-      </div>
-      <div className="space-y-2">
-        <div className="h-4 bg-white/[0.05] rounded-lg w-full relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/2 to-transparent -translate-x-full animate-[shimmer_2s_infinite_0.3s]"></div>
-        </div>
-        <div className="h-4 bg-white/[0.05] rounded-lg w-5/6 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/2 to-transparent -translate-x-full animate-[shimmer_2s_infinite_0.4s]"></div>
-        </div>
-      </div>
-      <div className="h-12 bg-white/[0.05] rounded-2xl w-full mt-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite_0.5s]"></div>
-      </div>
-    </div>
-  </div>
 );
 
 export default Menu;

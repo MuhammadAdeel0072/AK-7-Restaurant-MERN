@@ -42,6 +42,26 @@
   .btn-secondary:hover {
     @apply opacity-90;
   }
+
+  .glass-overlay {
+    background: rgba(26, 26, 26, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8) !important;
+  }
+
+  .card-premium {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 2.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .card-premium:hover {
+    border-color: rgba(212, 175, 55, 0.2);
+    background: rgba(255, 255, 255, 0.03);
+  }
 }
 
 @keyframes slide-in {

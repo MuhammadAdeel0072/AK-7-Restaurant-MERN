@@ -7,7 +7,7 @@ const { emitEvent } = require('../services/socketService');
 // @access  Private/Chef
 const getActiveOrders = asyncHandler(async (req, res) => {
   const orders = await Order.find({
-    status: { $in: ['confirmed', 'preparing'] }
+    status: { $in: ['confirmed', 'preparing', 'placed'] }
   })
   .populate('user', 'firstName lastName email')
   .sort({ priority: 1, createdAt: 1 }); // Urgent and VIP first, then FIFO
@@ -52,6 +52,10 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   
   if (status === 'preparing' && !order.preparationStartTime) {
     order.preparationStartTime = Date.now();
+    // Also start preparing items if not already
+    order.orderItems.forEach(item => {
+      if (item.status === 'pending') item.status = 'preparing';
+    });
   }
   
   if (status === 'ready') {
@@ -100,7 +104,7 @@ const updateItemStatus = asyncHandler(async (req, res) => {
   item.status = status;
 
   // Auto-update order status if first item starts being prepared
-  if (status === 'preparing' && order.status === 'confirmed') {
+  if (status === 'preparing' && (order.status === 'confirmed' || order.status === 'placed')) {
     order.status = 'preparing';
     order.preparationStartTime = Date.now();
     order.statusHistory.push({ status: 'preparing', timestamp: Date.now() });
@@ -119,6 +123,7 @@ const updateItemStatus = asyncHandler(async (req, res) => {
 
   // Notify
   emitEvent('kitchen', 'orderUpdate', updatedOrder);
+  emitEvent('admin', 'orderUpdate', updatedOrder);
   emitEvent(order.user.toString(), 'orderUpdate', updatedOrder);
 
   res.json(updatedOrder);
@@ -144,20 +149,21 @@ const getKitchenStats = asyncHandler(async (req, res) => {
     avgPrepTime: 0
   };
 
-  // Calculate delayed orders (e.g., > 30 mins and not ready)
-  const thirtyMinsAgo = new Date(Date.now() - 30 * 60 * 1000);
-  stats.delayed = ordersToday.filter(o => 
-    (o.status === 'confirmed' || o.status === 'preparing') && 
-    o.createdAt < thirtyMinsAgo
-  ).length;
+  // Calculate delayed orders based on estimatedPrepTime field
+  const now = new Date();
+  stats.delayed = ordersToday.filter(o => {
+    if (o.status === 'ready' || o.status === 'delivered' || o.status === 'cancelled') return false;
+    const prepLimit = new Date(o.createdAt.getTime() + (o.estimatedPrepTime || 30) * 60000);
+    return now > prepLimit;
+  }).length;
 
-  // Calculate average prep time for completed orders today
-  const readyOrders = ordersToday.filter(o => o.readyAt && o.preparationStartTime);
-  if (readyOrders.length > 0) {
-    const totalTime = readyOrders.reduce((acc, o) => {
+  // Calculate average prep time for completed orders today (in minutes)
+  const readyOrdersToday = ordersToday.filter(o => o.readyAt && o.preparationStartTime);
+  if (readyOrdersToday.length > 0) {
+    const totalTimeMs = readyOrdersToday.reduce((acc, o) => {
       return acc + (new Date(o.readyAt) - new Date(o.preparationStartTime));
     }, 0);
-    stats.avgPrepTime = Math.round((totalTime / readyOrders.length) / 60000); // in minutes
+    stats.avgPrepTime = Math.round((totalTimeMs / readyOrdersToday.length) / 60000);
   }
 
   res.json(stats);

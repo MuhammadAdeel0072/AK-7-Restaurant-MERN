@@ -10,12 +10,9 @@ const root = createRoot(document.getElementById('root'));
 
 if (!PUBLISHABLE_KEY) {
   root.render(
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-center px-4">
-      <h1 className="text-3xl font-bold text-red-600 mb-4">Configuration Missing</h1>
-      <p className="text-gray-700">
-        The application requires a Clerk publishable key to function. 
-        Please ensure <code className="bg-gray-200 px-2 py-1 rounded">VITE_CLERK_PUBLISHABLE_KEY</code> is set in your <code className="bg-gray-200 px-2 py-1 rounded">.env.local</code> file.
-      </p>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#121212', color: '#fff', textAlign: 'center', padding: '2rem' }}>
+      <h1 style={{ color: '#D4AF37', fontSize: '2rem', marginBottom: '1rem' }}>Configuration Missing</h1>
+      <p>Please ensure <code>VITE_CLERK_PUBLISHABLE_KEY</code> is set in your <code>.env.local</code> file.</p>
     </div>
   );
 } else {

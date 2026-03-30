@@ -6,12 +6,11 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
-  const { state } = useCart();
+  const { state, dispatch } = useCart();
   const { cartItems } = state;
   const { user, isSignedIn, isLoaded } = useUser();
   const { signOut } = useClerk();
 
-  const { dispatch } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
@@ -29,7 +28,6 @@ const Navbar = () => {
   const totalItems = cartItems.reduce((acc, item) => acc + item.qty, 0);
   const totalPrice = cartItems.reduce((acc, item) => acc + item.qty * item.price, 0);
 
-  // Close dropdown/mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -40,7 +38,6 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Close mobile menu on resize if screen becomes desktop
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) {
@@ -59,18 +56,16 @@ const Navbar = () => {
       setShowSignOutModal(false);
       window.location.href = '/';
     } catch {
-      // sign-out failed silently
     } finally {
       setSigningOut(false);
     }
   };
 
-  // Step 3: Add loading check
   if (!isLoaded) return null;
 
   return (
     <>
-      <nav className="bg-charcoal/80 backdrop-blur-md border-b border-gold/30 sticky top-0 z-50 px-4 md:px-8 py-4 flex justify-between items-center transition-colors duration-300">
+      <nav className="bg-charcoal/80 backdrop-blur-md border-b border-gold/30 sticky top-0 z-50 px-4 md:px-8 py-4 flex justify-between items-center transition-all duration-300">
         {/* Logo */}
         <Link to="/" className="text-2xl md:text-3xl font-serif font-bold text-gold tracking-wider z-50">
           AK-7 <span className="text-crimson">REST</span>
@@ -101,7 +96,6 @@ const Navbar = () => {
           {/* Auth */}
           {isSignedIn ? (
             <div className="relative" ref={dropdownRef}>
-              {/* Avatar button */}
               <button
                 onClick={() => setDropdownOpen((prev) => !prev)}
                 className="flex items-center gap-2.5 p-1 rounded-full border-2 border-gold/40 hover:border-gold transition-all duration-300"
@@ -119,192 +113,193 @@ const Navbar = () => {
                 </span>
               </button>
 
-              {/* Dropdown */}
               <AnimatePresence>
                 {dropdownOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -8, scale: 0.96 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -8, scale: 0.96 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute right-0 top-14 w-56 bg-charcoal border border-white/10 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.7)] overflow-hidden z-[200]"
-                  >
-                    {/* User info header */}
-                    <div className="px-5 py-4 border-b border-white/5">
-                      <p className="text-white font-bold text-sm truncate">{user?.fullName || user?.firstName}</p>
-                      <p className="text-gray-500 text-[10px] truncate">{user?.primaryEmailAddress?.emailAddress}</p>
-                    </div>
+                    <motion.div
+                      initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 top-14 w-56 bg-[#1a1a1a] border border-white/10 rounded-3xl shadow-[0_30px_90px_rgba(0,0,0,0.8)] overflow-hidden z-[200]"
+                    >
+                      <div className="px-5 py-5 border-b border-white/5 bg-white/[0.02]">
+                        <p className="text-white font-bold text-sm truncate">{user?.fullName || user?.firstName}</p>
+                        <p className="text-gold/40 text-[9px] font-black uppercase tracking-widest truncate mt-0.5">{user?.primaryEmailAddress?.emailAddress}</p>
+                      </div>
 
-                    {/* Menu items */}
-                    <div className="py-2">
+                      <div className="py-2">
+                        <Link
+                          to="/orders"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-3 px-5 py-3.5 text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm font-medium group/item border-l-2 border-transparent hover:border-gold"
+                        >
+                          <ShoppingBag className="w-4 h-4 text-gold/50 group-hover/item:text-gold transition-colors" />
+                          <span>Orders</span>
+                        </Link>
+                        <Link
+                          to="/reservation"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-3 px-5 py-3.5 text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm font-medium group/item border-l-2 border-transparent hover:border-gold"
+                        >
+                          <Calendar className="w-4 h-4 text-gold/50 group-hover/item:text-gold transition-colors" />
+                          <span>Booking</span>
+                        </Link>
+                        <Link
+                          to="/settings"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-3 px-5 py-3.5 text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm font-medium group/item border-l-2 border-transparent hover:border-gold"
+                        >
+                          <SettingsIcon className="w-4 h-4 text-gold/50 group-hover/item:text-gold transition-colors" />
+                          <span>Settings</span>
+                        </Link>
+                      </div>
+
+                      <div className="border-t border-white/5 py-2">
+                        <button
+                          onClick={() => { setDropdownOpen(false); setShowSignOutModal(true); }}
+                          className="w-full flex items-center gap-3 px-5 py-4 text-red-400 hover:text-red-300 hover:bg-red-400/5 transition-all text-sm font-black uppercase tracking-widest"
+                        >
+                          <LogOut className="w-4 h-4" /> Sign Out
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <Link
+                to="/signin"
+                className="flex items-center gap-2 bg-gold text-charcoal px-4 md:px-6 py-2 md:py-2.5 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest shadow-lg shadow-gold/20 hover:shadow-gold/40 hover:scale-105 active:scale-95 transition-all"
+              >
+                <LogIn size={14} className="md:w-4 md:h-4" />
+                <span>Sign In</span>
+              </Link>
+            )}
+
+            <button
+              className="md:hidden p-2 text-gold z-50 relative"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X className="w-7 h-7" /> : <MenuIcon className="w-7 h-7" />}
+            </button>
+          </div>
+
+          <AnimatePresence>
+            {isMobileMenuOpen && (
+              <>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="fixed inset-0 bg-black/90 backdrop-blur-md z-40 transition-opacity duration-300"
+                />
+                <motion.div
+                  initial={{ x: '100vw' }}
+                  animate={{ x: 0 }}
+                  exit={{ x: '100vw' }}
+                  transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                  className="fixed top-0 right-0 bottom-0 w-[85%] max-w-sm bg-[#1a1a1a] shadow-[-30px_0_90px_rgba(0,0,0,0.9)] border-l border-white/10 z-[100] p-8 flex flex-col pt-32"
+                >
+                  <div className="flex flex-col gap-8">
+                    {navLinks.map((link) => (
                       <Link
-                        to="/orders"
-                        onClick={() => setDropdownOpen(false)}
-                        className="flex items-center gap-3 px-5 py-3.5 text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm font-medium group/item"
+                        key={link.path}
+                        to={link.path}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="text-3xl font-serif font-black text-gray-400 hover:text-white transition-colors flex items-center justify-between group py-2"
                       >
-                        <ShoppingBag className="w-4 h-4 text-gold/50 group-hover/item:text-gold transition-colors" />
-                        <span>My Orders</span>
+                        <span className="group-hover:translate-x-2 transition-transform duration-300">{link.name}</span>
+                        <motion.div
+                          whileHover={{ x: 5 }}
+                          className="text-gold group-hover:scale-125 transition-transform"
+                        >
+                          <ChevronRight className="w-7 h-7" />
+                        </motion.div>
                       </Link>
-                      <Link
-                        to="/reservation"
-                        onClick={() => setDropdownOpen(false)}
-                        className="flex items-center gap-3 px-5 py-3.5 text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm font-medium group/item"
-                      >
-                        <Calendar className="w-4 h-4 text-gold/50 group-hover/item:text-gold transition-colors" />
-                        <span>My Bookings</span>
-                      </Link>
+                    ))}
+                    {isSignedIn && (
                       <Link
                         to="/settings"
-                        onClick={() => setDropdownOpen(false)}
-                        className="flex items-center gap-3 px-5 py-3.5 text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm font-medium group/item"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="text-3xl font-serif font-black text-white hover:text-gold transition-colors flex items-center justify-between group py-2 border-t border-white/5 pt-8"
                       >
-                        <SettingsIcon className="w-4 h-4 text-gold/50 group-hover/item:text-gold transition-colors" />
-                        <span>Settings</span>
+                        <span className="group-hover:translate-x-2 transition-transform duration-300">Settings</span>
+                        <motion.div
+                          whileHover={{ x: 5 }}
+                          className="text-gold group-hover:scale-125 transition-transform"
+                        >
+                          <SettingsIcon className="w-7 h-7" />
+                        </motion.div>
                       </Link>
-                    </div>
-
-                    {/* Sign Out */}
-                    <div className="border-t border-white/5 py-2">
-                      <button
-                        onClick={() => { setDropdownOpen(false); setShowSignOutModal(true); }}
-                        className="w-full flex items-center gap-3 px-5 py-3 text-red-400 hover:text-red-300 hover:bg-red-400/5 transition-all text-sm font-medium"
-                      >
-                        <LogOut className="w-4 h-4" /> Sign Out
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          ) : (
-            <Link
-              to="/signin"
-              className="flex items-center gap-2 bg-gold text-charcoal px-4 md:px-6 py-2 md:py-2.5 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest shadow-lg shadow-gold/20 hover:shadow-gold/40 hover:scale-105 active:scale-95 transition-all"
-            >
-              <LogIn size={14} className="md:w-4 md:h-4" />
-              <span>Sign In</span>
-            </Link>
-          )}
-
-          {/* Mobile hamburger toggle */}
-          <button 
-            className="md:hidden p-2 text-gold z-50 relative"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X className="w-7 h-7" /> : <MenuIcon className="w-7 h-7" />}
-          </button>
-        </div>
-
-        {/* Mobile Menu Overlay */}
-        <AnimatePresence>
-          {isMobileMenuOpen && (
-            <>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="fixed inset-0 bg-black/80 backdrop-blur-md z-40 transition-opacity duration-300"
-              />
-              <motion.div
-                initial={{ x: '100%' }}
-                animate={{ x: 0 }}
-                exit={{ x: '100%' }}
-                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                className="fixed top-0 right-0 bottom-0 w-[80%] max-w-sm bg-charcoal shadow-[-20px_0_60px_rgba(0,0,0,0.8)] border-l border-white/5 z-45 p-8 flex flex-col pt-24"
-              >
-                <div className="flex flex-col gap-6">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.path}
-                      to={link.path}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="text-2xl font-serif font-black text-gray-400 hover:text-gold transition-colors flex items-center justify-between group"
-                    >
-                      {link.name}
-                      <motion.div
-                        whileHover={{ x: 5 }}
-                        className="text-gold/20 group-hover:text-gold"
-                      >
-                        <ChevronRight className="w-6 h-6" />
-                      </motion.div>
-                    </Link>
-                  ))}
-                  {/* Additional Mobile-only Auth Links if needed, but adding Settings here for clarity */}
-                  {isSignedIn && (
-                    <Link
-                      to="/settings"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="text-2xl font-serif font-black text-gray-400 hover:text-gold transition-colors flex items-center justify-between group"
-                    >
-                      Settings
-                      <motion.div
-                        whileHover={{ x: 5 }}
-                        className="text-gold/20 group-hover:text-gold"
-                      >
-                        <SettingsIcon className="w-6 h-6" />
-                      </motion.div>
-                    </Link>
-                  )}
-                </div>
-
-                <div className="mt-auto pt-8 border-t border-white/5">
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 mb-4">AK-7 RESTAURANT SYSTEM</p>
-                  <div className="flex gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10" />
-                    <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10" />
-                    <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10" />
+                    )}
                   </div>
-                </div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
+
+                  <div className="mt-auto pb-8">
+                      {!isSignedIn ? (
+                        <Link 
+                           to="/signin" 
+                           onClick={() => setIsMobileMenuOpen(false)}
+                           className="w-full flex items-center justify-center gap-3 bg-gold text-charcoal py-5 rounded-[2rem] font-black text-lg uppercase tracking-widest shadow-2xl shadow-gold/20"
+                        >
+                           <LogIn className="w-6 h-6" /> Join Now
+                        </Link>
+                      ) : (
+                        <button
+                          onClick={() => { setIsMobileMenuOpen(false); setShowSignOutModal(true); }}
+                          className="w-full flex items-center justify-center gap-3 bg-red-500/10 border border-red-500/20 text-red-400 py-5 rounded-[2rem] font-black text-lg uppercase tracking-widest transition-all hover:bg-red-500/20"
+                        >
+                           <LogOut className="w-6 h-6" /> Sign Out
+                        </button>
+                      )}
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
       </nav>
 
-      {/* ── Sign Out Confirmation Modal ── */}
       <AnimatePresence>
         {showSignOutModal && (
-          <div className="fixed inset-0 z-[999] flex items-center justify-center p-6 bg-charcoal/80 backdrop-blur-xl">
+          <div className="fixed inset-0 z-[999] flex items-center justify-center p-6 bg-black/90 backdrop-blur-md">
             <motion.div
               initial={{ opacity: 0, scale: 0.92, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.92, y: 16 }}
-              transition={{ duration: 0.2 }}
-              className="bg-charcoal border border-white/10 p-10 rounded-[3rem] max-w-sm w-full shadow-[0_40px_80px_rgba(0,0,0,0.9)] text-center relative"
+              className="bg-[#1a1a1a] border border-white/10 p-12 rounded-[4rem] max-w-md w-full shadow-[0_40px_100px_rgba(0,0,0,0.9)] text-center relative"
             >
-              {/* Close */}
               <button
                 onClick={() => setShowSignOutModal(false)}
-                className="absolute top-6 right-6 p-2 text-gray-500 hover:text-white transition-colors rounded-xl hover:bg-white/5"
+                className="absolute top-8 right-8 p-3 text-gray-500 hover:text-white transition-colors rounded-2xl hover:bg-white/5"
               >
-                <X className="w-5 h-5" />
+                <X className="w-6 h-6" />
               </button>
 
-              {/* Icon */}
-              <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <AlertTriangle className="w-8 h-8 text-red-400" />
+              <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-red-500/20">
+                <AlertTriangle className="w-10 h-10 text-red-500" />
               </div>
 
-              <h2 className="text-2xl font-serif font-black text-white mb-3">Sign Out?</h2>
-              <p className="text-gray-400 text-sm leading-relaxed mb-8">
-                You will be signed out of your account. Your cart and saved items will be cleared.
-              </p>
-
-              <div className="flex gap-4">
+              <h2 className="text-4xl font-serif font-black text-white mb-4">Sign Out?</h2>
+              <p className="text-gray-500 mb-10 text-sm leading-relaxed px-4">Your current gourmet session and preferences will be secured. Re-authentication will be required for future orders.</p>
+              
+              <div className="flex gap-4 mt-8 px-2">
                 <button
                   onClick={() => setShowSignOutModal(false)}
-                  className="flex-1 py-3.5 rounded-2xl border border-white/10 text-gray-400 hover:text-white hover:border-white/20 font-bold text-sm transition-all"
+                  className="flex-1 py-4.5 rounded-[2rem] border border-white/10 text-gray-400 hover:text-white hover:border-white/20 font-bold text-sm transition-all uppercase tracking-widest"
                 >
-                  Stay
+                  Cancel
                 </button>
                 <button
                   onClick={handleSignOut}
                   disabled={signingOut}
-                  className="flex-1 py-3.5 rounded-2xl bg-red-500 hover:bg-red-400 text-white font-black text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed active:scale-95"
+                  className="flex-1 py-4.5 rounded-[2rem] bg-red-500 hover:bg-red-400 text-white font-black text-sm transition-all disabled:opacity-60 active:scale-95 shadow-xl shadow-red-500/20 uppercase tracking-widest"
                 >
-                  {signingOut ? 'Signing out...' : 'Yes, Sign Out'}
+                  {signingOut ? '...' : 'Sign Out'}
                 </button>
+              </div>
+
+              <div className="mt-10 pt-6 border-t border-white/5">
+                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-700">Identity Protection Active</p>
               </div>
             </motion.div>
           </div>
