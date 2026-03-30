@@ -18,7 +18,7 @@ connectDB();
 
 const app = express();
 const server = http.createServer(app);
-const io = init(server); // Initialize Socket.io for real-time communication
+const io = init(server);
 
 // ======================
 // 🔒 SECURITY & RATE LIMIT
@@ -41,12 +41,14 @@ app.use('/api/webhooks/clerk', webhookRoutes);
 // Body parser
 app.use(express.json());
 
-// ✅ CORS: supports local dev + deployed frontend/admin
+// CORS Configuration
 const allowedOrigins = [
   'http://localhost:5173', // client dev
   'http://localhost:5174', // admin dev
+  'http://localhost:5175', // chef dev
   process.env.FRONTEND_URL, // deployed client (e.g., https://your-client.vercel.app)
   process.env.ADMIN_URL,    // deployed admin (e.g., https://your-admin.vercel.app)
+  process.env.CHEF_URL,     // deployed chef (e.g., https://your-chef.vercel.app)
 ];
 app.use(cors({
   origin: function (origin, callback) {
@@ -76,6 +78,7 @@ const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const reservationRoutes = require('./routes/reservationRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const chefRoutes = require('./routes/chefRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
@@ -83,12 +86,13 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/chef', chefRoutes);
 
 // ======================
 // 🏠 ROOT ROUTE
 // ======================
 app.get('/', (req, res) => {
-  res.send('AK-7 REST API is running (Production Ready 🚀)');
+  res.send('AK-7 REST API is running');
 });
 
 // ======================

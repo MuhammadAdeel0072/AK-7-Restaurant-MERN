@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
     avatar: { type: String },
     role: {
         type: String,
-        enum: ['customer', 'staff', 'admin'],
+        enum: ['customer', 'staff', 'chef', 'admin'],
         default: 'customer'
     },
     addresses: [
@@ -21,16 +21,6 @@ const userSchema = new mongoose.Schema({
         }
     ],
     favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
-    cartItems: [
-        {
-            product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
-            name: String,
-            qty: Number,
-            image: String,
-            price: Number,
-            customizations: [Object]
-        }
-    ],
     loyaltyPoints: { type: Number, default: 0 },
     loyaltyTier: {
         type: String,

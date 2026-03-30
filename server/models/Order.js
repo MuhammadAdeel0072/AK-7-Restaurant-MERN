@@ -17,6 +17,11 @@ const orderSchema = new mongoose.Schema({
                 required: true,
                 ref: 'Product'
             },
+            status: {
+                type: String,
+                enum: ['pending', 'preparing', 'cooking', 'ready'],
+                default: 'pending'
+            },
             customizations: [
                 {
                     name: String,
@@ -26,11 +31,23 @@ const orderSchema = new mongoose.Schema({
             ]
         }
     ],
+    orderType: {
+        type: String,
+        enum: ['dine-in', 'delivery', 'pickup'],
+        default: 'dine-in'
+    },
+    priority: {
+        type: String,
+        enum: ['normal', 'urgent', 'vip'],
+        default: 'normal'
+    },
+    specialInstructions: { type: String },
+    estimatedPrepTime: { type: Number, default: 20 }, // in minutes
     shippingAddress: {
-        address: { type: String, required: true },
-        city: { type: String, required: true },
-        postalCode: { type: String, required: true },
-        country: { type: String, required: true },
+        address: { type: String },
+        city: { type: String },
+        postalCode: { type: String },
+        country: { type: String },
     },
     paymentMethod: { type: String, required: true },
     paymentReference: { type: String },
@@ -59,6 +76,7 @@ const orderSchema = new mongoose.Schema({
     ],
     preparationStartTime: { type: Date },
     preparationEndTime: { type: Date },
+    readyAt: { type: Date },
     deliveredAt: { type: Date },
     orderNumber: { type: String, unique: true },
     loyaltyPointsEarned: { type: Number, default: 0 }
@@ -69,6 +87,5 @@ const orderSchema = new mongoose.Schema({
 // Indexes for performance
 orderSchema.index({ status: 1 });
 orderSchema.index({ user: 1 });
-orderSchema.index({ orderNumber: 1 });
 
 module.exports = mongoose.model('Order', orderSchema);

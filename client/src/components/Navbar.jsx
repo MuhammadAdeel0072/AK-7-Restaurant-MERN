@@ -1,4 +1,4 @@
-import { ShoppingCart, Menu as MenuIcon, LogIn, User as UserIcon, ShoppingBag, Calendar, LogOut, X, AlertTriangle, Settings as SettingsIcon } from 'lucide-react';
+import { ShoppingCart, Menu as MenuIcon, LogIn, User as UserIcon, ShoppingBag, Calendar, LogOut, X, AlertTriangle, Settings as SettingsIcon, ChevronRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { Link } from 'react-router-dom';
 import { useUser, useClerk } from '@clerk/clerk-react';
@@ -12,15 +12,24 @@ const Navbar = () => {
   const { signOut } = useClerk();
 
   const { dispatch } = useCart();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const dropdownRef = useRef(null);
 
+  const navLinks = [
+    { name: 'Home', path: '/' },
+    { name: 'Menu', path: '/menu' },
+    { name: 'Orders', path: '/orders' },
+    { name: 'Table', path: '/reservation' },
+    { name: 'Profile', path: '/profile' },
+  ];
+
   const totalItems = cartItems.reduce((acc, item) => acc + item.qty, 0);
   const totalPrice = cartItems.reduce((acc, item) => acc + item.qty * item.price, 0);
 
-  // Close dropdown when clicking outside
+  // Close dropdown/mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -29,6 +38,17 @@ const Navbar = () => {
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Close mobile menu on resize if screen becomes desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const handleSignOut = async () => {
@@ -50,28 +70,26 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="bg-charcoal/80 backdrop-blur-md border-b border-gold/30 sticky top-0 z-50 px-6 py-4 flex justify-between items-center transition-colors duration-300">
+      <nav className="bg-charcoal/80 backdrop-blur-md border-b border-gold/30 sticky top-0 z-50 px-4 md:px-8 py-4 flex justify-between items-center transition-colors duration-300">
         {/* Logo */}
-        <Link to="/" className="text-3xl font-serif font-bold text-gold tracking-wider">
+        <Link to="/" className="text-2xl md:text-3xl font-serif font-bold text-gold tracking-wider z-50">
           AK-7 <span className="text-crimson">REST</span>
         </Link>
 
-        {/* Nav links */}
+        {/* Desktop Nav links */}
         <div className="hidden md:flex gap-8 items-center text-sm font-black uppercase tracking-widest">
-          <Link to="/" className="text-gray-300 hover:text-gold transition-colors">Home</Link>
-          <Link to="/menu" className="text-gray-300 hover:text-gold transition-colors">Menu</Link>
-          <Link to="/orders" className="text-gray-300 hover:text-gold transition-colors">Orders</Link>
-          <Link to="/reservation" className="text-gray-300 hover:text-gold transition-colors">Table</Link>
-          <Link to="/profile" className="text-gray-300 hover:text-gold transition-colors">Profile</Link>
+          {navLinks.map(link => (
+            <Link key={link.path} to={link.path} className="text-gray-300 hover:text-gold transition-colors">{link.name}</Link>
+          ))}
         </div>
 
         {/* Right side */}
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-3 md:gap-5">
           {/* Cart */}
           <Link to="/cart" className="relative flex items-center gap-2 group">
-            <ShoppingCart className="w-6 h-6 text-gold group-hover:scale-110 transition-transform" />
+            <ShoppingCart className="w-5 h-5 md:w-6 md:h-6 text-gold group-hover:scale-110 transition-transform" />
             {totalItems > 0 && (
-              <span className="absolute -top-2 -right-2 bg-crimson text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-bold">
+              <span className="absolute -top-2 -right-2 bg-crimson text-white text-[10px] w-4 h-4 md:w-5 md:h-5 flex items-center justify-center rounded-full font-bold">
                 {totalItems}
               </span>
             )}
@@ -90,9 +108,9 @@ const Navbar = () => {
                 aria-label="User menu"
               >
                 {user?.imageUrl ? (
-                  <img src={user.imageUrl} alt="avatar" className="w-8 h-8 rounded-full object-cover" />
+                  <img src={user.imageUrl} alt="avatar" className="w-7 h-7 md:w-8 md:h-8 rounded-full object-cover" />
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center">
+                  <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gold/20 flex items-center justify-center">
                     <UserIcon className="w-4 h-4 text-gold" />
                   </div>
                 )}
@@ -161,18 +179,87 @@ const Navbar = () => {
           ) : (
             <Link
               to="/signin"
-              className="flex items-center gap-2 bg-gold text-charcoal px-6 py-2.5 rounded-full font-black text-xs uppercase tracking-widest shadow-lg shadow-gold/20 hover:shadow-gold/40 hover:scale-105 active:scale-95 transition-all"
+              className="flex items-center gap-2 bg-gold text-charcoal px-4 md:px-6 py-2 md:py-2.5 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest shadow-lg shadow-gold/20 hover:shadow-gold/40 hover:scale-105 active:scale-95 transition-all"
             >
-              <LogIn size={16} />
+              <LogIn size={14} className="md:w-4 md:h-4" />
               <span>Sign In</span>
             </Link>
           )}
 
-          {/* Mobile hamburger */}
-          <button className="md:hidden p-2">
-            <MenuIcon className="w-7 h-7 text-gold" />
+          {/* Mobile hamburger toggle */}
+          <button 
+            className="md:hidden p-2 text-gold z-50 relative"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X className="w-7 h-7" /> : <MenuIcon className="w-7 h-7" />}
           </button>
         </div>
+
+        {/* Mobile Menu Overlay */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="fixed inset-0 bg-black/80 backdrop-blur-md z-40 transition-opacity duration-300"
+              />
+              <motion.div
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                className="fixed top-0 right-0 bottom-0 w-[80%] max-w-sm bg-charcoal shadow-[-20px_0_60px_rgba(0,0,0,0.8)] border-l border-white/5 z-45 p-8 flex flex-col pt-24"
+              >
+                <div className="flex flex-col gap-6">
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.path}
+                      to={link.path}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="text-2xl font-serif font-black text-gray-400 hover:text-gold transition-colors flex items-center justify-between group"
+                    >
+                      {link.name}
+                      <motion.div
+                        whileHover={{ x: 5 }}
+                        className="text-gold/20 group-hover:text-gold"
+                      >
+                        <ChevronRight className="w-6 h-6" />
+                      </motion.div>
+                    </Link>
+                  ))}
+                  {/* Additional Mobile-only Auth Links if needed, but adding Settings here for clarity */}
+                  {isSignedIn && (
+                    <Link
+                      to="/settings"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="text-2xl font-serif font-black text-gray-400 hover:text-gold transition-colors flex items-center justify-between group"
+                    >
+                      Settings
+                      <motion.div
+                        whileHover={{ x: 5 }}
+                        className="text-gold/20 group-hover:text-gold"
+                      >
+                        <SettingsIcon className="w-6 h-6" />
+                      </motion.div>
+                    </Link>
+                  )}
+                </div>
+
+                <div className="mt-auto pt-8 border-t border-white/5">
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 mb-4">AK-7 RESTAURANT SYSTEM</p>
+                  <div className="flex gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10" />
+                    <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10" />
+                    <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10" />
+                  </div>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* ── Sign Out Confirmation Modal ── */}

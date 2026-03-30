@@ -116,17 +116,17 @@ const MenuManagement = () => {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-8"
     >
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div>
-          <h1 className="text-4xl font-serif font-black text-soft-white tracking-tighter">Menu <span className="text-gold">Registry</span></h1>
-          <p className="text-soft-white/50 mt-2 uppercase text-[10px] font-bold tracking-[0.2em]">AK-7 REST CULINARY DATABASE</p>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-black text-soft-white tracking-tighter">Menu <span className="text-gold">Registry</span></h1>
+          <p className="text-soft-white/50 mt-1 sm:mt-2 uppercase text-[7px] sm:text-[9px] md:text-[10px] font-bold tracking-[0.2em]">AK-7 REST CULINARY DATABASE</p>
         </div>
         <button 
           onClick={() => handleOpenModal()}
-          className="btn-gold flex items-center space-x-2"
+          className="btn-gold flex items-center justify-center space-x-2 py-3 px-6 rounded-2xl w-full sm:w-auto"
         >
           <Plus className="w-5 h-5" />
-          <span>Add Masterpiece</span>
+          <span className="text-sm font-bold uppercase tracking-widest">Add Masterpiece</span>
         </button>
       </header>
 
@@ -147,12 +147,12 @@ const MenuManagement = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-white/5 text-soft-white/40 text-xs uppercase tracking-[0.2em]">
-                <th className="px-8 py-5 font-bold">Item Details</th>
-                <th className="px-8 py-5 font-bold">Category</th>
-                <th className="px-8 py-5 font-bold text-center">Price</th>
-                <th className="px-8 py-5 font-bold text-center">In Stock</th>
-                <th className="px-8 py-5 font-bold text-right">Refinement</th>
+              <tr className="bg-white/5 text-soft-white/40 text-[8px] sm:text-[10px] uppercase tracking-[0.2em]">
+                <th className="px-4 sm:px-8 py-4 sm:py-5 font-bold">Item Details</th>
+                <th className="px-4 sm:px-8 py-4 sm:py-5 font-bold">Category</th>
+                <th className="px-4 sm:px-8 py-4 sm:py-5 font-bold text-center">Price</th>
+                <th className="px-4 sm:px-8 py-4 sm:py-5 font-bold text-center">In Stock</th>
+                <th className="px-4 sm:px-8 py-4 sm:py-5 font-bold text-right">Refinement</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -163,48 +163,48 @@ const MenuManagement = () => {
               ) : (
                 filteredItems.map((item) => (
                   <tr key={item._id} className="hover:bg-white/[0.02] transition-colors group">
-                    <td className="px-8 py-6">
-                      <div className="flex items-center space-x-5">
+                    <td className="px-4 sm:px-8 py-4 sm:py-6">
+                      <div className="flex items-center space-x-3 sm:space-x-5">
                         <div className="relative group/img">
-                          <img src={item.image} alt={item.name} className="w-16 h-16 rounded-2xl object-cover glass-gold p-1 flex-shrink-0" onerror="this.src='https://placehold.co/100x100?text=Food'"/>
-                          <div className="absolute inset-0 bg-gold/10 opacity-0 group-hover/img:opacity-100 transition-opacity rounded-2xl"></div>
+                          <img src={item.image} alt={item.name} className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl object-cover glass-gold p-1 flex-shrink-0" onerror="this.src='https://placehold.co/100x100?text=Food'"/>
+                          <div className="absolute inset-0 bg-gold/10 opacity-0 group-hover/img:opacity-100 transition-opacity rounded-xl sm:rounded-2xl"></div>
                         </div>
                         <div>
-                          <p className="font-bold text-soft-white group-hover:text-gold transition-colors text-lg">{item.name}</p>
-                          <div className="flex gap-2 mt-2">
-                            {item.isVegetarian && <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-green-500/10 text-green-500 border border-green-500/20 uppercase tracking-tighter">VEG</span>}
-                            {item.isSpecial && <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-gold/10 text-gold border border-gold/20 uppercase tracking-tighter">SPECIAL</span>}
-                            {item.spicyLevel > 0 && <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-crimson/10 text-crimson border border-crimson/20 uppercase tracking-tighter">SPICY {item.spicyLevel}</span>}
+                          <p className="font-bold text-soft-white group-hover:text-gold transition-colors text-base sm:text-lg">{item.name}</p>
+                          <div className="flex flex-wrap gap-1 sm:gap-2 mt-1 sm:mt-2">
+                            {item.isVegetarian && <span className="px-1.5 py-0.5 rounded text-[8px] sm:text-[10px] font-bold bg-green-500/10 text-green-500 border border-green-500/20 uppercase tracking-tighter">VEG</span>}
+                            {item.isSpecial && <span className="px-1.5 py-0.5 rounded text-[8px] sm:text-[10px] font-bold bg-gold/10 text-gold border border-gold/20 uppercase tracking-tighter">SPECIAL</span>}
+                            {item.spicyLevel > 0 && <span className="px-1.5 py-0.5 rounded text-[8px] sm:text-[10px] font-bold bg-crimson/10 text-crimson border border-crimson/20 uppercase tracking-tighter">SPICY {item.spicyLevel}</span>}
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-4 sm:px-8 py-4 sm:py-6 text-[10px] sm:text-sm">
                       <span className="text-soft-white/60 font-medium">
                         {item.category}
                       </span>
                     </td>
-                    <td className="px-8 py-6 font-bold text-gold text-center text-lg">
+                    <td className="px-4 sm:px-8 py-4 sm:py-6 font-bold text-gold text-center text-base sm:text-lg">
                       Rs. {item.price}
                     </td>
-                    <td className="px-8 py-6 text-center">
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${item.countInStock < 5 ? 'bg-crimson/10 text-crimson border border-crimson/10' : 'bg-white/5 text-soft-white/60'}`}>
+                    <td className="px-4 sm:px-8 py-4 sm:py-6 text-center">
+                      <span className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold ${item.countInStock < 5 ? 'bg-crimson/10 text-crimson border border-crimson/10' : 'bg-white/5 text-soft-white/60'}`}>
                         {item.countInStock}
                       </span>
                     </td>
-                    <td className="px-8 py-6 text-right">
-                      <div className="flex justify-end gap-4">
+                    <td className="px-4 sm:px-8 py-4 sm:py-6 text-right">
+                      <div className="flex justify-end gap-2 sm:gap-4">
                         <button 
                           onClick={() => handleOpenModal(item)}
-                          className="p-2.5 text-soft-white/40 hover:text-gold hover:bg-gold/10 rounded-xl transition-all"
+                          className="p-2 sm:p-2.5 text-soft-white/40 hover:text-gold hover:bg-gold/10 rounded-xl transition-all"
                         >
-                          <Edit className="w-5 h-5" />
+                          <Edit className="w-4 h-4 sm:w-5 sm:h-5" />
                         </button>
                         <button 
                           onClick={() => handleDelete(item._id)}
-                          className="p-2.5 text-soft-white/40 hover:text-crimson hover:bg-crimson/10 rounded-xl transition-all"
+                          className="p-2 sm:p-2.5 text-soft-white/40 hover:text-crimson hover:bg-crimson/10 rounded-xl transition-all"
                         >
-                          <Trash2 className="w-5 h-5" />
+                          <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                         </button>
                       </div>
                     </td>
@@ -233,12 +233,12 @@ const MenuManagement = () => {
               exit={{ scale: 0.9, opacity: 0, y: 50 }}
               className="glass rounded-[32px] w-full max-w-4xl max-h-full overflow-y-auto relative z-10 shadow-[0_32px_128px_rgba(0,0,0,0.5)] border border-white/10"
             >
-              <div className="sticky top-0 bg-charcoal/50 backdrop-blur-xl p-8 border-b border-white/5 flex items-center justify-between z-20">
-                <h2 className="text-3xl font-serif font-bold text-gold tracking-tighter">
+              <div className="sticky top-0 bg-charcoal/80 backdrop-blur-xl p-5 md:p-8 border-b border-white/5 flex items-center justify-between z-20">
+                <h2 className="text-xl md:text-3xl font-serif font-bold text-gold tracking-tighter">
                   {editingItem ? 'Refine Delicacy' : 'New Culinary Piece'}
                 </h2>
-                <button onClick={handleCloseModal} className="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors text-soft-white/50 hover:text-soft-white">
-                  <X className="w-6 h-6" />
+                <button onClick={handleCloseModal} className="p-2 md:p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors text-soft-white/50 hover:text-soft-white">
+                  <X className="w-5 h-5 md:w-6 md:h-6" />
                 </button>
               </div>
               
@@ -353,19 +353,19 @@ const MenuManagement = () => {
                   </div>
                 </div>
 
-                <div className="pt-10 flex justify-end gap-6 sticky bottom-0 bg-transparent py-4">
+                <div className="pt-10 flex flex-col-reverse sm:flex-row justify-end gap-4 md:gap-6 sticky bottom-0 bg-charcoal/90 backdrop-blur-md p-5 md:p-8 border-t border-white/5">
                   <button 
                     type="button"
                     onClick={handleCloseModal}
-                    className="px-8 py-3 text-soft-white/50 hover:text-soft-white transition-colors font-bold uppercase tracking-widest text-sm"
+                    className="flex-1 sm:flex-none px-8 py-3 text-soft-white/50 hover:text-soft-white transition-colors font-bold uppercase tracking-widest text-xs md:text-sm"
                   >
                     Discard
                   </button>
                   <button 
                     type="submit"
-                    className="btn-gold px-12 py-3 text-lg flex items-center gap-3"
+                    className="flex-1 sm:flex-none btn-gold px-12 py-3 text-sm md:text-lg flex items-center justify-center gap-3 rounded-2xl"
                   >
-                    <Save className="w-6 h-6" />
+                    <Save className="w-5 h-5 md:w-6 md:h-6" />
                     <span>{editingItem ? 'Update Piece' : 'Seal Creation'}</span>
                   </button>
                 </div>

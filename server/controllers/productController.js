@@ -20,7 +20,7 @@ const getProducts = asyncHandler(async (req, res) => {
   if (isSpecial) query.isSpecial = isSpecial === 'true';
   if (dietary) query.dietaryInfo = { $in: dietary.split(',') };
 
-  let products = await Product.find(query).lean();
+  let products = await Product.find(query).populate('category').lean();
   
   // Safety check for empty results or missing image URLs
   products = (products || []).map(product => ({
@@ -40,7 +40,7 @@ const getProducts = asyncHandler(async (req, res) => {
 // @route   GET /api/products/:id
 // @access  Public
 const getProductById = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.id).lean();
+  const product = await Product.findById(req.params.id).populate('category').lean();
 
   if (product) {
     res.json(product);

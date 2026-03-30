@@ -58,7 +58,7 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
             );
             console.log(`User ${id} synced successfully`);
         } catch (err) {
-            console.error('Error syncing user:', err);
+            console.error('Error syncing user:', err.message);
             return res.status(500).json({ message: 'Sync failed' });
         }
     }
@@ -68,7 +68,7 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
             await User.findOneAndDelete({ clerkId: id });
             console.log(`User ${id} deleted successfully`);
         } catch (err) {
-            console.error('Error deleting user:', err);
+            console.error('Error deleting user:', err.message);
             return res.status(500).json({ message: 'Delete failed' });
         }
     }

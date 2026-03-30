@@ -58,18 +58,18 @@ const PaymentManagement = () => {
       className="max-w-4xl mx-auto space-y-10"
     >
       <header>
-        <h1 className="text-4xl font-serif font-black text-soft-white tracking-tighter">Vault <span className="text-gold">Command</span></h1>
-        <p className="text-soft-white/50 mt-2 uppercase text-[10px] font-bold tracking-[0.2em]">AK-7 REST FINANCIAL GATEWAY</p>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-black text-soft-white tracking-tighter">Vault <span className="text-gold">Command</span></h1>
+        <p className="text-soft-white/50 mt-1 sm:mt-2 uppercase text-[7px] sm:text-[9px] md:text-[10px] font-bold tracking-[0.2em]">AK-7 REST FINANCIAL GATEWAY</p>
       </header>
 
-      <form onSubmit={handleSave} className="glass rounded-[32px] border border-white/5 p-10 space-y-8 shadow-2xl">
+      <form onSubmit={handleSave} className="glass rounded-[2rem] sm:rounded-[32px] border border-white/5 p-6 sm:p-10 space-y-6 sm:space-y-8 shadow-2xl">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-3">
             <label className="text-[10px] font-bold text-gold uppercase tracking-[0.2em] ml-1">EasyPaisa Gateway</label>
             <div className="relative group">
               <Wallet className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-gold transition-colors" />
               <input 
-                className="w-full bg-white/5 border border-white/10 rounded-2xl px-12 py-4 text-soft-white focus:outline-none focus:border-gold/50 focus:bg-white/[0.08] transition-all" 
+                className="w-full bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl px-10 sm:px-12 py-3 sm:py-4 text-soft-white text-sm sm:text-base focus:outline-none focus:border-gold/50 focus:bg-white/[0.08] transition-all" 
                 placeholder="03xx xxxxxxx"
                 value={config.easypaisaNumber}
                 onChange={(e) => setConfig({...config, easypaisaNumber: e.target.value})}
@@ -82,7 +82,7 @@ const PaymentManagement = () => {
             <div className="relative group">
               <Wallet className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-gold transition-colors" />
               <input 
-                className="w-full bg-white/5 border border-white/10 rounded-2xl px-12 py-4 text-soft-white focus:outline-none focus:border-gold/50 focus:bg-white/[0.08] transition-all" 
+                className="w-full bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl px-10 sm:px-12 py-3 sm:py-4 text-soft-white text-sm sm:text-base focus:outline-none focus:border-gold/50 focus:bg-white/[0.08] transition-all" 
                 placeholder="03xx xxxxxxx"
                 value={config.jazzcashNumber}
                 onChange={(e) => setConfig({...config, jazzcashNumber: e.target.value})}
@@ -92,15 +92,15 @@ const PaymentManagement = () => {
 
           <div className="md:col-span-2 space-y-3 pt-4 border-t border-white/5">
              <label className="text-[10px] font-bold text-gold uppercase tracking-[0.2em] ml-1">Bank Institution</label>
-             <div className="relative group">
-               <Landmark className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-gold transition-colors" />
-               <input 
-                className="w-full bg-white/5 border border-white/10 rounded-2xl px-12 py-4 text-soft-white focus:outline-none focus:border-gold/50 focus:bg-white/[0.08] transition-all" 
-                placeholder="Name of the established bank"
-                value={config.bankName}
-                onChange={(e) => setConfig({...config, bankName: e.target.value})}
-              />
-             </div>
+              <div className="relative group">
+                <Landmark className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-gold transition-colors" />
+                <input 
+                 className="w-full bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl px-10 sm:px-12 py-3 sm:py-4 text-soft-white text-sm sm:text-base focus:outline-none focus:border-gold/50 focus:bg-white/[0.08] transition-all" 
+                 placeholder="Name of the established bank"
+                 value={config.bankName}
+                 onChange={(e) => setConfig({...config, bankName: e.target.value})}
+               />
+              </div>
           </div>
 
           <div className="space-y-3">
@@ -108,7 +108,7 @@ const PaymentManagement = () => {
             <div className="relative group">
               <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-gold transition-colors" />
               <input 
-                className="w-full bg-white/5 border border-white/10 rounded-2xl px-12 py-4 text-soft-white focus:outline-none focus:border-gold/50 focus:bg-white/[0.08] transition-all" 
+                className="w-full bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl px-10 sm:px-12 py-3 sm:py-4 text-soft-white text-sm sm:text-base focus:outline-none focus:border-gold/50 focus:bg-white/[0.08] transition-all" 
                 placeholder="IBAN or Account Number"
                 value={config.bankAccount}
                 onChange={(e) => setConfig({...config, bankAccount: e.target.value})}
@@ -119,7 +119,7 @@ const PaymentManagement = () => {
           <div className="space-y-3">
             <label className="text-[10px] font-bold text-gold uppercase tracking-[0.2em] ml-1">Title of Account</label>
             <input 
-              className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-soft-white focus:outline-none focus:border-gold/50 focus:bg-white/[0.08] transition-all" 
+              className="w-full bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl px-6 py-3 sm:py-4 text-soft-white text-sm sm:text-base focus:outline-none focus:border-gold/50 focus:bg-white/[0.08] transition-all" 
               placeholder="Full Registered Name"
               value={config.accountTitle}
               onChange={(e) => setConfig({...config, accountTitle: e.target.value})}
@@ -143,10 +143,10 @@ const PaymentManagement = () => {
           <button 
             type="submit" 
             disabled={saving}
-            className="btn-gold px-10 py-4 flex items-center gap-3 disabled:opacity-50 group"
+            className="btn-gold px-8 sm:px-10 py-3 sm:py-4 flex items-center gap-2 sm:gap-3 disabled:opacity-50 group text-xs sm:text-sm"
           >
-            {saving ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5 group-hover:scale-110 transition-transform" />}
-            <span>{saving ? 'UPDATING VAULT...' : 'SAVE CONFIGURATION'}</span>
+            {saving ? <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" /> : <Save className="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform" />}
+            <span>{saving ? 'UPDATING...' : 'SAVE CONFIGURATION'}</span>
           </button>
         </div>
       </form>

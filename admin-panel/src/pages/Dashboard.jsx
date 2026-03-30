@@ -64,24 +64,24 @@ const Dashboard = () => {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-10"
+      className="space-y-6 md:space-y-10"
     >
       <header>
-        <h1 className="text-4xl font-serif font-black mb-2 tracking-tighter">
+        <h1 className="text-3xl md:text-5xl font-serif font-black mb-1 md:mb-2 tracking-tighter italic transition-all duration-700">
           <span className="text-gold">AK-7</span> <span className="text-crimson ml-1">REST</span>
         </h1>
-        <p className="text-soft-white/50 tracking-[0.3em] uppercase text-[10px] font-bold">Culinary Control Center</p>
+        <p className="text-soft-white/40 tracking-[0.4em] uppercase text-[8px] md:text-[10px] font-black">Culinary Control Center</p>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
         {cards.map((card, idx) => (
           <motion.div 
             key={idx} 
             variants={itemVariants}
-            className="glass p-8 rounded-2xl border border-white/5 flex flex-col justify-between h-40 hover:border-gold/30 transition-all duration-500 group"
+            className="glass p-5 md:p-8 rounded-2xl border border-white/5 flex flex-col justify-between h-32 md:h-40 hover:border-gold/30 transition-all duration-500 group"
           >
             <div className="flex items-center justify-between">
-              <span className="text-soft-white/40 text-xs font-bold uppercase tracking-widest">{card.title}</span>
+              <span className="text-soft-white/40 text-[10px] md:text-xs font-bold uppercase tracking-widest">{card.title}</span>
               <card.icon className={`w-5 h-5 ${card.color} opacity-70 group-hover:scale-110 transition-transform`} />
             </div>
             <h3 className="text-3xl font-bold font-sans text-soft-white mt-4">{card.value}</h3>
@@ -89,10 +89,10 @@ const Dashboard = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        <motion.div variants={itemVariants} className="glass p-8 rounded-3xl border border-white/5 relative overflow-hidden group">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-10">
+        <motion.div variants={itemVariants} className="glass p-5 md:p-8 rounded-3xl border border-white/5 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 blur-3xl rounded-full -mr-16 -mt-16"></div>
-          <h2 className="text-xl font-serif font-bold text-gold mb-8 flex items-center gap-3">
+          <h2 className="text-lg md:text-xl font-serif font-bold text-gold mb-6 md:mb-8 flex items-center gap-3">
              <div className="w-1 h-6 bg-gold rounded-full"></div>
              Popular Items
           </h2>
