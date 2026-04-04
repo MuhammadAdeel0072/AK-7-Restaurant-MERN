@@ -1,3 +1,4 @@
+const asyncHandler = require('express-async-handler');
 const Order = require('../models/Order');
 const User = require('../models/User');
 const LoyaltyTransaction = require('../models/Loyalty');
