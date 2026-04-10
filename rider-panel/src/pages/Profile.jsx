@@ -1,17 +1,17 @@
 import React from 'react';
-import { useUser, SignOutButton } from '../mockAuth';
+import { useAuth } from '../context/AuthContext';
 import { User, Phone, MapPin, Mail, Shield, LogOut, Award, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRider } from '../context/RiderContext';
 
 const Profile = () => {
-    const { user } = useUser();
+    const { user, logout } = useAuth();
     const { stats } = useRider();
 
     const menuItems = [
-        { icon: User, label: 'Full Name', value: `${user?.firstName} ${user?.lastName}` },
-        { icon: Mail, label: 'Email Terminal', value: user?.primaryEmailAddress?.emailAddress },
-        { icon: Phone, label: 'Communications', value: user?.primaryPhoneNumber || '+92 300 1234567' },
+        { icon: User, label: 'Full Name', value: `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'N/A' },
+        { icon: Mail, label: 'Email Terminal', value: user?.email || 'N/A' },
+        { icon: Phone, label: 'Communications', value: '+92 300 1234567' },
         { icon: Shield, label: 'Access Level', value: 'Authorized Rider', color: 'text-gold' },
     ];
 
@@ -19,12 +19,11 @@ const Profile = () => {
         <div className="max-w-4xl mx-auto space-y-10 pb-20">
             <header className="flex flex-col items-center justify-center text-center py-10 card-premium relative overflow-hidden bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.05),transparent)]">
                 <div className="relative mb-6">
-                    <div className="w-32 h-32 rounded-xl p-1 bg-gradient-to-tr from-gold to-crimson shadow-[0_0_40px_rgba(212,175,55,0.2)]">
-                        <img 
-                            src={user?.imageUrl} 
-                            alt="avatar" 
-                            className="w-full h-full object-cover rounded-md border-4 border-charcoal"
-                        />
+                    <div className="w-32 h-32 rounded-xl p-1 bg-gradient-to-tr from-gold to-crimson shadow-[0_0_40px_rgba(212,175,55,0.2)] flex items-center justify-center">
+                        {user?.avatar
+                            ? <img src={user.avatar} alt="avatar" className="w-full h-full object-cover rounded-md border-4 border-charcoal" />
+                            : <User className="w-16 h-16 text-gold/40" />
+                        }
                     </div>
                     <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-gold rounded-md flex items-center justify-center border-4 border-charcoal shadow-xl">
                         <Award className="w-5 h-5 text-charcoal" />
@@ -76,11 +75,12 @@ const Profile = () => {
                                 Shift Settings
                             </button>
                             <div className="h-px bg-white/5 my-4" />
-                            <SignOutButton>
-                                <button className="w-full py-4 rounded-md bg-crimson/10 border border-crimson/20 text-[10px] font-black text-crimson uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-crimson hover:text-white transition-all shadow-lg shadow-crimson/5 group">
-                                    <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> TERMINATE SESSION
-                                </button>
-                            </SignOutButton>
+                            <button
+                                onClick={logout}
+                                className="w-full py-4 rounded-md bg-crimson/10 border border-crimson/20 text-[10px] font-black text-crimson uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-crimson hover:text-white transition-all shadow-lg shadow-crimson/5 group"
+                            >
+                                <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> TERMINATE SESSION
+                            </button>
                         </div>
                     </div>
 

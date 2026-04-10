@@ -5,10 +5,8 @@ export const getUserProfile = async () => {
   return response.data;
 };
 
-export const syncUser = async (userData) => {
-  const response = await apiClient.post('/auth/sync', userData);
-  return response.data;
-};
+// Authentication service using custom JWT identity system
+
 
 export const updateUserProfile = async (userData) => {
   const response = await apiClient.put('/auth/profile', userData);

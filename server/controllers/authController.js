@@ -1,15 +1,82 @@
 const asyncHandler = require('express-async-handler');
-const { clerkClient } = require('@clerk/express');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Cart = require('../models/Cart');
 const Order = require('../models/Order');
 const LoyaltyTransaction = require('../models/Loyalty');
 
+// Generate JWT
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: '30d',
+  });
+};
+
+// @desc    Register a new user
+// @route   POST /api/auth/register
+// @access  Public
+const registerUser = asyncHandler(async (req, res) => {
+  const { firstName, lastName, email, password } = req.body;
+
+  const userExists = await User.findOne({ email });
+
+  if (userExists) {
+    res.status(400);
+    throw new Error('User already exists');
+  }
+
+  const user = await User.create({
+    firstName,
+    lastName,
+    email,
+    password,
+    role: 'customer', 
+  });
+
+  if (user) {
+    res.status(201).json({
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+      token: generateToken(user._id),
+    });
+  } else {
+    res.status(400);
+    throw new Error('Invalid user data');
+  }
+});
+
+// @desc    Authenticate user & get token
+// @route   POST /api/auth/login
+// @access  Public
+const authUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (user && (await user.matchPassword(password))) {
+    res.json({
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+      avatar: user.avatar,
+      token: generateToken(user._id),
+    });
+  } else {
+    res.status(401);
+    throw new Error('Invalid email or password');
+  }
+});
+
 // @desc    Get user profile (Self)
 // @route   GET /api/auth/profile
 // @access  Private
 const getUserProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id).lean();
+  const user = await User.findById(req.user._id).select('-password').lean();
 
   if (user) {
     res.json(user);
@@ -17,40 +84,6 @@ const getUserProfile = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('User not found');
   }
-});
-
-// @desc    Sync Clerk User with Database
-// @route   POST /api/auth/sync
-// @access  Clerk JWT (no DB user required)
-const syncUser = asyncHandler(async (req, res) => {
-  const clerkId = req.clerkUserId || req.body.clerkId;
-  const { email, firstName, lastName, avatar } = req.body;
-
-  if (!clerkId) {
-    res.status(400);
-    throw new Error('clerkId is required');
-  }
-
-  let user = await User.findOne({ clerkId });
-
-  if (user) {
-    user.firstName = firstName || user.firstName;
-    user.lastName = lastName || user.lastName;
-    user.email = email || user.email;
-    user.avatar = avatar || user.avatar;
-    await user.save();
-  } else {
-    user = await User.create({
-      clerkId,
-      email: email || '',
-      firstName: firstName || '',
-      lastName: lastName || '',
-      avatar: avatar || '',
-      role: 'customer'
-    });
-  }
-
-  res.status(200).json(user);
 });
 
 // @desc    Update user profile
@@ -64,15 +97,27 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     throw new Error('User not found');
   }
 
-  const { firstName, lastName, phoneNumber, address, avatar } = req.body;
+  const { firstName, lastName, phoneNumber, addresses, avatar, password } = req.body;
   if (firstName !== undefined) user.firstName = firstName;
   if (lastName !== undefined) user.lastName = lastName;
-  if (phoneNumber !== undefined) user.phoneNumber = phoneNumber;
-  if (address !== undefined) user.address = address;
   if (avatar !== undefined) user.avatar = avatar;
+  
+  if (addresses !== undefined) user.addresses = addresses;
+  
+  if (password) {
+    user.password = password;
+  }
 
   const updated = await user.save();
-  res.json(updated);
+  res.json({
+    _id: updated._id,
+    firstName: updated.firstName,
+    lastName: updated.lastName,
+    email: updated.email,
+    role: updated.role,
+    avatar: updated.avatar,
+    token: generateToken(updated._id),
+  });
 });
 
 // --- CART FEATURES ---
@@ -113,7 +158,6 @@ const getLoyaltyStatus = asyncHandler(async (req, res) => {
 // @route   DELETE /api/auth/delete
 // @access  Private
 const deleteUserAccount = asyncHandler(async (req, res) => {
-  // Get user ID from request
   const userId = req.user?._id;
 
   if (!userId) {
@@ -121,39 +165,14 @@ const deleteUserAccount = asyncHandler(async (req, res) => {
     throw new Error('User ID not found in request');
   }
 
-  // Find user to get clerkId before deletion
-  const user = await User.findById(userId);
-
-  if (!user) {
-    res.status(404);
-    throw new Error('User not found');
-  }
-
-  // Delete from Clerk if clerkId exists (only in production)
-  if (user.clerkId && user.clerkId !== 'dev_user') {
-    try {
-      await clerkClient.users.deleteUser(user.clerkId);
-      console.log(`Clerk user deleted: ${user.clerkId}`);
-    } catch (error) {
-      console.error('Clerk deletion error:', error);
-      // Continue even if Clerk deletion fails (user might already be deleted)
-    }
-  }
-
-  // Delete all user-related data from MongoDB
   try {
-    // Delete cart
     await Cart.findOneAndDelete({ user: userId });
-    
-    // Delete loyalty transactions
     await LoyaltyTransaction.deleteMany({ user: userId });
     
-    // Delete orders (keep for audit trail in production, but delete in dev)
     if (process.env.NODE_ENV === 'development') {
       await Order.deleteMany({ user: userId });
     }
     
-    // Delete user
     await User.findByIdAndDelete(userId);
 
     res.status(200).json({ 
@@ -167,4 +186,14 @@ const deleteUserAccount = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { getUserProfile, updateUserProfile, syncUser, getCart, updateCart, getLoyaltyStatus, deleteUserAccount };
+module.exports = { 
+  registerUser, 
+  authUser, 
+  getUserProfile, 
+  updateUserProfile, 
+  getCart, 
+  updateCart, 
+  getLoyaltyStatus, 
+  deleteUserAccount 
+};
+

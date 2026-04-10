@@ -22,7 +22,7 @@ The system is designed around a premium visual language ensuring a spectacular u
 The consumer-facing portal for ordering and discovery, engineered for aesthetics and ease of use.
 - **Dynamic Catalog**: Real-time filtering, categorical sorting, and fuzzy search for delicacies.
 - **Gourmet Cart**: Seamless addition, modification, and quantity management with dynamic state updates.
-- **Enterprise-Grade Authentication**: Secure user login and profile management via Clerk (Google, X, Email OTP).
+- **Enterprise-Grade Authentication**: Secure user login and profile management via a custom JWT-based identity system.
 - **Stripe Payments**: Integrated checkout for secure, seamless digital transactions.
 
 ### 2. 👨‍🍳 Professional Chef Panel
@@ -43,7 +43,7 @@ The centralized command center for holistic restaurant operations.
 ### 4. 🧠 Backend Infrastructure
 The unseen, high-performance engine powering the entire ecosystem.
 - **Real-Time Gateway**: Built with Socket.IO (v4) for zero-latency, bi-directional event emission across all modular nodes.
-- **Secure Auth API**: Tightly coupled with Clerk Node SDK and proprietary middleware to ensure endpoint safety.
+- **Secure Auth API**: Tightly coupled with custom JWT validation and proprietary middleware to ensure endpoint safety.
 - **Data Persistence**: MongoDB with Mongoose ODM for structured, scalable, and relationship-driven data storage.
 - **Automated Workflows**: Configured for automated email notifications (Nodemailer) and PDF invoice generation (PDFKit).
 
@@ -58,7 +58,7 @@ The unseen, high-performance engine powering the entire ecosystem.
 | **Backend Frameworks** | Node.js, Express 5 |
 | **Real-Time Comm.** | Socket.IO 4 |
 | **Database** | MongoDB (Mongoose 9) |
-| **Authentication** | Clerk (Social OAuth + Email OTP) |
+| **Authentication** | Custom JWT (Email + Password) |
 | **Payment Gateway** | Stripe |
 | **Localization (i18n)** | react-i18next (English / Urdu RTL) |
 | **Deployment** | Vercel (Frontends), Render/Railway (Backend) |
@@ -76,7 +76,7 @@ cd AK-7-Restaurant-MERN
 ```
 
 ### 2. Configure Environment Variables
-Each of the 4 modules requires its own `.env` file. You must set up API keys for Clerk, MongoDB, and Stripe:
+Each of the project modules requires its own `.env` file. You must set up configuration for MongoDB, JWT secrets, and payment gateways:
 - `client/.env.local`
 - `admin-panel/.env.local`
 - `chef-panel/.env.local`

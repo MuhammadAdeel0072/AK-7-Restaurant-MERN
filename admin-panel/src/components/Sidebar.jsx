@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Utensils, ShoppingBag, Calendar, CreditCard, Users, LogOut, X } from 'lucide-react';
-import { SignOutButton } from '@clerk/clerk-react';
+import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BrandLogo, typographyClasses } from './BrandingUtils';
 
 const Sidebar = ({ isOpen, onClose }) => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const { logout } = useAuth();
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -72,12 +73,13 @@ const Sidebar = ({ isOpen, onClose }) => {
       </nav>
 
       <div className="p-6 border-t border-white/5">
-        <SignOutButton>
-          <button className="flex items-center space-x-4 w-full px-5 py-4 text-crimson hover:bg-crimson/5 rounded-xl transition-all duration-300 group border border-transparent hover:border-crimson/20">
-            <LogOut className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            <span className="font-bold tracking-wider">LOGOUT</span>
-          </button>
-        </SignOutButton>
+        <button
+          onClick={logout}
+          className="flex items-center space-x-4 w-full px-5 py-4 text-crimson hover:bg-crimson/5 rounded-xl transition-all duration-300 group border border-transparent hover:border-crimson/20"
+        >
+          <LogOut className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          <span className="font-bold tracking-wider">LOGOUT</span>
+        </button>
       </div>
     </motion.aside>
   );

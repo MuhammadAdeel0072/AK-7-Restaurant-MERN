@@ -36,10 +36,8 @@ app.use(cors({
   ],
   credentials: true,
 }));
-const { clerkMiddleware } = require('@clerk/express');
 
 app.use(express.json());
-app.use(clerkMiddleware()); // Mandatory for Clerk v5 integration
 
 // ======================
 // 🔒 SECURITY & RATE LIMIT
@@ -80,8 +78,6 @@ const reservationRoutes = require('./routes/reservationRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const chefRoutes = require('./routes/chefRoutes');
 const riderRoutes = require('./routes/riderRoutes');
-const webhookRoutes = require('./routes/webhookRoutes');
-
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/analytics', analyticsRoutes);
@@ -91,10 +87,10 @@ app.use('/api/reservations', reservationRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/chef', chefRoutes);
 app.use('/api/rider', riderRoutes);
-app.use('/api/webhooks/clerk', webhookRoutes);
 
 // ======================
 // 🏠 ROOT ROUTE
+
 // ======================
 app.get('/', (req, res) => {
   res.send('AK-7 REST API is running');

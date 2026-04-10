@@ -1,11 +1,7 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
-import { useUser, useAuth, AuthenticateWithRedirectCallback } from '@clerk/clerk-react';
-import { setupInterceptors } from './services/apiClient';
-import { useCart } from './context/CartContext';
-import { useProfile } from './context/UserContext';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
-import { UserProvider } from './context/UserContext';
+import { AuthProvider } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
@@ -19,33 +15,17 @@ import AuthGuard from './components/AuthGuard';
 import Orders from './pages/Orders';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
-
-const AuthRedirect = () => {
-  const { profile, loading } = useProfile();
-  const { state } = useCart();
-  const navigate = useNavigate();
-
-  // Logic to handle redirection after login if needed
-  // Removed specific redirect to keep user on same page or go to destination
-  return null;
-};
-
 import OrderTracker from './pages/OrderTracker';
-
 import Help from './pages/Help';
-
 import Reservations from './pages/Reservations';
 import Settings from './pages/Settings';
 
 function App() {
-  const { getToken } = useAuth();
 
-  useEffect(() => {
-    setupInterceptors(getToken);
-  }, [getToken]);
+
 
   return (
-    <UserProvider>
+    <AuthProvider>
       <SocketProvider>
         <CartProvider>
           <Router>
@@ -56,7 +36,6 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/signup" element={<SignUp />} />
-                <Route path="/sso-callback" element={<AuthenticateWithRedirectCallback />} />
                 <Route path="/menu" element={<Menu />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={
@@ -100,7 +79,7 @@ function App() {
           </Router>
         </CartProvider>
       </SocketProvider>
-    </UserProvider>
+    </AuthProvider>
   );
 }
 

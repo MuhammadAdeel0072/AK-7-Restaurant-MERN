@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { getAvailableOrders, getMyOrders, getRiderStats } from '../services/api';
 import socket, { joinRiders } from '../services/socket';
-import { useUser } from '../mockAuth';
+import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 
 const RiderContext = createContext();
@@ -15,7 +15,7 @@ export const useRider = () => {
 };
 
 export const RiderProvider = ({ children }) => {
-    const { user } = useUser();
+    const { user } = useAuth();
     const [availableOrders, setAvailableOrders] = useState([]);
     const [myOrders, setMyOrders] = useState([]);
     const [stats, setStats] = useState(null);

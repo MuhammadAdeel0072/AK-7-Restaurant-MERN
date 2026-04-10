@@ -1,15 +1,15 @@
-import { useAuth } from '@clerk/clerk-react';
-import { useState, useEffect } from 'react';
-import { Shield as AuthIcon } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { Shield as AuthIcon, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const AuthGuard = ({ children }) => {
-  const { isSignedIn, isLoaded } = useAuth();
+  const { isSignedIn, loading } = useAuth();
 
-  if (!isLoaded) {
+  if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <Loader2 className="animate-spin h-12 w-12 text-gold mb-4" />
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gold/60">Verifying Identity</p>
       </div>
     );
   }
@@ -23,7 +23,7 @@ const AuthGuard = ({ children }) => {
         <h2 className="text-3xl font-serif font-bold text-white mb-2">Private Experience</h2>
         <p className="text-gold/60 font-medium tracking-widest uppercase text-[10px] mb-8">Identification required for gourmet access</p>
         <Link
-          to="/sign-in"
+          to="/signin"
           className="bg-gold text-charcoal font-black py-4 px-12 rounded-2xl transition-all transform hover:scale-105 shadow-xl shadow-gold/20 active:scale-95"
         >
           Secure Identity
@@ -36,3 +36,4 @@ const AuthGuard = ({ children }) => {
 };
 
 export default AuthGuard;
+

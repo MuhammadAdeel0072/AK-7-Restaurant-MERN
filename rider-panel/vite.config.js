@@ -11,6 +11,6 @@ export default defineConfig({
     open: true,
   },
   optimizeDeps: {
-    exclude: ['@clerk/clerk-react', '@clerk/shared'],
+    exclude: [],
   },
 });

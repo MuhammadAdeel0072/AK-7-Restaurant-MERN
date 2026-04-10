@@ -1,12 +1,21 @@
-import { useSignUp, useUser } from '@clerk/clerk-react';
 import { useState, useEffect } from 'react';
-import { Mail, Chrome, Loader2, ArrowRight, CheckCircle2, AlertCircle, User as UserIcon } from 'lucide-react';
+import { Mail, Lock, Loader2, ArrowRight, CheckCircle2, AlertCircle, User as UserIcon, Eye, EyeOff } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const SignUp = () => {
-    const { isLoaded, signUp, setActive } = useSignUp();
-    const { isSignedIn } = useUser();
+    const { register, isSignedIn, loading: authLoading } = useAuth();
     const navigate = useNavigate();
+
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [isValidEmail, setIsValidEmail] = useState(null);
 
     useEffect(() => {
         if (isSignedIn) {
@@ -14,66 +23,31 @@ const SignUp = () => {
         }
     }, [isSignedIn, navigate]);
 
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [otpSent, setOtpSent] = useState(false);
-    const [code, setCode] = useState('');
-    const [isValidEmail, setIsValidEmail] = useState(null);
-
     const validateEmail = (val) => {
         setEmail(val);
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         setIsValidEmail(val.length > 0 ? re.test(val) : null);
     };
 
-    const handleSocialLogin = async (provider) => {
-        if (!isLoaded) return;
-        setLoading(true);
-        setError('');
-        try {
-            await signUp.authenticateWithRedirect({
-                strategy: `oauth_${provider}`,
-                redirectUrl: '/sso-callback',
-                redirectUrlComplete: '/'
-            });
-        } catch (err) {
-            setLoading(false);
-            setError(err.errors ? err.errors[0].longMessage : 'That service is currently busy. Try again soon.');
-        }
-    };
-
-    const handleEmailSignUp = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!isLoaded || !isValidEmail || (!otpSent && !name)) return;
+        if (!isValidEmail || !password || !firstName || password !== confirmPassword) {
+            if (password !== confirmPassword) setError('Passwords do not match');
+            return;
+        }
+        
         setLoading(true);
         setError('');
         try {
-            if (!otpSent) {
-                const nameParts = name.split(' ');
-                const firstName = nameParts[0];
-                const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
-
-                await signUp.create({
-                    emailAddress: email,
-                    firstName,
-                    lastName
-                });
-
-                await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-                setOtpSent(true);
-            } else {
-                const result = await signUp.attemptEmailAddressVerification({
-                    code: code
-                });
-                if (result.status === "complete") {
-                    await setActive({ session: result.createdSessionId });
-                    window.location.href = '/';
-                }
-            }
+            await register({
+                firstName,
+                lastName,
+                email,
+                password
+            });
+            navigate('/');
         } catch (err) {
-            setError(err.errors ? err.errors[0].longMessage : 'Registration failed. Please check your details and try again.');
+            setError(err.response?.data?.message || 'Registration failed. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -83,7 +57,7 @@ const SignUp = () => {
         <div className="min-h-[90vh] flex items-center justify-center p-4 bg-charcoal py-12">
             <div className="bg-charcoal w-full md:max-w-md rounded-3xl border border-gold/30 shadow-[0_0_40px_rgba(212,175,55,0.15)] relative flex flex-col overflow-hidden">
 
-                {loading && (
+                {(loading || authLoading) && (
                     <div className="absolute inset-0 bg-charcoal/95 backdrop-blur-md flex flex-col items-center justify-center z-50 animate-in fade-in duration-300">
                         <Loader2 className="w-16 h-16 text-gold animate-spin mb-6" />
                         <p className="text-xl font-bold text-gold tracking-wider font-serif">Creating Identity...</p>
@@ -107,112 +81,106 @@ const SignUp = () => {
                         </div>
                     )}
 
-                    {!otpSent && (
-                        <div className="space-y-4 mb-4">
-                            <button
-                                onClick={() => handleSocialLogin('google')}
-                                className="w-full flex items-center justify-center gap-3 p-4 bg-white/5 border border-white/10 rounded-2xl hover:border-gold hover:bg-white/10 transition-all group active:scale-[0.98]"
-                            >
-                                <Chrome className="text-gray-300 group-hover:text-gold transition-colors" size={20} />
-                                <span className="font-bold text-white tracking-wide group-hover:text-gold transition-colors">Register with Google</span>
-                            </button>
-                            <button
-                                onClick={() => handleSocialLogin('x')}
-                                className="w-full flex items-center justify-center gap-3 p-4 bg-black border border-white/10 rounded-2xl hover:border-gold transition-all group active:scale-[0.98]"
-                            >
-                                <span className="text-xl font-black text-white group-hover:scale-110 transition-transform">X</span>
-                                <span className="font-bold text-white tracking-wide">Register with X</span>
-                            </button>
-                        </div>
-                    )}
-
-                    {!otpSent && (
-                        <div className="relative mb-6">
-                            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/10"></div></div>
-                            <div className="relative flex justify-center text-[10px] font-black uppercase tracking-widest"><span className="px-4 bg-charcoal text-gray-400">Or traditional enrollment</span></div>
-                        </div>
-                    )}
-
-                    <form onSubmit={handleEmailSignUp} className="space-y-5">
-                        {!otpSent ? (
-                            <>
-                                <div className="space-y-2">
-                                    <label htmlFor="name-input" className="text-[10px] font-black text-gold uppercase tracking-widest ml-1">Full Name</label>
-                                    <div className="relative">
-                                        <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
-                                        <input
-                                            id="name-input"
-                                            type="text"
-                                            required
-                                            className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl outline-none transition-all font-bold text-white placeholder:text-gray-600 focus:border-gold"
-                                            placeholder="Gourmet Chef"
-                                            value={name}
-                                            onChange={(e) => setName(e.target.value)}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <label htmlFor="email-input" className="text-[10px] font-black text-gold uppercase tracking-widest ml-1">Email Address</label>
-                                    <div className="relative">
-                                        <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${isValidEmail ? 'text-green-400' : 'text-gray-500'}`} size={20} />
-                                        <input
-                                            id="email-input"
-                                            type="email"
-                                            required
-                                            className={`w-full pl-12 pr-12 py-4 bg-white/5 border rounded-2xl outline-none transition-all font-bold text-white placeholder:text-gray-600 ${isValidEmail === true ? 'border-green-400/50 focus:border-green-400' : isValidEmail === false ? 'border-crimson/50 focus:border-crimson' : 'border-white/10 focus:border-gold'}`}
-                                            placeholder="chef@ak7rest.com"
-                                            value={email}
-                                            onChange={(e) => validateEmail(e.target.value)}
-                                        />
-                                    </div>
-                                </div>
-                            </>
-                        ) : (
-                            <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
-                                <div className="text-center">
-                                    <label htmlFor="otp-input" className="text-xs font-black text-gold uppercase tracking-widest mb-3 block">Enter Verification Code</label>
-                                    <input
-                                        id="otp-input"
-                                        type="text"
-                                        required
-                                        maxLength={6}
-                                        className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-center text-3xl font-black tracking-[0.5rem] focus:border-gold outline-none transition-all text-white"
-                                        placeholder="000000"
-                                        value={code}
-                                        onChange={(e) => setCode(e.target.value)}
-                                        autoFocus
-                                    />
-                                </div>
-                                <p className="text-center text-sm text-gray-400 p-4 border border-white/5 bg-white/5 rounded-xl">
-                                    Enrollment code sent to <span className="text-gold font-bold block">{email}</span>
-                                </p>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-gold uppercase tracking-widest ml-1">First Name</label>
+                                <input
+                                    type="text"
+                                    required
+                                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl outline-none transition-all font-bold text-white focus:border-gold"
+                                    placeholder="Zarar"
+                                    value={firstName}
+                                    onChange={(e) => setFirstName(e.target.value)}
+                                />
                             </div>
-                        )}
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-gold uppercase tracking-widest ml-1">Last Name</label>
+                                <input
+                                    type="text"
+                                    required
+                                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl outline-none transition-all font-bold text-white focus:border-gold"
+                                    placeholder="Ahmed"
+                                    value={lastName}
+                                    onChange={(e) => setLastName(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-gold uppercase tracking-widest ml-1">Email Terminal</label>
+                            <div className="relative">
+                                <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${isValidEmail ? 'text-green-400' : 'text-gray-500'}`} size={20} />
+                                <input
+                                    type="email"
+                                    required
+                                    className={`w-full pl-12 pr-4 py-4 bg-white/5 border rounded-2xl outline-none transition-all font-bold text-white placeholder:text-gray-600 ${isValidEmail === true ? 'border-green-400/50 focus:border-green-400' : isValidEmail === false ? 'border-crimson/50 focus:border-crimson' : 'border-white/10 focus:border-gold'}`}
+                                    placeholder="customer@ak7rest.com"
+                                    value={email}
+                                    onChange={(e) => validateEmail(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-gold uppercase tracking-widest ml-1">Security Key</label>
+                            <div className="relative">
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    required
+                                    className="w-full pl-12 pr-12 py-4 bg-white/5 border border-white/10 rounded-2xl outline-none focus:border-gold transition-all font-bold text-white"
+                                    placeholder="Minimum 6 characters"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gold"
+                                >
+                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-gold uppercase tracking-widest ml-1">Confirm Key</label>
+                            <div className="relative">
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
+                                <input
+                                    type="password"
+                                    required
+                                    className={`w-full pl-12 pr-4 py-4 bg-white/5 border rounded-2xl outline-none transition-all font-bold text-white ${password && confirmPassword && password !== confirmPassword ? 'border-crimson' : 'border-white/10 focus:border-gold'}`}
+                                    placeholder="Repeat security key"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                />
+                            </div>
+                        </div>
 
                         <button
                             type="submit"
-                            disabled={loading || (!otpSent && (!name || !isValidEmail)) || (otpSent && code.length < 6)}
-                            className={`w-full py-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-3 shadow-xl ${((!otpSent && (!name || !isValidEmail)) || (otpSent && code.length < 6)) ? 'bg-white/5 text-gray-500 cursor-not-allowed border border-white/10' : 'bg-gold hover:bg-yellow-400 text-charcoal hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] active:scale-[0.98]'}`}
+                            disabled={loading || !firstName || !isValidEmail || !password || password !== confirmPassword}
+                            className={`w-full py-4 mt-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-3 shadow-xl ${(loading || !firstName || !isValidEmail || !password || password !== confirmPassword) ? 'bg-white/5 text-gray-500 cursor-not-allowed border border-white/10' : 'bg-gold hover:bg-yellow-400 text-charcoal hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] active:scale-[0.98]'}`}
                         >
-                            {otpSent ? 'Complete Enrollment' : 'Initiate Membership'}
+                            Initiate Membership
                             <ArrowRight size={20} />
                         </button>
                     </form>
 
-                    {!otpSent && (
-                        <div className="mt-8 text-center border-t border-white/5 pt-6">
-                            <p className="text-gray-400 text-sm font-medium">
-                                Already a member?{' '}
-                                <Link to="/sign-in" className="text-gold font-bold hover:underline underline-offset-4 transition-all">
-                                    Sign In here
-                                </Link>
-                            </p>
-                        </div>
-                    )}
+                    <div className="mt-8 text-center border-t border-white/5 pt-6">
+                        <p className="text-gray-400 text-sm font-medium">
+                            Already a member?{' '}
+                            <Link to="/signin" className="text-gold font-bold hover:underline underline-offset-4 transition-all">
+                                Sign In here
+                            </Link>
+                        </p>
+                    </div>
                 </div>
 
                 <div className="bg-white/5 p-4 border-t border-white/10 flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-gray-500 px-8">
-                    <span className="flex items-center gap-2 text-gold"><span className="w-1.5 h-1.5 bg-gold rounded-full animate-pulse shadow-[0_0_5px_currentColor]"></span> Identity Verified</span>
+                    <span className="flex items-center gap-2 text-gold"><span className="w-1.5 h-1.5 bg-gold rounded-full animate-pulse shadow-[0_0_5px_currentColor]"></span> Identity Secured</span>
                     <span>AK-7 Guest Protocol</span>
                 </div>
             </div>
@@ -221,3 +189,4 @@ const SignUp = () => {
 };
 
 export default SignUp;
+

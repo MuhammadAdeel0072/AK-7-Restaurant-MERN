@@ -1,14 +1,15 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
-    clerkId: { type: String, required: true, unique: true },
     firstName: { type: String },
     lastName: { type: String },
     email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
     avatar: { type: String },
     role: {
         type: String,
-        enum: ['customer', 'staff', 'chef', 'admin', 'rider'],
+        enum: ['customer', 'admin', 'chef', 'rider'],
         default: 'customer'
     },
     addresses: [
@@ -31,6 +32,20 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 });
 
+// Hash password before saving
+userSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) {
+        return next();
+    }
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+});
 
+// Method to compare passwords
+userSchema.methods.matchPassword = async function (enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password);
+};
 
 module.exports = mongoose.model('User', userSchema);
+

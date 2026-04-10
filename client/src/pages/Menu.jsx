@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getProducts } from '../services/menuService';
 import { useCart } from '../context/CartContext';
-import { useProfile } from '../context/UserContext';
+import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { ShoppingCart, Heart, Search, Filter, Plus, Minus, X, Package, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -16,7 +16,7 @@ const Menu = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [qty, setQty] = useState(1);
   const { dispatch } = useCart();
-  const { profile, isSignedIn } = useProfile();
+  const { user: profile, isSignedIn } = useAuth();
   const { siteUpdate } = useSocket();
 
   useEffect(() => {

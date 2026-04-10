@@ -1,15 +1,14 @@
 import { ShoppingCart, Menu as MenuIcon, LogIn, User as UserIcon, ShoppingBag, Calendar, LogOut, X, AlertTriangle, Settings as SettingsIcon, ChevronRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { Link } from 'react-router-dom';
-import { useUser, useClerk } from '@clerk/clerk-react';
+import { useAuth } from '../context/AuthContext';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
   const { state, dispatch } = useCart();
   const { cartItems } = state;
-  const { user, isSignedIn, isLoaded } = useUser();
-  const { signOut } = useClerk();
+  const { user, isSignedIn, loading: isLoading, logout } = useAuth();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -48,20 +47,18 @@ const Navbar = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const handleSignOut = async () => {
+  const handleSignOut = () => {
     setSigningOut(true);
     try {
       dispatch({ type: 'CLEAR_CART' });
-      await signOut();
+      logout();
       setShowSignOutModal(false);
-      window.location.href = '/';
-    } catch {
     } finally {
       setSigningOut(false);
     }
   };
 
-  if (!isLoaded) return null;
+  if (isLoading) return null;
 
   return (
     <>
@@ -101,8 +98,8 @@ const Navbar = () => {
                 className="flex items-center gap-2.5 p-1 rounded-full border-2 border-gold/40 hover:border-gold transition-all duration-300"
                 aria-label="User menu"
               >
-                {user?.imageUrl ? (
-                  <img src={user.imageUrl} alt="avatar" className="w-7 h-7 md:w-8 md:h-8 rounded-full object-cover" />
+                {user?.avatar ? (
+                  <img src={user.avatar} alt="avatar" className="w-7 h-7 md:w-8 md:h-8 rounded-full object-cover" />
                 ) : (
                   <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gold/20 flex items-center justify-center">
                     <UserIcon className="w-4 h-4 text-gold" />
@@ -123,8 +120,8 @@ const Navbar = () => {
                       className="absolute right-0 top-14 w-56 bg-[#1a1a1a] border border-white/10 rounded-3xl shadow-[0_30px_90px_rgba(0,0,0,0.8)] overflow-hidden z-[200]"
                     >
                       <div className="px-5 py-5 border-b border-white/5 bg-white/[0.02]">
-                        <p className="text-white font-bold text-sm truncate">{user?.fullName || user?.firstName}</p>
-                        <p className="text-gold/40 text-[9px] font-black uppercase tracking-widest truncate mt-0.5">{user?.primaryEmailAddress?.emailAddress}</p>
+                        <p className="text-white font-bold text-sm truncate">{user?.firstName} {user?.lastName}</p>
+                        <p className="text-gold/40 text-[9px] font-black uppercase tracking-widest truncate mt-0.5">{user?.email}</p>
                       </div>
 
                       <div className="py-2">

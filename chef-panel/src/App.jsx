@@ -1,76 +1,57 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { SignedIn, SignedOut, RedirectToSignIn, useUser } from "@clerk/clerk-react";
 import ChefLayout from "./components/ChefLayout";
 import Dashboard from "./pages/Dashboard";
 import ActiveOrders from "./pages/ActiveOrders";
 import OrderDetails from "./pages/OrderDetails";
-import { useEffect, useState } from "react";
-import api from "./services/api";
+import ReadyQueue from "./pages/ReadyQueue";
+import Alerts from "./pages/Alerts";
+import Settings from "./pages/Settings";
+import Login from "./pages/Login";
+import { AlertProvider } from "./context/AlertContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import { Toaster } from "react-hot-toast";
 
-const AuthGuard = ({ children }) => {
-  const { user, isLoaded } = useUser();
-  const [isAuthorized, setIsAuthorized] = useState(null);
-
-  useEffect(() => {
-    const checkRole = () => {
-      if (isLoaded && user) {
-        try {
-          // If publicMetadata is set, check for 'chef' role.
-          // Fallback to true if no metadata is present to avoid locking out.
-          const role = user.publicMetadata?.role;
-          if (role && role !== 'chef' && role !== 'admin') {
-            setIsAuthorized(false);
-          } else {
-            setIsAuthorized(true);
-          }
-        } catch (error) {
-          console.error("Auth check failed", error);
-          setIsAuthorized(false);
-        }
-      }
-    };
-    checkRole();
-  }, [isLoaded, user]);
-
+const ProtectedRoute = ({ children }) => {
+  const { isSignedIn, isLoaded } = useAuth();
+  
   if (!isLoaded) return (
-    <div className="h-screen w-full flex items-center justify-center bg-charcoal">
-       <div className="w-12 h-12 border-4 border-gold border-t-transparent rounded-full animate-spin"></div>
+    <div className="min-h-screen bg-[#121212] flex items-center justify-center">
+      <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
-
-  if (isAuthorized === false) {
-    return (
-      <div className="h-screen w-full flex flex-col items-center justify-center bg-charcoal text-white p-6 text-center">
-        <h2 className="text-3xl font-serif font-black text-crimson mb-4 uppercase tracking-tighter">Access Restricted</h2>
-        <p className="text-soft-white/60 max-w-sm mb-8">This station requires Chef-level credentials. Please contact administration for authorization.</p>
-        <button className="btn-gold" onClick={() => (window.location.href = "/")}>RETURN TO BASE</button>
-      </div>
-    );
-  }
-
+  
+  if (!isSignedIn) return <Navigate to="/login" />;
+  
   return children;
 };
 
-import ReadyQueue from "./pages/ReadyQueue";
-import Alerts from "./pages/Alerts";
-
-import Settings from "./pages/Settings";
-import { AlertProvider } from "./context/AlertContext";
-
 function App() {
   return (
-    <Routes>
-      <Route element={<AlertProvider><ChefLayout /></AlertProvider>}>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/orders" element={<ActiveOrders />} />
-        <Route path="/orders/:id" element={<OrderDetails />} />
-        <Route path="/ready" element={<ReadyQueue />} />
-        <Route path="/alerts" element={<Alerts />} />
-        <Route path="/settings" element={<Settings />} />
+    <AuthProvider>
+      <Toaster position="top-right" />
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        
+        <Route element={
+          <ProtectedRoute>
+            <AlertProvider>
+              <ChefLayout />
+            </AlertProvider>
+          </ProtectedRoute>
+        }>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/orders" element={<ActiveOrders />} />
+          <Route path="/orders/:id" element={<OrderDetails />} />
+          <Route path="/ready" element={<ReadyQueue />} />
+          <Route path="/alerts" element={<Alerts />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
+
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Route>
-    </Routes>
+      </Routes>
+    </AuthProvider>
   );
 }
 
 export default App;
+

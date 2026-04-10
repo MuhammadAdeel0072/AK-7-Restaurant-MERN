@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
 import { useRider } from '../context/RiderContext';
-import { useUser, SignOutButton } from '../mockAuth';
+import { useAuth } from '../context/AuthContext';
 import { BrandLogo, typographyClasses } from './BrandingUtils';
 
 const RiderLayout = () => {
@@ -19,7 +19,7 @@ const RiderLayout = () => {
     const [currentTime, setCurrentTime] = useState(new Date());
     const location = useLocation();
     const { stats } = useRider();
-    const { user } = useUser();
+    const { user, logout } = useAuth();
 
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -101,12 +101,18 @@ const RiderLayout = () => {
                                 <p className="text-xs font-bold text-white leading-none">{user?.firstName}</p>
                                 <p className="text-[10px] font-bold text-gold/40 uppercase tracking-widest mt-1">Online</p>
                             </div>
-                            <img 
-                                src={user?.imageUrl} 
-                                className="w-10 h-10 rounded-md border border-white/10 object-cover" 
-                                alt="avatar" 
-                            />
+                            {user?.avatar
+                                ? <img src={user.avatar} className="w-10 h-10 rounded-md border border-white/10 object-cover" alt="avatar" />
+                                : <div className="w-10 h-10 rounded-md border border-white/10 bg-white/5 flex items-center justify-center"><UserIcon className="w-5 h-5 text-gold/40" /></div>
+                            }
                         </div>
+                        <button
+                            onClick={logout}
+                            className="p-2 text-crimson/60 hover:text-crimson hover:bg-crimson/5 rounded-lg transition-all ml-2"
+                            title="Sign Out"
+                        >
+                            <LogOut className="w-5 h-5" />
+                        </button>
                     </div>
                 </header>
 

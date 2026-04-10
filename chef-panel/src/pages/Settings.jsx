@@ -7,10 +7,10 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { useUser } from '@clerk/clerk-react';
+import { useAuth } from '../context/AuthContext';
 
 const Settings = () => {
-    const { user } = useUser();
+    const { user } = useAuth();
     const [saving, setSaving] = useState(false);
 
     const handleSave = () => {
@@ -47,13 +47,13 @@ const Settings = () => {
                 <div className="space-y-4">
                     <div className="flex items-center gap-4 p-5 rounded-2xl bg-white/5 border border-white/5">
                         <div className="w-12 h-12 bg-gold/10 rounded-xl flex items-center justify-center border border-gold/20">
-                            {user?.imageUrl 
-                                ? <img src={user.imageUrl} alt="avatar" className="w-full h-full object-cover rounded-xl" />
+                            {user?.avatar 
+                                ? <img src={user.avatar} alt="avatar" className="w-full h-full object-cover rounded-xl" />
                                 : <User className="w-5 h-5 text-gold" />
                             }
                         </div>
                         <div>
-                            <p className="text-white font-bold">{user?.fullName || user?.firstName || 'Chef'}</p>
+                            <p className="text-white font-bold">{user?.firstName} {user?.lastName || ''}</p>
                             <p className="text-soft-white/40 text-[10px] uppercase font-black tracking-widest">Kitchen Staff</p>
                         </div>
                         <div className="ml-auto">

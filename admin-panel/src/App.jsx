@@ -1,6 +1,5 @@
 import React from 'react';
-import { ClerkProvider, SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ErrorBoundary from './components/ErrorBoundary';
 import AdminLayout from './components/AdminLayout';
 import Dashboard from './pages/Dashboard';
@@ -9,54 +8,53 @@ import OrderManagement from './pages/OrderManagement';
 import ReservationManagement from './pages/ReservationManagement';
 import PaymentManagement from './pages/PaymentManagement';
 import UserManagement from './pages/UserManagement';
+import Login from './pages/Login';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { Toaster } from 'react-hot-toast';
 
-const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
-const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true' || !CLERK_PUBLISHABLE_KEY;
+const ProtectedRoute = ({ children }) => {
+  const { isSignedIn, isLoaded } = useAuth();
+  
+  if (!isLoaded) return (
+    <div className="min-h-screen bg-[#0f1115] flex items-center justify-center">
+      <div className="w-10 h-10 border-3 border-gold border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+  
+  if (!isSignedIn) return <Navigate to="/login" />;
+  
+  return children;
+};
 
 function App() {
-  // Production mode: use Clerk authentication
-  if (!DEV_MODE && !CLERK_PUBLISHABLE_KEY) {
-    return <div className="text-center p-10 text-red-500">Missing Clerk Publishable Key</div>;
-  }
-
   return (
     <ErrorBoundary>
-      <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY || 'pk_test_dummy'}>
+      <AuthProvider>
+        <Toaster position="top-right" />
         <BrowserRouter>
-          {!DEV_MODE ? (
-            <>
-              <SignedIn>
-                <Routes>
-                  <Route element={<AdminLayout />}>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/menu" element={<MenuManagement />} />
-                    <Route path="/orders" element={<OrderManagement />} />
-                    <Route path="/reservations" element={<ReservationManagement />} />
-                    <Route path="/payments" element={<PaymentManagement />} />
-                    <Route path="/users" element={<UserManagement />} />
-                  </Route>
-                </Routes>
-              </SignedIn>
-              <SignedOut>
-                <RedirectToSignIn />
-              </SignedOut>
-            </>
-          ) : (
-            <Routes>
-              <Route element={<AdminLayout />}>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/menu" element={<MenuManagement />} />
-                <Route path="/orders" element={<OrderManagement />} />
-                <Route path="/reservations" element={<ReservationManagement />} />
-                <Route path="/payments" element={<PaymentManagement />} />
-                <Route path="/users" element={<UserManagement />} />
-              </Route>
-            </Routes>
-          )}
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            
+            <Route path="/" element={
+              <ProtectedRoute>
+                <AdminLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<Dashboard />} />
+              <Route path="/menu" element={<MenuManagement />} />
+              <Route path="/orders" element={<OrderManagement />} />
+              <Route path="/reservations" element={<ReservationManagement />} />
+              <Route path="/payments" element={<PaymentManagement />} />
+              <Route path="/users" element={<UserManagement />} />
+            </Route>
+
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
         </BrowserRouter>
-      </ClerkProvider>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }
 
 export default App;
+

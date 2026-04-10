@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
-import { useProfile } from '../context/UserContext';
+import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { createOrder } from '../services/orderService';
 import { getPaymentConfig } from '../services/paymentService';
@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const Checkout = () => {
   const { state, dispatch } = useCart();
   const { cartItems } = state;
-  const { profile } = useProfile();
+  const { user: profile } = useAuth();
   const navigate = useNavigate();
 
   const [step, setStep] = useState(1);

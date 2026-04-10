@@ -1,12 +1,22 @@
 const express = require('express');
 const router = express.Router();
-const { getUserProfile, updateUserProfile, syncUser, getCart, updateCart, getLoyaltyStatus, deleteUserAccount } = require('../controllers/authController');
-const { protect, clerkAuth } = require('../middleware/authMiddleware');
+const { 
+  registerUser, 
+  authUser, 
+  getUserProfile, 
+  updateUserProfile, 
+  getCart, 
+  updateCart, 
+  getLoyaltyStatus, 
+  deleteUserAccount 
+} = require('../controllers/authController');
+const { protect } = require('../middleware/authMiddleware');
 
-// Sync route: only needs a valid JWT, not a DB user (upserts the user)
-router.post('/sync', clerkAuth, syncUser);
+// Public routes
+router.post('/register', registerUser);
+router.post('/login', authUser);
 
-// All routes below require full protection (valid JWT + DB user)
+// Protected routes
 router.use(protect);
 
 router.get('/profile', getUserProfile);
@@ -16,3 +26,4 @@ router.get('/loyalty', getLoyaltyStatus);
 router.delete('/delete', deleteUserAccount);
 
 module.exports = router;
+

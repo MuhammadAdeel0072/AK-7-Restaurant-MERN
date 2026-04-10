@@ -3,7 +3,7 @@
 ## 🎨 Consistent Design System Across All Panels
 
 This document outlines the unified branding, typography, and logo usage across all three panels: **Admin**, **Chef**, and **Rider**.
-
+ 
 ---
 
 ## 📝 Typography System
