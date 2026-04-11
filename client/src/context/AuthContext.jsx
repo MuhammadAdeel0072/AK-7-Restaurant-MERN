@@ -46,8 +46,10 @@ export const AuthProvider = ({ children }) => {
       toast.success(`Welcome back, ${data.firstName}!`);
       return data;
     } catch (error) {
-      const message = error.response?.data?.message || 'Login failed';
-      toast.error(message);
+      const message = error.response?.data?.message || error.message || 'Login failed';
+      if (message && typeof message === 'string') {
+        toast.error(message);
+      }
       throw error;
     } finally {
       setLoading(false);
@@ -64,8 +66,10 @@ export const AuthProvider = ({ children }) => {
       toast.success('Account created successfully!');
       return data;
     } catch (error) {
-      const message = error.response?.data?.message || 'Registration failed';
-      toast.error(message);
+      const message = error.response?.data?.message || error.message || 'Registration failed';
+      if (message && typeof message === 'string') {
+        toast.error(message);
+      }
       throw error;
     } finally {
       setLoading(false);
@@ -79,6 +83,30 @@ export const AuthProvider = ({ children }) => {
     toast.success('Logged out successfully');
   };
 
+  const forgotPassword = async (email) => {
+    try {
+      const { data } = await apiClient.post('/auth/forgot-password', { email });
+      toast.success('OTP sent! Check server logs.');
+      return data;
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to send OTP';
+      toast.error(message);
+      throw error;
+    }
+  };
+
+  const resetPassword = async (email, otp, newPassword) => {
+    try {
+      const { data } = await apiClient.post('/auth/reset-password', { email, otp, newPassword });
+      toast.success('Password reset successfully!');
+      return data;
+    } catch (error) {
+      const message = error.response?.data?.message || 'Reset failed';
+      toast.error(message);
+      throw error;
+    }
+  };
+
   const updateProfile = async (data) => {
     try {
       const updated = await updateUserProfile(data);
@@ -86,7 +114,10 @@ export const AuthProvider = ({ children }) => {
       toast.success('Profile updated successfully');
       return updated;
     } catch (error) {
-      toast.error('Failed to update profile');
+      const message = error.response?.data?.message || error.message || 'Failed to update profile';
+      if (message && typeof message === 'string') {
+        toast.error(message);
+      }
       throw error;
     }
   };
@@ -101,6 +132,8 @@ export const AuthProvider = ({ children }) => {
       logout,
       register,
       updateProfile, 
+      forgotPassword,
+      resetPassword,
       refreshProfile: fetchProfile 
     }}>
       {children}

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { Coffee, Lock, User, ShieldCheck } from 'lucide-react';
+import { Coffee, Lock, User, ShieldCheck, XCircle } from 'lucide-react';
 
 const Login = () => {
     const { login } = useAuth();
@@ -10,6 +10,12 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+
+    const handleClear = () => {
+        setEmail('');
+        setPassword('');
+        toast.success('Inputs cleared');
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -43,7 +49,7 @@ const Login = () => {
                     <p className="text-xs font-medium text-white/40 uppercase tracking-[0.3em]">Command Center Authorization</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6 relative">
+                <form onSubmit={handleSubmit} className="space-y-6 relative" autoComplete="off">
                     <div className="space-y-2">
                         <label className="text-[10px] font-bold text-white/60 uppercase tracking-widest ml-1">Admin Identity</label>
                         <div className="relative group/input">
@@ -53,9 +59,19 @@ const Login = () => {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white font-medium placeholder:text-white/10 focus:border-gold/50 focus:bg-white/[0.05] outline-none transition-all"
+                                autoComplete="off"
+                                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-12 text-white font-medium placeholder:text-white/10 focus:border-gold/50 focus:bg-white/[0.05] outline-none transition-all"
                                 placeholder="admin@ak7rest.com"
                             />
+                            {email && (
+                                <button 
+                                    type="button" 
+                                    onClick={() => setEmail('')}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/10 hover:text-crimson transition-colors"
+                                >
+                                    <XCircle size={18} />
+                                </button>
+                            )}
                         </div>
                     </div>
 
@@ -68,16 +84,26 @@ const Login = () => {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
-                                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white font-medium placeholder:text-white/10 focus:border-gold/50 focus:bg-white/[0.05] outline-none transition-all"
+                                autoComplete="off"
+                                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-12 text-white font-medium placeholder:text-white/10 focus:border-gold/50 focus:bg-white/[0.05] outline-none transition-all"
                                 placeholder="••••••••"
                             />
+                            {password && (
+                                <button 
+                                    type="button" 
+                                    onClick={() => setPassword('')}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/10 hover:text-crimson transition-colors"
+                                >
+                                    <XCircle size={18} />
+                                </button>
+                            )}
                         </div>
                     </div>
 
                     <button 
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-gold hover:bg-yellow-400 text-[#0f1115] py-4 rounded-2x font-bold uppercase tracking-widest text-sm transition-all shadow-xl shadow-gold/10 flex items-center justify-center gap-3 active:scale-[0.98] disabled:opacity-50"
+                        className="w-full bg-gold hover:bg-yellow-400 text-[#0f1115] py-4 rounded-full font-bold uppercase tracking-widest text-sm transition-all shadow-xl shadow-gold/10 flex items-center justify-center gap-3 active:scale-[0.98] disabled:opacity-50"
                     >
                         {loading ? <div className="w-5 h-5 border-2 border-[#0f1115]/30 border-t-[#0f1115] rounded-full animate-spin"></div> : (
                             <>
@@ -85,6 +111,15 @@ const Login = () => {
                                 Authenticate
                             </>
                         )}
+                    </button>
+
+                    <button 
+                        type="button"
+                        onClick={handleClear}
+                        className="w-full text-xs font-bold text-white/30 uppercase tracking-[0.2em] hover:text-crimson transition-all pt-3 flex items-center justify-center gap-2"
+                    >
+                        <XCircle size={14} />
+                        Clear Entries
                     </button>
                 </form>
 

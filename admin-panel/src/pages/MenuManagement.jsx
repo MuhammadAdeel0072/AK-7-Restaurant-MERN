@@ -70,8 +70,7 @@ const MenuManagement = () => {
       }
     } catch (error) {
       console.error('Failed to fetch categories', error);
-      // Fallback to default categories
-      setCategories(['Food', 'Dishes', 'Sweets', 'Drinks']);
+      setCategories([]);
     }
   };
 

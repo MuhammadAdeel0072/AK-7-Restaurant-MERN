@@ -1,21 +1,20 @@
 const asyncHandler = require('express-async-handler');
 const Product = require('../models/Product');
-
-// Store in-memory categories for newly added ones (not yet in products)
-let customCategories = [];
+const Category = require('../models/Category');
 
 // @desc    Fetch all unique categories
 // @route   GET /api/categories
 // @access  Public
 const getCategories = asyncHandler(async (req, res) => {
     try {
-        // Get all unique categories from products
+        // Get all categories from the Category model
+        // and also any unique categories from products (just in case)
+        const dbCategories = await Category.find().lean();
         const productsCategories = await Product.distinct('category').lean();
         
-        // Combine with custom categories
-        const allCategories = [...new Set([...productsCategories, ...customCategories])].filter(Boolean);
+        const dbCategoryNames = dbCategories.map(cat => cat.name);
+        const allCategories = [...new Set([...dbCategoryNames, ...productsCategories])].filter(Boolean);
         
-        // Return as array of objects for frontend compatibility
         const formattedCategories = allCategories.map(cat => ({
             _id: cat,
             name: cat,
@@ -24,6 +23,7 @@ const getCategories = asyncHandler(async (req, res) => {
 
         res.json(formattedCategories);
     } catch (error) {
+        console.error('Fetch Categories Error:', error);
         res.status(500);
         throw new Error('Failed to fetch categories');
     }
@@ -40,17 +40,22 @@ const addCategory = asyncHandler(async (req, res) => {
         throw new Error('Category name is required');
     }
 
-    if (!customCategories.includes(name.trim())) {
-        customCategories.push(name.trim());
+    const trimmedName = name.trim();
+    
+    // Check if exists
+    let category = await Category.findOne({ name: trimmedName });
+    
+    if (!category) {
+        category = await Category.create({ name: trimmedName });
     }
 
     res.status(201).json({ 
         success: true, 
         message: 'Category added successfully',
         category: {
-            _id: name.trim(),
-            name: name.trim(),
-            label: name.trim()
+            _id: category.name,
+            name: category.name,
+            label: category.name
         }
     });
 });
@@ -61,7 +66,7 @@ const addCategory = asyncHandler(async (req, res) => {
 const deleteCategory = asyncHandler(async (req, res) => {
     const { name } = req.params;
 
-    customCategories = customCategories.filter(cat => cat !== name);
+    await Category.findOneAndDelete({ name });
 
     res.json({ 
         success: true, 

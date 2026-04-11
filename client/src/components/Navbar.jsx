@@ -1,4 +1,4 @@
-import { ShoppingCart, Menu as MenuIcon, LogIn, User as UserIcon, ShoppingBag, Calendar, LogOut, X, AlertTriangle, Settings as SettingsIcon, ChevronRight } from 'lucide-react';
+import { ShoppingCart, Menu as MenuIcon, LogIn, User as UserIcon, ShoppingBag, Calendar, LogOut, X, AlertTriangle, Settings as SettingsIcon, ChevronRight, HelpCircle } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -22,7 +22,6 @@ const Navbar = () => {
     { name: 'Orders', path: '/orders' },
     { name: 'History', path: '/order-history' },
     { name: 'Table', path: '/reservation' },
-    { name: 'Help', path: '/help' },
   ];
 
   const totalItems = cartItems.reduce((acc, item) => acc + item.qty, 0);
@@ -78,6 +77,11 @@ const Navbar = () => {
 
         {/* Right side */}
         <div className="flex items-center gap-3 md:gap-5">
+          {/* Help */}
+          <Link to="/help" className="flex items-center group" title="Help">
+            <HelpCircle className="w-5 h-5 md:w-6 md:h-6 text-gold/60 group-hover:text-gold transition-colors" />
+          </Link>
+
           {/* Cart */}
           <Link to="/cart" className="relative flex items-center gap-2 group">
             <ShoppingCart className="w-5 h-5 md:w-6 md:h-6 text-gold group-hover:scale-110 transition-transform" />
@@ -141,6 +145,14 @@ const Navbar = () => {
                         >
                           <Calendar className="w-4 h-4 text-gold/50 group-hover/item:text-gold transition-colors" />
                           <span>Booking</span>
+                        </Link>
+                        <Link
+                          to="/help"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-3 px-5 py-3.5 text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm font-medium group/item border-l-2 border-transparent hover:border-gold"
+                        >
+                          <HelpCircle className="w-4 h-4 text-gold/50 group-hover/item:text-gold transition-colors" />
+                          <span>Help</span>
                         </Link>
                         <Link
                           to="/settings"

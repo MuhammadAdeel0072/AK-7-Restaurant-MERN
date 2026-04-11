@@ -31,14 +31,7 @@ apiClient.interceptors.response.use(
       // Potential redirect to login could happen here if we had access to history
     } else if (error.response?.status >= 500) {
       const errorDetail = error.response?.data?.message || 'Server-side protocol failure';
-      toast.error(`System Protocol Error: ${errorDetail}`, {
-        id: 'api-error',
-        style: {
-          background: '#1a1a1a',
-          color: '#ff4b4b',
-          border: '1px solid #ff4b4b',
-        },
-      });
+      toast.error(`System Protocol Error: ${errorDetail}`);
     }
     return Promise.reject(error);
   }

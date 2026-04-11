@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { Utensils, Lock, User, ChefHat } from 'lucide-react';
+import { ChefHat, Lock, User, Utensils, XCircle } from 'lucide-react';
 
 const Login = () => {
     const { login } = useAuth();
@@ -11,10 +11,16 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
 
+    const handleClear = () => {
+        setEmail('');
+        setPassword('');
+        toast.success('Inputs cleared');
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        const loadingToast = toast.loading('Authenticating chef credentials...');
+        const loadingToast = toast.loading('Activating Kitchen protocol...');
         try {
             await login(email, password);
             toast.dismiss(loadingToast);
@@ -29,68 +35,98 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#121212] flex items-center justify-center p-6 font-sans">
-            <div className="w-full max-w-md bg-[#1e1e1e] border border-white/5 rounded-[2.5rem] p-10 shadow-2xl relative overflow-hidden group">
+        <div className="min-h-screen bg-[#0f1115] flex items-center justify-center p-6 font-sans">
+            <div className="w-full max-w-md bg-[#1a1d23] border border-white/5 rounded-[2rem] p-10 shadow-2xl relative overflow-hidden group">
                 {/* Visual Background Elements */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-gold/10 rounded-full blur-3xl -ml-16 -mb-16"></div>
+                <div className="absolute -top-24 -right-24 w-48 h-48 bg-gold/10 rounded-full blur-[80px]"></div>
+                <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-crimson/10 rounded-full blur-[80px]"></div>
 
                 <div className="text-center mb-10 relative">
-                    <div className="w-20 h-20 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-orange-500/20 group-hover:scale-110 transition-transform duration-500">
-                        <ChefHat className="text-orange-500" size={40} />
+                    <div className="w-16 h-16 bg-gold/10 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-gold/20 rotate-3 group-hover:rotate-6 transition-transform">
+                        <ChefHat className="text-gold" size={32} />
                     </div>
-                    <h1 className="text-3xl font-serif font-black text-white tracking-wide mb-2 uppercase italic">Kitchen <span className="text-orange-500">HQ</span></h1>
-                    <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.5em]">Executive Chef Access Only</p>
+                    <h1 className="text-3xl font-bold text-white tracking-tight mb-2">AK-7 <span className="text-gold">Chef</span></h1>
+                    <p className="text-xs font-medium text-white/40 uppercase tracking-[0.3em]">Culinary HQ Authorization</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6 relative">
+                <form onSubmit={handleSubmit} className="space-y-6 relative" autoComplete="off">
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black text-white/50 uppercase tracking-widest ml-1">Chef Identifier</label>
+                        <label className="text-[10px] font-bold text-white/60 uppercase tracking-widest ml-1">Chef Identity</label>
                         <div className="relative group/input">
-                            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within/input:text-orange-500 transition-colors" size={20} />
+                            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within/input:text-gold transition-colors" size={20} />
                             <input 
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white font-bold placeholder:text-white/10 focus:border-orange-500/50 outline-none transition-all"
+                                autoComplete="off"
+                                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-12 text-white font-medium placeholder:text-white/10 focus:border-gold/50 focus:bg-white/[0.05] outline-none transition-all"
                                 placeholder="chef@ak7rest.com"
                             />
+                            {email && (
+                                <button 
+                                    type="button" 
+                                    onClick={() => setEmail('')}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/10 hover:text-crimson transition-colors"
+                                >
+                                    <XCircle size={18} />
+                                </button>
+                            )}
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black text-white/50 uppercase tracking-widest ml-1">Kitchen Secret</label>
+                        <label className="text-[10px] font-bold text-white/60 uppercase tracking-widest ml-1">Secret Key</label>
                         <div className="relative group/input">
-                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within/input:text-orange-500 transition-colors" size={20} />
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within/input:text-gold transition-colors" size={20} />
                             <input 
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
-                                className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white font-bold placeholder:text-white/10 focus:border-orange-500/50 outline-none transition-all"
+                                autoComplete="off"
+                                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-12 text-white font-medium placeholder:text-white/10 focus:border-gold/50 focus:bg-white/[0.05] outline-none transition-all"
                                 placeholder="••••••••"
                             />
+                            {password && (
+                                <button 
+                                    type="button" 
+                                    onClick={() => setPassword('')}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/10 hover:text-crimson transition-colors"
+                                >
+                                    <XCircle size={18} />
+                                </button>
+                            )}
                         </div>
                     </div>
 
                     <button 
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-orange-600 hover:bg-orange-500 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-xl shadow-orange-900/20 flex items-center justify-center gap-3 active:scale-[0.98] disabled:opacity-50"
+                        className="w-full bg-gold hover:bg-yellow-400 text-[#0f1115] py-4 rounded-full font-bold uppercase tracking-widest text-sm transition-all shadow-xl shadow-gold/10 flex items-center justify-center gap-3 active:scale-[0.98] disabled:opacity-50"
                     >
-                        {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : (
+                        {loading ? <div className="w-5 h-5 border-2 border-[#0f1115]/30 border-t-[#0f1115] rounded-full animate-spin"></div> : (
                             <>
                                 <Utensils size={20} />
-                                Open Station
+                                Authenticate Station
                             </>
                         )}
                     </button>
+
+                    <button 
+                        type="button"
+                        onClick={handleClear}
+                        className="w-full text-xs font-bold text-white/30 uppercase tracking-[0.2em] hover:text-crimson transition-all pt-3 flex items-center justify-center gap-2"
+                    >
+                        <XCircle size={14} />
+                        Clear Entries
+                    </button>
                 </form>
 
-                <div className="mt-10 pt-6 border-t border-white/5 flex items-center justify-between text-[8px] font-black text-white/10 uppercase tracking-[0.3em]">
-                    <span>Secure Line 07</span>
-                    <span>AK-7 CulinaryOS</span>
+                <div className="mt-10 pt-6 border-t border-white/5 flex items-center justify-center gap-4 text-[9px] font-bold text-white/20 uppercase tracking-widest">
+                    <span>V3.0 Secure</span>
+                    <span className="w-1 h-1 bg-white/10 rounded-full"></span>
+                    <span>Kitchen Protocol</span>
                 </div>
             </div>
         </div>

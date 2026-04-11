@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { Mail, Lock, Loader2, Key } from 'lucide-react';
+import { Bike, Lock, User, ShieldCheck, XCircle } from 'lucide-react';
 
 const Login = () => {
     const { login } = useAuth();
@@ -10,11 +10,17 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
-    
+
+    const handleClear = () => {
+        setEmail('');
+        setPassword('');
+        toast.success('Inputs cleared');
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        const loadingToast = toast.loading('Authenticating rider credentials...');
+        const loadingToast = toast.loading('Activating Logistics protocol...');
         try {
             await login(email, password);
             toast.dismiss(loadingToast);
@@ -27,62 +33,100 @@ const Login = () => {
             setLoading(false);
         }
     };
-    
+
     return (
-        <div className="min-h-screen bg-charcoal flex items-center justify-center p-6">
-            <div className="w-full max-w-md bg-charcoal-light border border-gold/20 rounded-3xl p-8 shadow-2xl relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                    <Key size={120} className="text-gold -rotate-12" />
+        <div className="min-h-screen bg-[#0f1115] flex items-center justify-center p-6 font-sans">
+            <div className="w-full max-w-md bg-[#1a1d23] border border-white/5 rounded-[2rem] p-10 shadow-2xl relative overflow-hidden group">
+                {/* Visual Background Elements */}
+                <div className="absolute -top-24 -right-24 w-48 h-48 bg-gold/10 rounded-full blur-[80px]"></div>
+                <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-crimson/10 rounded-full blur-[80px]"></div>
+
+                <div className="text-center mb-10 relative">
+                    <div className="w-16 h-16 bg-gold/10 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-gold/20 rotate-3 group-hover:rotate-6 transition-transform">
+                        <Bike className="text-gold" size={32} />
+                    </div>
+                    <h1 className="text-3xl font-bold text-white tracking-tight mb-2">AK-7 <span className="text-gold">Rider</span></h1>
+                    <p className="text-xs font-medium text-white/40 uppercase tracking-[0.3em]">Logistics Terminal Authorization</p>
                 </div>
 
-                <div className="text-center mb-10">
-                    <h1 className="text-4xl font-serif font-black text-gold tracking-tighter italic uppercase mb-2">Rider <span className="text-white">Terminal</span></h1>
-                    <p className="text-[10px] font-bold text-soft-white/40 uppercase tracking-[0.4em]">Logistics Authentication Protocol</p>
-                </div>
-
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6 relative" autoComplete="off">
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black text-gold uppercase tracking-widest ml-1">Personnel ID (Email)</label>
-                        <div className="relative">
-                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gold/50" size={18} />
+                        <label className="text-[10px] font-bold text-white/60 uppercase tracking-widest ml-1">Rider Identity</label>
+                        <div className="relative group/input">
+                            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within/input:text-gold transition-colors" size={20} />
                             <input 
                                 type="email"
                                 value={email}
-                                required
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white font-bold placeholder:text-white/20 focus:border-gold/50 outline-none transition-all"
+                                required
+                                autoComplete="off"
+                                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-12 text-white font-medium placeholder:text-white/10 focus:border-gold/50 focus:bg-white/[0.05] outline-none transition-all"
                                 placeholder="rider@ak7rest.com"
                             />
+                            {email && (
+                                <button 
+                                    type="button" 
+                                    onClick={() => setEmail('')}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/10 hover:text-crimson transition-colors"
+                                >
+                                    <XCircle size={18} />
+                                </button>
+                            )}
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black text-gold uppercase tracking-widest ml-1">Security Key</label>
-                        <div className="relative">
-                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gold/50" size={18} />
+                        <label className="text-[10px] font-bold text-white/60 uppercase tracking-widest ml-1">Personnel Key</label>
+                        <div className="relative group/input">
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within/input:text-gold transition-colors" size={20} />
                             <input 
                                 type="password"
                                 value={password}
-                                required
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white font-bold placeholder:text-white/20 focus:border-gold/50 outline-none transition-all"
+                                required
+                                autoComplete="off"
+                                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-12 text-white font-medium placeholder:text-white/10 focus:border-gold/50 focus:bg-white/[0.05] outline-none transition-all"
                                 placeholder="••••••••"
                             />
+                            {password && (
+                                <button 
+                                    type="button" 
+                                    onClick={() => setPassword('')}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/10 hover:text-crimson transition-colors"
+                                >
+                                    <XCircle size={18} />
+                                </button>
+                            )}
                         </div>
                     </div>
 
                     <button 
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-gold hover:bg-yellow-400 text-charcoal py-4 rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-lg shadow-gold/20 flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
+                        className="w-full bg-gold hover:bg-yellow-400 text-[#0f1115] py-4 rounded-full font-bold uppercase tracking-widest text-sm transition-all shadow-xl shadow-gold/10 flex items-center justify-center gap-3 active:scale-[0.98] disabled:opacity-50"
                     >
-                        {loading ? <Loader2 className="animate-spin" /> : 'Authorize Access'}
+                        {loading ? <div className="w-5 h-5 border-2 border-[#0f1115]/30 border-t-[#0f1115] rounded-full animate-spin"></div> : (
+                            <>
+                                <ShieldCheck size={20} />
+                                Authenticate Identity
+                            </>
+                        )}
+                    </button>
+
+                    <button 
+                        type="button"
+                        onClick={handleClear}
+                        className="w-full text-xs font-bold text-white/30 uppercase tracking-[0.2em] hover:text-crimson transition-all pt-3 flex items-center justify-center gap-2"
+                    >
+                        <XCircle size={14} />
+                        Clear Entries
                     </button>
                 </form>
 
-                <div className="mt-10 pt-6 border-t border-white/5 flex items-center justify-between text-[8px] font-black text-soft-white/20 uppercase tracking-widest">
-                    <span>Terminal AK-7-R3</span>
-                    <span>Encrypted Connection Active</span>
+                <div className="mt-10 pt-6 border-t border-white/5 flex items-center justify-center gap-4 text-[9px] font-bold text-white/20 uppercase tracking-widest">
+                    <span>V3.0 Secure</span>
+                    <span className="w-1 h-1 bg-white/10 rounded-full"></span>
+                    <span>Rider Protocol</span>
                 </div>
             </div>
         </div>

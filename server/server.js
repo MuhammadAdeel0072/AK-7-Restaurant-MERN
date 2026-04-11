@@ -13,8 +13,7 @@ const { errorHandler } = require('./middleware/errorHandler');
 // Load environment variables
 dotenv.config();
 
-// Connect to MongoDB
-connectDB();
+// Database connection is handled in startServer()
 
 const app = express();
 const server = http.createServer(app);
@@ -52,8 +51,6 @@ const limter = rateLimit({
 });
 app.use('/api/', limter);
 
-
-
 // Security headers - Relaxed for cross-origin development
 app.use(helmet({
   contentSecurityPolicy: false,
@@ -81,6 +78,7 @@ const riderRoutes = require('./routes/riderRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const dealRoutes = require('./routes/dealRoutes');
+
 app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/admin', adminRoutes);
@@ -96,7 +94,6 @@ app.use('/api/rider', riderRoutes);
 
 // ======================
 // 🏠 ROOT ROUTE
-
 // ======================
 app.get('/', (req, res) => {
   res.send('AK-7 REST API is running');
@@ -123,6 +120,37 @@ const PORT = process.env.PORT || 5000;
 
 server.timeout = 60000;
 
-server.listen(PORT, '127.0.0.1', () => {
-  console.log(`Server Forced to 127.0.0.1:${PORT}`);
+// Handle port conflicts gracefully
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(`\n❌ FATAL: Port ${PORT} is already in use!`);
+    console.error('Solution: Kill the existing process or use a different PORT.');
+    console.error(`\nTo kill the process using port ${PORT}:`);
+    console.error('Windows: netstat -ano | findstr :' + PORT);
+    console.error('Then: taskkill /PID <PID> /F\n');
+    process.exit(1);
+  } else {
+    console.error('❌ Server crash error:', error);
+    process.exit(1);
+  }
 });
+
+// Main initialization
+const startServer = async () => {
+  try {
+    // Wait for DB to connect before listening
+    console.log('🔄 Initializing Database Connection...');
+    await connectDB();
+    
+    server.listen(PORT, '0.0.0.0', () => {
+      console.log(`✅ Server running on http://localhost:${PORT}`);
+      console.log(`✅ Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log('✅ System Protocol: All systems operational. Awaiting incoming data streams.');
+    });
+  } catch (error) {
+    console.error('❌ Failed to connect to database. Server will not start:', error.message);
+    process.exit(1);
+  }
+};
+
+startServer();

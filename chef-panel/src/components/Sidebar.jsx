@@ -87,7 +87,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           className="flex items-center space-x-4 w-full px-5 py-4 text-crimson hover:bg-crimson/5 rounded-xl transition-all duration-300 group border border-transparent hover:border-crimson/20"
         >
           <LogOut className="w-5 h-5 mr-4 group-hover:translate-x-1 transition-transform" />
-          <span className="font-bold tracking-wider text-sm">Sign Out</span>
+          <span className="font-bold tracking-wider text-sm uppercase">LOGOUT</span>
         </button>
       </div>
     </motion.aside>

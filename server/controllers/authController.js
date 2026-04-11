@@ -18,33 +18,66 @@ const generateToken = (id) => {
 const registerUser = asyncHandler(async (req, res, next) => {
   const { firstName, lastName, email, password } = req.body;
 
+  // Validate required fields
+  if (!email || !password) {
+    console.error('❌ Registration Error: Missing required fields', { email: !!email, password: !!password });
+    res.status(400);
+    throw new Error('Email and password are required');
+  }
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    console.error(`❌ Registration Error: Invalid email format: ${email}`);
+    res.status(400);
+    throw new Error('Invalid email format');
+  }
+
+  // Validate password length
+  if (password.length < 6) {
+    console.error('❌ Registration Error: Password too short');
+    res.status(400);
+    throw new Error('Password must be at least 6 characters long');
+  }
+
   const userExists = await User.findOne({ email });
 
   if (userExists) {
+    console.error(`❌ Registration Error: User already exists: ${email}`);
     res.status(400);
     throw new Error('User already exists');
   }
 
-  const user = await User.create({
-    firstName,
-    lastName,
-    email,
-    password,
-    role: 'customer', 
-  });
-
-  if (user) {
-    res.status(201).json({
-      _id: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      role: user.role,
-      token: generateToken(user._id),
+  try {
+    console.log(`📝 Creating new user: ${email}`);
+    const user = await User.create({
+      firstName: firstName || 'User',
+      lastName: lastName || '',
+      email,
+      password,
+      role: 'customer', 
     });
-  } else {
-    res.status(400);
-    throw new Error('Invalid user data');
+
+    console.log(`✅ User created successfully: ${email}`);
+
+    if (user) {
+      const token = generateToken(user._id);
+      res.status(201).json({
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+        token: token,
+      });
+    } else {
+      console.error('❌ Registration Error: Failed to create user');
+      res.status(400);
+      throw new Error('Invalid user data');
+    }
+  } catch (error) {
+    console.error('❌ Registration Error:', error.message);
+    throw error;
   }
 });
 
@@ -54,9 +87,45 @@ const registerUser = asyncHandler(async (req, res, next) => {
 const authUser = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
+  // Validate input
+  if (!email || !password) {
+    console.error('❌ Login Error: Missing email or password', { email: !!email, password: !!password });
+    res.status(400);
+    throw new Error('Email and password are required');
+  }
 
-  if (user && (await user.matchPassword(password))) {
+  // Find user
+  const user = await User.findOne({ email });
+  console.log(`🔍 User lookup for ${email}:`, user ? 'Found' : 'Not found');
+
+  // Check if user exists
+  if (!user) {
+    console.error(`❌ Login Error: User not found for email: ${email}`);
+    res.status(401);
+    throw new Error('Invalid email or password');
+  }
+
+  // Verify password field exists and is valid
+  if (!user.password || typeof user.password !== 'string') {
+    console.error(`❌ Login Error: User found but password field is corrupted for ${email}`);
+    res.status(500);
+    throw new Error('Server error: User account data is corrupted. Please contact support.');
+  }
+
+  // Compare passwords safely
+  let isPasswordValid = false;
+  try {
+    isPasswordValid = await user.matchPassword(password);
+    console.log(`🔐 Password comparison result for ${email}:`, isPasswordValid ? 'MATCH ✅' : 'FAIL ❌');
+  } catch (bcryptError) {
+    console.error(`❌ Bcrypt Error during password comparison for ${email}:`, bcryptError.message);
+    res.status(500);
+    throw new Error('Server error: Password verification failed. Account data might be inconsistent.');
+  }
+
+  if (isPasswordValid) {
+    const token = generateToken(user._id);
+    console.log(`✅ Login successful for ${email}`);
     res.json({
       _id: user._id,
       firstName: user.firstName,
@@ -64,9 +133,10 @@ const authUser = asyncHandler(async (req, res, next) => {
       email: user.email,
       role: user.role,
       avatar: user.avatar,
-      token: generateToken(user._id),
+      token: token,
     });
   } else {
+    console.error(`❌ Login Error: Invalid password for ${email}`);
     res.status(401);
     throw new Error('Invalid email or password');
   }
@@ -193,6 +263,77 @@ const deleteUserAccount = asyncHandler(async (req, res, next) => {
   }
 });
 
+// @desc    Forgot Password - Generate OTP
+// @route   POST /api/auth/forgot-password
+// @access  Public
+const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    res.status(400);
+    throw new Error('Please provide an email address');
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    res.status(404);
+    throw new Error('No user found with that email address');
+  }
+
+  // Generate 6-digit OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  
+  // Set OTP and Expiry (10 minutes)
+  user.resetPasswordOTP = otp;
+  user.resetPasswordExpires = Date.now() + 10 * 60 * 1000;
+  await user.save();
+
+  // For development: Log OTP to console
+  console.log(`\n🔑 [PASSWORD RESET] OTP for ${email}: ${otp}\n`);
+
+  res.status(200).json({ 
+    success: true, 
+    message: 'OTP sent to your email (simulated)' 
+  });
+});
+
+// @desc    Reset Password using OTP
+// @route   POST /api/auth/reset-password
+// @access  Public
+const resetPassword = asyncHandler(async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+
+  if (!email || !otp || !newPassword) {
+    res.status(400);
+    throw new Error('Please provide email, OTP, and new password');
+  }
+
+  const user = await User.findOne({ 
+    email,
+    resetPasswordOTP: otp,
+    resetPasswordExpires: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    res.status(400);
+    throw new Error('Invalid or expired OTP');
+  }
+
+  // Update password and clear OTP fields
+  user.password = newPassword;
+  user.resetPasswordOTP = undefined;
+  user.resetPasswordExpires = undefined;
+  await user.save();
+
+  console.log(`✅ Password successfully reset for user: ${email}`);
+
+  res.status(200).json({ 
+    success: true, 
+    message: 'Password reset successful. You can now log in.' 
+  });
+});
+
 module.exports = { 
   registerUser, 
   authUser, 
@@ -202,6 +343,8 @@ module.exports = {
   updateCart,
   getLoyaltyStatus, 
   deleteUserAccount,
-  clearCart
+  clearCart,
+  forgotPassword,
+  resetPassword
 };
 

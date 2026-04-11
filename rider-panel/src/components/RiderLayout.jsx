@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import { 
     LayoutDashboard, 
     Truck, 
@@ -56,33 +56,41 @@ const RiderLayout = () => {
                         <span className={`${typographyClasses.labelSmall} block mt-2`}>Rider Logistics Terminal</span>
                     </div>
 
-                    <nav className="flex-1 space-y-2">
-                        {navItems.map((item) => {
-                            const Icon = item.icon;
-                            const isActive = location.pathname === item.path;
-                            return (
-                                <Link
-                                    key={item.path}
-                                    to={item.path}
-                                    onClick={() => setIsSidebarOpen(false)}
-                                    className={`
-                                        flex items-center gap-4 px-6 py-4 rounded-md transition-all group
-                                        ${isActive ? 'glass-gold text-gold shadow-[0_0_20px_rgba(212,175,55,0.1)]' : 'text-soft-white/40 hover:bg-white/5 hover:text-white'}
-                                    `}
-                                >
-                                    <Icon className={`w-5 h-5 ${isActive ? 'text-gold' : 'text-gold/40 group-hover:scale-110 group-hover:text-gold transition-transform'}`} />
-                                    <span className="text-lg font-bold uppercase tracking-widest">{item.label}</span>
-                                </Link>
-                            );
-                        })}
+                    <nav className="flex-1 space-y-3">
+                        {navItems.map((item) => (
+                            <NavLink
+                                key={item.path}
+                                to={item.path}
+                                onClick={() => setIsSidebarOpen(false)}
+                                className={({ isActive }) =>
+                                    `flex items-center space-x-4 px-5 py-4 rounded-xl transition-all duration-300 group ${
+                                        isActive 
+                                            ? 'bg-gold/10 text-gold border border-gold/20 shadow-[0_0_20px_rgba(212,175,55,0.1)]' 
+                                            : 'text-soft-white/60 hover:bg-white/5 hover:text-soft-white border border-transparent'
+                                    }`
+                                }
+                            >
+                                <item.icon className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+                                <span className="font-semibold tracking-wide">{item.label}</span>
+                            </NavLink>
+                        ))}
                     </nav>
 
                     {/* Stats Card - Aligned with Card Premium */}
-                    <div className="mt-auto p-6 glass rounded-2xl border border-white/5 text-center">
+                    <div className="mt-auto p-4 glass rounded-2xl border border-white/5 text-center mb-4">
                         <p className="text-[10px] text-soft-white/20 font-bold uppercase tracking-widest mb-2">My Stats Today</p>
                         <p className="text-3xl font-serif font-black text-gold italic leading-none">{stats?.completedToday || 0}</p>
                         <p className="text-[10px] font-bold text-soft-white/40 uppercase tracking-widest mt-1">Completed Missions</p>
                     </div>
+
+                    {/* Standardized Logout - Matching Admin/Chef */}
+                    <button
+                        onClick={logout}
+                        className="flex items-center space-x-4 w-full px-5 py-4 text-crimson hover:bg-crimson/5 rounded-xl transition-all duration-300 group border border-transparent hover:border-crimson/20"
+                    >
+                        <LogOut className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        <span className="font-bold tracking-wider text-sm uppercase">LOGOUT</span>
+                    </button>
                 </div>
             </aside>
 
@@ -109,7 +117,7 @@ const RiderLayout = () => {
                         <button
                             onClick={logout}
                             className="p-2 text-crimson/60 hover:text-crimson hover:bg-crimson/5 rounded-lg transition-all ml-2"
-                            title="Sign Out"
+                            title="Logout"
                         >
                             <LogOut className="w-5 h-5" />
                         </button>

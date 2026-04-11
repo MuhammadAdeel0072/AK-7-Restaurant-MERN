@@ -6,7 +6,7 @@ import { useSocket } from '../context/SocketContext';
 import { ShoppingCart, Heart, Search, Filter, Plus, Minus, X, Package, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { fallbackItems } from '../data/menuData';
+
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
@@ -28,13 +28,10 @@ const Menu = () => {
       try {
         setLoading(true);
         const data = await getProducts();
-        if (data && data.length > 0) {
-          setProducts(data);
-        } else {
-          setProducts(fallbackItems);
-        }
+        setProducts(Array.isArray(data) ? data : []);
       } catch (error) {
-        setProducts(fallbackItems);
+        console.error('Failed to fetch products:', error);
+        setProducts([]);
       } finally {
         setLoading(false);
       }
@@ -52,8 +49,7 @@ const Menu = () => {
         }
       } catch (error) {
         console.error('Failed to fetch categories:', error);
-        // Fallback to default categories
-        setCategories(['Food', 'Dishes', 'Sweets', 'Drinks']);
+        setCategories([]);
       }
     };
     
@@ -171,9 +167,9 @@ const Menu = () => {
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-6 md:px-8 py-2.5 md:py-3 rounded-2xl transition-all font-black text-[10px] md:text-xs uppercase tracking-widest whitespace-nowrap ${
+                className={`px-8 py-2.5 md:py-3 rounded-2xl transition-all font-black text-[10px] md:text-xs uppercase tracking-widest whitespace-nowrap ${
                   activeCategory === cat
-                    ? 'bg-gold text-charcoal shadow-[0_0_20px_rgba(212,175,55,0.4)] scale-105'
+                    ? 'bg-gold text-charcoal shadow-[0_0_20px_rgba(212,175,55,0.4)] scale-105 border-transparent'
                     : 'bg-white/5 text-gray-400 hover:text-gold border border-white/5 hover:border-gold/30'
                 }`}
               >
@@ -189,7 +185,7 @@ const Menu = () => {
           {[...Array(8)].map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : filteredProducts.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 items-stretch">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 items-stretch min-h-[500px]">
           {filteredProducts.map(product => {
             const isFav = profile?.favorites?.includes(product._id);
             return (
@@ -262,7 +258,7 @@ const Menu = () => {
                     onClick={(e) => addToCartHandler(product, 1, e)}
                     className="mt-auto w-full flex items-center justify-between bg-white/5 hover:bg-gold/10 border border-white/5 group-hover:border-gold/30 hover:border-gold/50 px-5 py-3.5 rounded-2xl transition-all duration-300 group/btn"
                   >
-                    <span className="text-[9px] font-black uppercase tracking-widest text-white/40 group-hover/btn:text-gold transition-colors">Add to Cart</span>
+                    <span className="text-[11px] font-black uppercase tracking-widest text-white/40 group-hover/btn:text-gold transition-colors">Add to Cart</span>
                     <ShoppingCart className="w-4 h-4 text-gold/40 group-hover/btn:text-gold group-hover/btn:scale-110 transition-all" />
                   </button>
                 </div>
