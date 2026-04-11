@@ -82,6 +82,25 @@ const Menu = () => {
       };
       fetchProducts();
     }
+
+    // Handle category updates
+    if (siteUpdate?.type === 'categoryAdded' || siteUpdate?.type === 'categoryUpdated' || siteUpdate?.type === 'categoryDeleted') {
+      const fetchCategories = async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/categories`);
+          if (response.ok) {
+            const data = await response.json();
+            const categoryNames = Array.isArray(data) 
+              ? data.map(cat => typeof cat === 'string' ? cat : cat.name)
+              : [];
+            setCategories(categoryNames);
+          }
+        } catch (error) {
+          console.error('Failed to fetch categories:', error);
+        }
+      };
+      fetchCategories();
+    }
   }, [siteUpdate]);
 
   const addToCartHandler = (product, quantity = 1, e) => {

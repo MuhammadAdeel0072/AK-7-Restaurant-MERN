@@ -34,7 +34,21 @@ const MenuManagement = () => {
     
     // Listen for real-time updates from other admin sessions or system
     socket.on('menuUpdated', fetchItems);
-    return () => socket.off('menuUpdated');
+    
+    // Listen for admin actions (in case multiple admins are working)
+    socket.on('adminAction', (data) => {
+      if (data?.type?.includes('category')) {
+        fetchCategories();
+      }
+      if (data?.type === 'menuUpdate') {
+        fetchItems();
+      }
+    });
+    
+    return () => {
+      socket.off('menuUpdated');
+      socket.off('adminAction');
+    };
   }, []);
 
   const fetchItems = async () => {
@@ -68,15 +82,29 @@ const MenuManagement = () => {
       return;
     }
     
-    // Add category to the list (categories are just strings in the Product model)
-    if (!categories.includes(newCategoryName)) {
+    if (categories.includes(newCategoryName)) {
+      toast.error('Category already exists ❌');
+      return;
+    }
+
+    const loadingToast = toast.loading('Adding category...');
+    try {
+      // Save category to backend
+      await api.post('/categories', { name: newCategoryName });
+      
+      // Update local state
       setCategories([...categories, newCategoryName]);
       const categoryName = newCategoryName;
       setNewCategoryName('');
-      socket.emit('adminAction', { type: 'categoryAdded' });
+      
+      // Broadcast socket event to all clients
+      socket.emit('adminAction', { type: 'categoryAdded', category: categoryName });
+      
+      toast.dismiss(loadingToast);
       toast.success(`${categoryName} category added successfully ✅`);
-    } else {
-      toast.error('Category already exists ❌');
+    } catch (error) {
+      toast.dismiss(loadingToast);
+      toast.error(error.response?.data?.message || 'Failed to add category ❌');
     }
   };
 
@@ -109,7 +137,13 @@ const MenuManagement = () => {
         await api.put(`/products/${product._id}`, { ...product, category: editingCategoryName });
       }
 
-      socket.emit('adminAction', { type: 'categoryUpdated' });
+      // Delete old category from backend and add new one
+      await api.delete(`/categories/${oldName}`);
+      await api.post('/categories', { name: editingCategoryName });
+
+      // Broadcast socket event
+      socket.emit('adminAction', { type: 'categoryUpdated', oldCategory: oldName, newCategory: editingCategoryName });
+      
       toast.dismiss(loadingToast);
       toast.success(`Category updated to "${editingCategoryName}" ✅`);
       setEditingCategoryId(null);
@@ -133,15 +167,22 @@ const MenuManagement = () => {
     if (window.confirm(`Are you sure you want to delete "${categoryName}" category?`)) {
       const loadingToast = toast.loading('Deleting category...');
       try {
+        // Delete from backend
+        await api.delete(`/categories/${categoryName}`);
+        
+        // Update local state
         const updatedCategories = categories.filter((_, i) => i !== index);
         setCategories(updatedCategories);
-        socket.emit('adminAction', { type: 'categoryDeleted' });
+        
+        // Broadcast socket event
+        socket.emit('adminAction', { type: 'categoryDeleted', category: categoryName });
+        
         toast.dismiss(loadingToast);
         toast.success(`Category "${categoryName}" deleted successfully 🗑️`);
         setEditingCategoryId(null);
       } catch (error) {
         toast.dismiss(loadingToast);
-        toast.error('Failed to delete category ❌');
+        toast.error(error.response?.data?.message || 'Failed to delete category ❌');
       }
     }
   };

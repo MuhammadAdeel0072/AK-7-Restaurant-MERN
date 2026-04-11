@@ -55,6 +55,13 @@ const init = (server) => {
       console.log('Rider joined delivery room');
     });
 
+    // Listen for admin actions and broadcast to all clients
+    socket.on('adminAction', (data) => {
+      console.log('Admin action received:', data);
+      // Broadcast to all connected clients
+      io.emit('adminAction', data);
+    });
+
     socket.on('disconnect', () => {
       console.log('Socket Disconnected:', socket.id);
     });
