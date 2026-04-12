@@ -72,7 +72,7 @@ const ActiveOrders = () => {
             <AlertCircle className="w-12 h-12 text-crimson mx-auto mb-2" />
             <p className="text-crimson font-bold uppercase tracking-widest text-xs">Operation Error</p>
             <p className="text-soft-white/60">{error}</p>
-            <button onClick={fetchOrders} className="btn-gold scale-90">RETRY SYSTEM SYNC</button>
+            <button onClick={fetchOrders} className="btn-gold scale-90">REFRESH PAGE</button>
         </div>
     );
 
@@ -83,7 +83,7 @@ const ActiveOrders = () => {
                     <h1 className="text-4xl font-serif font-black mb-1 tracking-tighter italic">
                         Live <span className="text-gold ml-1">Orders Queue</span>
                     </h1>
-                    <p className="text-soft-white/40 tracking-[0.2em] uppercase text-[10px] font-bold italic">Real-time Kitchen Workflow Synchronization</p>
+                    <p className="text-soft-white/40 tracking-[0.2em] uppercase text-[10px] font-bold italic">Live Kitchen Status</p>
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-4">
@@ -122,7 +122,7 @@ const ActiveOrders = () => {
                         >
                             <ChefHat className="w-16 h-16 text-gold/10 mx-auto mb-6" />
                             <h2 className="text-2xl font-serif text-white/20 uppercase tracking-widest">No Active Orders</h2>
-                            <p className="text-soft-white/10 text-[10px] mt-2 font-bold italic tracking-widest">Awaiting incoming data streams...</p>
+                            <p className="text-soft-white/10 text-[10px] mt-2 font-bold italic tracking-widest">Waiting for new orders...</p>
                         </motion.div>
                     ) : (
                         filteredOrders.map((order) => (

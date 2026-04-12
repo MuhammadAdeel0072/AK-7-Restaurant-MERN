@@ -20,7 +20,7 @@ const Checkout = () => {
     address: '',
   });
 
-  // Autofill Identity Logic
+  // Autofill User Info Logic
   useEffect(() => {
     if (profile) {
       setShippingAddress({
@@ -49,7 +49,7 @@ const Checkout = () => {
   }, []);
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.qty * item.price, 0);
-  const tax = subtotal * 0.1;
+  const tax = 0;
   const deliveryFee = subtotal > 50 ? 0 : 5;
   const total = subtotal + tax + deliveryFee;
 
@@ -64,7 +64,7 @@ const Checkout = () => {
 
   const submitHandler = async () => {
     if (!shippingAddress.phoneNumber || !shippingAddress.address) {
-      return toast.error('Phone and Address are required protocol');
+      return toast.error('Phone and Address are required');
     }
 
     setIsSubmitting(true);
@@ -72,7 +72,7 @@ const Checkout = () => {
     try {
       const orderData = {
         orderItems: cartItems
-          .filter(item => item.product) // Protocol Clean: Prevent connection drops by removing null IDs
+          .filter(item => item.product) // Data Clean: Prevent errors by removing null IDs
           .map(item => ({
             product: item.product,
             name: item.name,
@@ -103,7 +103,7 @@ const Checkout = () => {
       toast.dismiss(loadingToast);
       const errorMsg = error.response?.data?.message || error.message || 'Order placement failed ❌';
       toast.error(errorMsg);
-      console.error('Order submission protocol failure:', error);
+      console.error('Order submission failure:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -178,10 +178,10 @@ const Checkout = () => {
                     onClick={() => {
                       const { phoneNumber, address } = shippingAddress;
                       if (!phoneNumber || !address) {
-                        return toast.error('Both fields are required for delivery sync');
+                        return toast.error('Both fields are required');
                       }
                       if (phoneNumber.length < 10) {
-                        return toast.error('Check your phone identity');
+                        return toast.error('Check your phone number');
                       }
                       nextStep();
                     }}
@@ -202,7 +202,7 @@ const Checkout = () => {
                 className="space-y-8"
               >
                 <div className="card-premium p-10 sm:p-12 shadow-2xl group hover:border-gold/20 transition-all">
-                  <h2 className="text-3xl font-serif font-black text-white mb-10 border-b border-white/5 pb-6">Payment Protocol</h2>
+                  <h2 className="text-3xl font-serif font-black text-white mb-10 border-b border-white/5 pb-6">Payment Mode</h2>
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     {[
                       { id: 'EasyPaisa', icon: Smartphone, label: 'EasyPaisa' },
@@ -224,7 +224,7 @@ const Checkout = () => {
                   {paymentMethod !== 'cod' && (
                     <div className="mt-10 p-8 card-premium bg-gold/5 border border-gold/20 rounded-[2.5rem] animate-in fade-in slide-in-from-bottom-4">
                       <div className="text-center space-y-6">
-                        <p className="text-gray-500 text-xs font-medium italic">Secure transfer protocol: please dispatch the total amount to the identity below</p>
+                        <p className="text-gray-500 text-xs font-medium italic">Please send the total amount to the number below</p>
                         <div className="text-3xl font-black text-gold tracking-[0.2em] bg-black/40 p-6 rounded-2xl border border-white/5 shadow-inner">
                           0300 0000000
                         </div>
@@ -240,11 +240,11 @@ const Checkout = () => {
                         </div>
                         <button
                           onClick={() => {
-                            if (paymentRef) { setHasPaid(true); toast.success('Transaction Synchronized'); }
+                            if (paymentRef) { setHasPaid(true); toast.success('Payment Received'); }
                           }}
                           className={`w-full py-5 rounded-[2rem] font-black uppercase tracking-[0.2em] text-xs transition-all active:scale-95 ${hasPaid ? 'bg-green-500 text-white shadow-green-500/20 shadow-xl' : 'bg-gold text-charcoal shadow-gold/20 shadow-xl'}`}
                         >
-                          {hasPaid ? 'Protocol Confirmed ✓' : 'Register Payment'}
+                          {hasPaid ? 'Confirmed ✓' : 'Register Payment'}
                         </button>
                       </div>
                     </div>
@@ -275,7 +275,7 @@ const Checkout = () => {
                 className="space-y-8"
               >
                 <div className="card-premium p-10 sm:p-12 shadow-2xl group hover:border-gold/20 transition-all">
-                  <h2 className="text-3xl font-serif font-black text-white mb-10 border-b border-white/5 pb-8">Gourmet Review</h2>
+                  <h2 className="text-3xl font-serif font-black text-white mb-10 border-b border-white/5 pb-8">Order Review</h2>
                   <div className="space-y-8 max-h-[400px] overflow-y-auto pr-6 custom-scrollbar mb-10">
                     {cartItems.map((item, i) => (
                       <div key={i} className="flex items-center gap-8 group/item bg-white/[0.01] p-4 rounded-3xl border border-white/5">
@@ -302,9 +302,9 @@ const Checkout = () => {
                         <MapPin className="text-gold w-6 h-6" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-gold/60 font-black uppercase tracking-[0.2em] text-[10px] mb-2 opacity-80">Logistics Destination</p>
+                        <p className="text-gold/60 font-black uppercase tracking-[0.2em] text-[10px] mb-2 opacity-80">Delivery Address</p>
                         <p className="text-white font-serif font-bold text-2xl truncate mb-1">{shippingAddress.address}</p>
-                        <p className="text-gray-500 font-black uppercase tracking-widest text-[9px]">Direct Delivery Terminal</p>
+                        <p className="text-gray-500 font-black uppercase tracking-widest text-[9px]">Direct Delivery</p>
                       </div>
                     </div>
                   </div>
@@ -318,7 +318,7 @@ const Checkout = () => {
                       disabled={isSubmitting}
                       className="flex-[2] bg-crimson text-white font-black py-5 rounded-[2rem] flex items-center justify-center gap-4 shadow-2xl shadow-crimson/20 active:scale-95 hover:bg-red-500 transition-all disabled:opacity-30 uppercase tracking-[0.2em] text-xs"
                     >
-                      {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : 'Confirm Order Identity'}
+                      {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : 'Confirm Order'}
                       {!isSubmitting && <CheckCircle className="w-5 h-5" />}
                     </button>
                   </div>
@@ -330,10 +330,10 @@ const Checkout = () => {
 
         <div className="lg:col-span-1">
           <div className="card-premium p-10 sticky top-28 shadow-2xl bg-[#1a1a1a]/40 group hover:border-gold/30">
-            <h3 className="text-2xl font-serif font-black text-white mb-10 border-b border-white/10 pb-6 uppercase tracking-widest">Financials</h3>
+            <h3 className="text-2xl font-serif font-black text-white mb-10 border-b border-white/10 pb-6 uppercase tracking-widest">Summary</h3>
             <div className="space-y-6 mb-10">
               <div className="flex justify-between text-gray-500 font-black uppercase tracking-widest text-[10px]">
-                <span>Gourmet Subtotal</span>
+                <span>Cart Subtotal</span>
                 <span className="text-white">Rs. {subtotal}</span>
               </div>
               <div className="flex justify-between text-gray-500 font-black uppercase tracking-widest text-[10px]">
@@ -341,14 +341,14 @@ const Checkout = () => {
                 <span className="text-white">Rs. {tax.toFixed(0)}</span>
               </div>
               <div className="flex justify-between text-gray-500 font-black uppercase tracking-widest text-[10px]">
-                <span>Logistics Fee</span>
+                <span>Delivery Fee</span>
                 <span className={`font-black ${deliveryFee === 0 ? 'text-green-500' : 'text-white'}`}>
-                  {deliveryFee === 0 ? 'COMPLIMENTARY' : `Rs. ${deliveryFee}`}
+                  {deliveryFee === 0 ? 'FREE' : `Rs. ${deliveryFee}`}
                 </span>
               </div>
             </div>
             <div className="pt-10 border-t border-white/10 flex flex-col gap-2">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gold/60 mb-2">Total Exposure</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gold/60 mb-2">Total Amount</p>
               <p className="text-6xl font-serif font-black text-gold tracking-tighter leading-none">Rs. {total.toFixed(0)}</p>
             </div>
           </div>

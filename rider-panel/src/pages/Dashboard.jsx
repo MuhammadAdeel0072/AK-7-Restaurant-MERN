@@ -47,9 +47,9 @@ const Dashboard = () => {
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-10">
                 <div>
                     <h1 className="text-4xl font-serif font-black tracking-tighter italic mb-1 uppercase">
-                        Rider <span className="text-gold ml-1">Terminal</span>
+                        Rider <span className="text-gold ml-1">Dashboard</span>
                     </h1>
-                    <p className="label-caps italic tracking-[0.25em]">Real-time Logistics Monitoring</p>
+                    <p className="label-caps italic tracking-[0.25em]">Live Order Tracking</p>
                 </div>
 
                 <div className="flex items-center gap-8 glass p-6 rounded-2xl border border-white/5">
@@ -70,7 +70,7 @@ const Dashboard = () => {
                 <section className="lg:col-span-7 space-y-6">
                     <div className="flex items-center justify-between">
                         <h2 className="text-xs font-black uppercase tracking-[0.2em] text-soft-white/60 flex items-center gap-2">
-                            <LayoutDashboard className="w-4 h-4 text-gold" /> Active Mission
+                            <LayoutDashboard className="w-4 h-4 text-gold" /> Current Order
                         </h2>
                     </div>
 
@@ -92,8 +92,8 @@ const Dashboard = () => {
                                     <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-6">
                                         <AlertCircle className="w-8 h-8 text-soft-white/10" />
                                     </div>
-                                    <h3 className="text-xl font-serif text-white/20 uppercase tracking-widest leading-none">No Active Task</h3>
-                                    <p className="text-[10px] text-soft-white/10 font-bold uppercase tracking-widest mt-3 italic">Awaiting manual assignment or acceptance...</p>
+                                    <h3 className="text-xl font-serif text-white/20 uppercase tracking-widest leading-none">No Active Orders</h3>
+                                    <p className="text-[10px] text-soft-white/10 font-bold uppercase tracking-widest mt-3 italic">Waiting for a new order...</p>
                                 </motion.div>
                             )}
                         </AnimatePresence>
@@ -103,7 +103,7 @@ const Dashboard = () => {
                 {/* Available Queue Section */}
                 <section className="lg:col-span-5 space-y-6">
                     <h2 className="text-xs font-black uppercase tracking-[0.2em] text-soft-white/60 flex items-center gap-2">
-                        <ShoppingBag className="w-4 h-4 text-gold" /> Open Orders Hub
+                        <ShoppingBag className="w-4 h-4 text-gold" /> Available Orders
                     </h2>
 
                     <div className="space-y-4 max-h-[600px] overflow-y-auto no-scrollbar pr-2">

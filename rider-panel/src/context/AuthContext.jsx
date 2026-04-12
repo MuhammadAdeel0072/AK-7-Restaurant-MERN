@@ -24,14 +24,13 @@ export const AuthProvider = ({ children }) => {
         try {
             const { data } = await api.post('/auth/login', { email, password });
             if (data.role !== 'rider' && data.role !== 'admin') {
-                toast.error('Unauthorized: This terminal is for Riders only.');
+                toast.error('Access denied. This panel is for riders only.');
                 return;
             }
             localStorage.setItem('ak7_token', data.token);
             setUser(data);
-            toast.success('Rider Terminal Authorized');
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Login failed');
+            toast.error(error.response?.data?.message || 'Login failed. Please try again.');
             throw error;
         }
     };
@@ -39,7 +38,7 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         localStorage.removeItem('ak7_token');
         setUser(null);
-        toast.success('Session Terminated');
+        toast.success('Logged out successfully.');
     };
 
     useEffect(() => {

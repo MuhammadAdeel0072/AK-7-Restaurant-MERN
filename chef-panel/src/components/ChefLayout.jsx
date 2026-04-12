@@ -3,7 +3,6 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import { Menu as MenuIcon, Clock, Bell } from "lucide-react";
 import { joinKitchen } from "../services/socket";
-import { Toaster } from 'react-hot-toast';
 import { useAlertContext } from "../context/AlertContext";
 
 const ChefLayout = () => {
@@ -26,7 +25,7 @@ const ChefLayout = () => {
 
   return (
     <div className="flex min-h-screen bg-charcoal text-soft-white selection:bg-gold selection:text-charcoal relative">
-      <Toaster />
+      
       
       {/* Mobile Backdrop */}
       {isSidebarOpen && (

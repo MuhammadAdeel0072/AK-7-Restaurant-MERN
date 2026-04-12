@@ -20,15 +20,15 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        const loadingToast = toast.loading('Activating Kitchen protocol...');
+        const loadingToast = toast.loading('Signing in...');
         try {
             await login(email, password);
             toast.dismiss(loadingToast);
-            toast.success('Welcome to Kitchen HQ! 👨‍🍳');
+            toast.success('Welcome back, Chef! 👨‍🍳', { duration: 3000 });
             navigate('/');
         } catch (error) {
             toast.dismiss(loadingToast);
-            toast.error(error.response?.data?.message || 'Authentication failed ❌');
+            toast.error(error.response?.data?.message || 'Wrong email or password.', { duration: 4000 });
         } finally {
             setLoading(false);
         }

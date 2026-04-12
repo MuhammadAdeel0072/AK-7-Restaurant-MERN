@@ -21,7 +21,7 @@ const getAdminStats = asyncHandler(async (req, res) => {
 
   const totalRevenueResult = await Order.aggregate([
     { $match: { isPaid: true } },
-    { $group: { _id: null, total: { $sum: '$totalPrice' } } }
+    { $group: { _id: null, total: { $sum: { $subtract: ['$totalPrice', { $ifNull: ['$taxPrice', 0] }] } } } }
   ]);
   const totalRevenue = totalRevenueResult.length > 0 ? totalRevenueResult[0].total : 0;
 

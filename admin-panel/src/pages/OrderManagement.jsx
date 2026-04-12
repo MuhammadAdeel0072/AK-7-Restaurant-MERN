@@ -67,8 +67,8 @@ const OrderManagement = () => {
     >
       <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <header>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-black text-soft-white tracking-tighter">Order <span className="text-gold">Logistics</span></h1>
-          <p className="text-soft-white/50 mt-1 sm:mt-2 uppercase text-[7px] sm:text-[9px] md:text-[10px] font-bold tracking-[0.2em]">AK-7 REST LIVE OPERATION TRACKER</p>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-black text-soft-white tracking-tighter">Order <span className="text-gold">History</span></h1>
+          <p className="text-soft-white/50 mt-1 sm:mt-2 uppercase text-[7px] sm:text-[9px] md:text-[10px] font-bold tracking-[0.2em]">Restaurant Order Tracker</p>
         </header>
         
         <div className="flex flex-wrap gap-2 bg-white/5 p-1.5 rounded-2xl border border-white/5 overflow-x-auto no-scrollbar">
@@ -88,9 +88,9 @@ const OrderManagement = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {[
-          { label: 'Awaiting Prep', value: stats.pending, icon: Clock, color: 'text-gold' },
-          { label: 'In Kitchen', value: stats.preparing, icon: PackageCheck, color: 'text-orange-400' },
-          { label: 'On Route', value: stats.dispatched, icon: Truck, color: 'text-blue-400' },
+          { label: 'New Orders', value: stats.pending, icon: Clock, color: 'text-gold' },
+          { label: 'Cooking', value: stats.preparing, icon: PackageCheck, color: 'text-orange-400' },
+          { label: 'Out for Delivery', value: stats.dispatched, icon: Truck, color: 'text-blue-400' },
         ].map((item, idx) => (
           <div key={idx} className="glass p-6 rounded-2xl border border-white/5 flex items-center gap-5">
             <div className={`p-4 rounded-xl bg-white/5 ${item.color}`}>
@@ -109,10 +109,10 @@ const OrderManagement = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-white/5 text-soft-white/40 text-[8px] sm:text-[10px] uppercase tracking-[0.2em]">
-                <th className="px-4 sm:px-8 py-4 sm:py-6 font-bold">Patron & Order ID</th>
-                <th className="px-4 sm:px-8 py-4 sm:py-6 font-bold">Investment</th>
-                <th className="px-4 sm:px-8 py-4 sm:py-6 font-bold">Current State</th>
-                <th className="px-4 sm:px-8 py-4 sm:py-6 font-bold text-right">Command</th>
+                <th className="px-4 sm:px-8 py-4 sm:py-6 font-bold">Customer & Order ID</th>
+                <th className="px-4 sm:px-8 py-4 sm:py-6 font-bold">Total Price</th>
+                <th className="px-4 sm:px-8 py-4 sm:py-6 font-bold">Order Status</th>
+                <th className="px-4 sm:px-8 py-4 sm:py-6 font-bold text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -134,7 +134,7 @@ const OrderManagement = () => {
                       <td className="px-4 sm:px-8 py-6 sm:py-8">
                         <div>
                           <p className="font-bold text-soft-white text-base sm:text-lg">#{order.orderNumber || order._id.slice(-6).toUpperCase()}</p>
-                          <p className="text-soft-white/40 text-[10px] sm:text-sm mt-1">{order.user?.firstName} {order.user?.lastName || 'Guest Patron'}</p>
+                          <p className="text-soft-white/40 text-[10px] sm:text-sm mt-1">{order.user?.firstName} {order.user?.lastName || 'Guest'}</p>
                           <p className="text-[8px] sm:text-[10px] text-gold/50 mt-2 uppercase tracking-tighter">{new Date(order.createdAt).toLocaleString()}</p>
                         </div>
                       </td>
@@ -161,9 +161,9 @@ const OrderManagement = () => {
                             <option value="placed">Placed</option>
                             <option value="preparing">Preparing</option>
                             <option value="ready">Ready</option>
-                            <option value="out-for-delivery">Dispatch</option>
+                            <option value="out-for-delivery">Out for Delivery</option>
                             <option value="delivered">Delivered</option>
-                            <option value="cancelled">Void</option>
+                            <option value="cancelled">Cancel</option>
                           </select>
                         </div>
                       </td>

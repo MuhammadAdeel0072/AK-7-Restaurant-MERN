@@ -309,7 +309,7 @@ const Navbar = () => {
               </div>
 
               <div className="mt-10 pt-6 border-t border-white/5">
-                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-700">Identity Protection Active</p>
+                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-700">Secure sign out</p>
               </div>
             </motion.div>
           </div>

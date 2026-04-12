@@ -70,9 +70,9 @@ const Orders = () => {
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
                 <div>
                    <h1 className="text-4xl font-serif font-black tracking-tighter italic mb-1 uppercase">
-                       Mission <span className="text-gold ml-1">Archive</span>
+                       Order <span className="text-gold ml-1">History</span>
                    </h1>
-                   <p className="label-caps italic tracking-[0.25em]">Historical Logistics Log</p>
+                   <p className="label-caps italic tracking-[0.25em]">Your Previous Deliveries</p>
                 </div>
             </header>
 
@@ -80,7 +80,7 @@ const Orders = () => {
                 {/* Current Active Mission */}
                 <section>
                     <h2 className="label-caps italic text-gold/40 flex items-center gap-3 mb-8 border-l-2 border-gold/20 pl-4">
-                       <Truck className="w-4 h-4" /> Active Mission
+                       <Truck className="w-4 h-4" /> Current Order
                     </h2>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -92,7 +92,7 @@ const Orders = () => {
                                     animate={{ opacity: 1 }}
                                 >
                                     <ShoppingBag className="w-16 h-16 text-white/5 mx-auto mb-6" />
-                                    <p className="label-caps italic opacity-40">No active missions found.</p>
+                                    <p className="label-caps italic opacity-40">No active orders found.</p>
                                 </motion.div>
                             ) : (
                                 activeOrders.map((order) => (
@@ -111,12 +111,12 @@ const Orders = () => {
                 {/* History Section */}
                 <section>
                     <h2 className="label-caps italic text-soft-white/20 flex items-center gap-3 mb-8 border-l-2 border-white/5 pl-4">
-                       <Clock className="w-4 h-4" /> Completed Missions
+                       <Clock className="w-4 h-4" /> Delivered Orders
                     </h2>
                     
                     <div className="space-y-6">
                         {completedOrders.length === 0 ? (
-                            <p className="label-caps text-center py-10 opacity-20 italic">Historical logs are currently empty.</p>
+                            <p className="label-caps text-center py-10 opacity-20 italic">No historical data available.</p>
                         ) : (
                             completedOrders.map((order) => (
                                 <div key={order._id} className="card-premium p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6 group opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all">
@@ -134,7 +134,7 @@ const Orders = () => {
                                         </div>
                                     </div>
                                     <div className="text-left sm:text-right">
-                                        <p className="text-[10px] text-soft-white/20 font-bold uppercase tracking-widest mb-1 italic">Mission Success At</p>
+                                        <p className="text-[10px] text-soft-white/20 font-bold uppercase tracking-widest mb-1 italic">Delivered At</p>
                                         <p className="text-sm font-bold text-gold/40 tracking-wider font-mono uppercase">{new Date(order.deliveredAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                                     </div>
                                 </div>

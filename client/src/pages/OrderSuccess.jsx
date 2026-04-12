@@ -63,7 +63,7 @@ const OrderSuccess = () => {
             <div className="text-center max-w-3xl border-b border-white/5 pb-16 mb-16">
                 <h1 className="text-5xl font-serif font-black mb-6 text-white uppercase tracking-tighter italic">Order Placed Successfully 🎉</h1>
                 <p className="text-xl text-gray-400 font-medium leading-relaxed italic">
-                    Your gourmet selection is now being synchronized with our kitchen. Prepare for an exceptional dining experience.
+                    Your order has been sent to our kitchen. We'll start preparing it right away!
                 </p>
             </div>
 
@@ -99,7 +99,7 @@ const OrderSuccess = () => {
                     className="group relative bg-gold text-charcoal px-12 py-5 rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-gold/20 flex items-center gap-3"
                 >
                     <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                    <span className="relative z-10">Track Mission</span>
+                    <span className="relative z-10">Track Order</span>
                     <ArrowRight className="w-5 h-5 relative z-10 transition-transform group-hover:translate-x-2" />
                 </Link>
                 

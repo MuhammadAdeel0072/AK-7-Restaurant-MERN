@@ -12,7 +12,7 @@ const Help = () => {
                 </div>
                 <div>
                     <h2 className="text-2xl font-serif font-black text-white tracking-tight">{title}</h2>
-                    <p className="text-[9px] text-gold/40 font-black uppercase tracking-[0.2em] mt-0.5">Assistance Protocol</p>
+                    <p className="text-[9px] text-gold/40 font-black uppercase tracking-[0.2em] mt-0.5">How we can help</p>
                 </div>
             </div>
             {children}

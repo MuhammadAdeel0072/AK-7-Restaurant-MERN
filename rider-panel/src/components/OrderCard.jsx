@@ -52,7 +52,7 @@ const OrderCard = ({ order, onAction, actionLoading }) => {
                 </div>
                 
                 <div className="text-right">
-                    <p className="text-[10px] font-bold text-soft-white/20 uppercase tracking-widest mb-1 italic">Total Value</p>
+                    <p className="text-[10px] font-bold text-soft-white/20 uppercase tracking-widest mb-1 italic">Order Total</p>
                     <p className="text-lg font-serif font-black text-white italic">Rs. {order.totalPrice}</p>
                 </div>
             </div>
@@ -66,7 +66,7 @@ const OrderCard = ({ order, onAction, actionLoading }) => {
                         </div>
                         <div>
                             <p className="text-[10px] font-bold text-soft-white/20 uppercase tracking-widest leading-none mb-1">Pick Up From</p>
-                            <p className="text-xs font-bold text-white tracking-tight uppercase tracking-wider italic">AK-7 REST — Midnight Station</p>
+                            <p className="text-xs font-bold text-white tracking-tight uppercase tracking-wider italic">AK-7 REST — Main Kitchen</p>
                         </div>
                     </div>
                     <div className="flex gap-4">

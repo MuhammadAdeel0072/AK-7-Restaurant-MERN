@@ -90,7 +90,7 @@ const OrderTracker = () => {
       socket.on('orderUpdate', (updatedOrder) => {
         if (updatedOrder._id === id) {
           setOrder(updatedOrder);
-          toast.success(`Order Protocol: ${updatedOrder.status.toUpperCase()}`);
+          toast.success(`Order Status: ${updatedOrder.status.toUpperCase()}`);
         }
       });
 
@@ -108,12 +108,12 @@ const OrderTracker = () => {
   }, [socket, id]);
 
   const steps = [
-    { status: 'placed', label: 'Order Received', icon: Package, desc: 'Signal synchronized with terminal.' },
-    { status: 'preparing', label: 'Preparing', icon: Clock, desc: 'Master chefs are engineering your feast.' },
-    { status: 'ready', label: 'Ready', icon: CheckCircle, desc: 'Quality inspection complete.' },
-    { status: 'picked-up', label: 'Picked by Rider', icon: Bike, desc: 'Courier has secured the package.' },
-    { status: 'out-for-delivery', label: 'Out for Delivery', icon: Navigation, desc: 'Courier is in transit.' },
-    { status: 'delivered', label: 'Delivered', icon: MapPin, desc: 'Mission accomplished.' },
+    { status: 'placed', label: 'Order Received', icon: Package, desc: 'We have received your order.' },
+    { status: 'preparing', label: 'Preparing', icon: Clock, desc: 'Our chefs are cooking your meal.' },
+    { status: 'ready', label: 'Ready', icon: CheckCircle, desc: 'Order is ready for pickup.' },
+    { status: 'picked-up', label: 'Picked by Rider', icon: Bike, desc: 'Rider has picked up your order.' },
+    { status: 'out-for-delivery', label: 'Out for Delivery', icon: Navigation, desc: 'Rider is on the way.' },
+    { status: 'delivered', label: 'Delivered', icon: MapPin, desc: 'Order delivered.' },
   ];
 
   const currentStep = steps.findIndex(s => s.status === order?.status);
@@ -132,11 +132,11 @@ const OrderTracker = () => {
         <RefreshCw className="w-16 h-16 text-gold animate-spin" />
         <div className="absolute inset-0 bg-gold/20 blur-2xl rounded-full"></div>
       </div>
-      <p className="text-gold font-serif text-2xl italic tracking-widest animate-pulse">SYNCHRONIZING TRAJECTORY...</p>
+      <p className="text-gold font-serif text-2xl italic tracking-widest animate-pulse">UPDATING STATUS...</p>
     </div>
   );
 
-  if (!order) return <div className="text-center py-24 text-white font-serif italic text-2xl">Trajectory Lost: Order ID Not Found.</div>;
+  if (!order) return <div className="text-center py-24 text-white font-serif italic text-2xl">Order Not Found.</div>;
 
   return (
     <div className="container mx-auto px-6 py-12 max-w-6xl">
@@ -146,7 +146,7 @@ const OrderTracker = () => {
                 <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" /> Return to Archives
             </Link>
             <h1 className="text-5xl font-serif font-black text-white italic tracking-tighter">
-                MISSION <span className="text-gold">#{order.orderNumber}</span>
+                ORDER <span className="text-gold">#{order.orderNumber}</span>
             </h1>
         </div>
         <div className="card-premium bg-gold/10 border-gold/20 p-6 flex items-center gap-6 shadow-[0_0_50px_rgba(212,175,55,0.1)]">
@@ -164,7 +164,7 @@ const OrderTracker = () => {
         {/* Left: Tracker Sidebar */}
         <div className="lg:col-span-1 space-y-4">
             <div className="card-premium p-8 space-y-8">
-                <h3 className="text-xs font-black uppercase tracking-[0.4em] text-gold/40 border-b border-white/5 pb-4">Live Protocol</h3>
+                <h3 className="text-xs font-black uppercase tracking-[0.4em] text-gold/40 border-b border-white/5 pb-4">Order Status</h3>
                 <div className="space-y-8 relative">
                     <div className="absolute left-[23px] top-6 bottom-6 w-0.5 bg-white/5"></div>
                     {steps.map((s, i) => (
@@ -190,12 +190,12 @@ const OrderTracker = () => {
                         <Smartphone className="w-4 h-4 text-gold" />
                     </div>
                     <div>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-gold/40">Support Terminal</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-gold/40">Help Center</p>
                         <p className="text-white font-bold text-sm">+92 300 0000000</p>
                     </div>
                 </div>
                 <button className="w-full py-4 rounded-2xl border border-white/10 text-white text-[10px] font-black uppercase tracking-widest hover:bg-white/5 transition-all">
-                    Initiate Comms
+                    Call for Help
                 </button>
             </div>
         </div>
@@ -240,7 +240,7 @@ const OrderTracker = () => {
                 <div className="absolute top-8 left-8 card-premium bg-black/80 backdrop-blur-xl p-6 border border-white/10">
                     <p className="text-[10px] font-black uppercase tracking-widest text-gold mb-2 flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
-                        Live Telemetry
+                        Live Tracking
                     </p>
                     <p className="text-white font-serif italic text-lg leading-tight uppercase font-black tracking-tighter">
                         {order.status.replace('-', ' ')}
@@ -250,7 +250,7 @@ const OrderTracker = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                 <div className="space-y-6">
-                    <h3 className="text-xs font-black uppercase tracking-[0.4em] text-gold/40 border-b border-white/5 pb-4">Logistics Identity</h3>
+                    <h3 className="text-xs font-black uppercase tracking-[0.4em] text-gold/40 border-b border-white/5 pb-4">Delivery Details</h3>
                     <div className="flex gap-6">
                         <div className="w-14 h-14 bg-white/5 rounded-3xl flex items-center justify-center shrink-0">
                             <MapPin className="text-gold w-6 h-6" />
@@ -268,7 +268,7 @@ const OrderTracker = () => {
                 </div>
 
                 <div className="space-y-6">
-                    <h3 className="text-xs font-black uppercase tracking-[0.4em] text-gold/40 border-b border-white/5 pb-4">Financial Summary</h3>
+                    <h3 className="text-xs font-black uppercase tracking-[0.4em] text-gold/40 border-b border-white/5 pb-4">Payment Details</h3>
                     <div className="space-y-4">
                         {order.orderItems.map((item, i) => (
                             <div key={i} className="flex justify-between items-center group">
@@ -279,11 +279,11 @@ const OrderTracker = () => {
                     </div>
                     <div className="pt-6 border-t border-white/5 flex justify-between items-end">
                         <div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-gold/40">Settlement Total</p>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-gold/40">Order Total</p>
                             <p className="text-4xl font-serif font-black text-gold italic">Rs. {order.totalPrice.toFixed(0)}</p>
                         </div>
                         <div className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest ${order.isPaid ? 'bg-green-500/10 text-green-500 border border-green-500/20' : 'bg-gold/10 text-gold border border-gold/20'}`}>
-                            {order.isPaid ? 'Protocol Paid' : 'COD Active'}
+                            {order.isPaid ? 'Paid Online' : 'COD Active'}
                         </div>
                     </div>
                 </div>

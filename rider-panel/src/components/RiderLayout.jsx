@@ -29,12 +29,12 @@ const RiderLayout = () => {
     const navItems = [
         { path: '/', label: 'Dashboard', icon: LayoutDashboard },
         { path: '/orders', label: 'Deliveries', icon: Truck },
-        { path: '/profile', label: 'Station', icon: UserIcon },
+        { path: '/profile', label: 'Profile', icon: UserIcon },
     ];
 
     return (
         <div className="flex min-h-screen bg-charcoal text-soft-white font-sans selection:bg-gold selection:text-charcoal relative">
-            <Toaster position="top-center" />
+            
             
             {/* Sidebar Overlay */}
             {isSidebarOpen && (
@@ -53,7 +53,7 @@ const RiderLayout = () => {
                     {/* Synchronized Logo - Matching Reference Image */}
                     <div className="mb-12">
                         <BrandLogo size="md" />
-                        <span className={`${typographyClasses.labelSmall} block mt-2`}>Rider Logistics Terminal</span>
+                        <span className={`${typographyClasses.labelSmall} block mt-2`}>Rider Dashboard</span>
                     </div>
 
                     <nav className="flex-1 space-y-3">
@@ -80,7 +80,7 @@ const RiderLayout = () => {
                     <div className="mt-auto p-4 glass rounded-2xl border border-white/5 text-center mb-4">
                         <p className="text-[10px] text-soft-white/20 font-bold uppercase tracking-widest mb-2">My Stats Today</p>
                         <p className="text-3xl font-serif font-black text-gold italic leading-none">{stats?.completedToday || 0}</p>
-                        <p className="text-[10px] font-bold text-soft-white/40 uppercase tracking-widest mt-1">Completed Missions</p>
+                        <p className="text-[10px] font-bold text-soft-white/40 uppercase tracking-widest mt-1">Deliveries Completed</p>
                     </div>
 
                     {/* Standardized Logout - Matching Admin/Chef */}

@@ -24,14 +24,13 @@ export const AuthProvider = ({ children }) => {
         try {
             const { data } = await api.post('/auth/login', { email, password });
             if (data.role !== 'chef' && data.role !== 'admin') {
-                toast.error('Access Denied: Chef Authorization Required');
+                toast.error('Access denied. This panel is for chefs only.');
                 return;
             }
             localStorage.setItem('ak7_token', data.token);
             setUser(data);
-            toast.success('Kitchen Terminal Authorized');
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Login failed');
+            toast.error(error.response?.data?.message || 'Login failed. Please try again.');
             throw error;
         }
     };
@@ -39,7 +38,7 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         localStorage.removeItem('ak7_token');
         setUser(null);
-        toast.success('Kitchen Session Terminated');
+        toast.success('Logged out successfully.');
     };
 
     useEffect(() => {

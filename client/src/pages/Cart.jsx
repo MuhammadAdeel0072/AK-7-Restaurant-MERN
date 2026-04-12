@@ -27,7 +27,7 @@ const Cart = () => {
   };
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.qty * item.price, 0);
-  const tax = subtotal * 0.1;
+  const tax = 0;
   const deliveryFee = subtotal > 50 ? 0 : 5;
   const total = subtotal + tax + deliveryFee;
   const estimatedPoints = Math.floor(total * 10);
@@ -118,7 +118,7 @@ const Cart = () => {
                 </div>
                 <div className="flex justify-between text-gray-500 text-sm font-black uppercase tracking-widest">
                   <span>Service Tax</span>
-                  <span className="text-white">Rs. {tax.toFixed(0)}</span>
+                  <span className="text-green-500">Free</span>
                 </div>
                 <div className="flex justify-between text-gray-500 text-sm font-black uppercase tracking-widest">
                   <span>Logistics</span>
