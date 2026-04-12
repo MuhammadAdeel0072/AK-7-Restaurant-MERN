@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Utensils, ShoppingBag, Calendar, CreditCard, Users, LogOut, X, Tag } from 'lucide-react';
+import { LayoutDashboard, Utensils, ShoppingBag, Calendar, CreditCard, LogOut, X, Tag } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BrandLogo, typographyClasses } from './BrandingUtils';
@@ -24,13 +24,13 @@ const Sidebar = ({ isOpen, onClose }) => {
     { title: 'Orders', path: '/orders', icon: ShoppingBag },
     { title: 'Reservations', path: '/reservations', icon: Calendar },
     { title: 'Payments', path: '/payments', icon: CreditCard },
-    { title: 'Users', path: '/users', icon: Users },
+
   ];
 
   return (
-    <motion.aside 
+    <motion.aside
       initial={false}
-      animate={{ 
+      animate={{
         x: isOpen || isDesktop ? 0 : -300,
         opacity: isOpen || isDesktop ? 1 : 0
       }}
@@ -45,14 +45,14 @@ const Sidebar = ({ isOpen, onClose }) => {
       <div className="p-8 border-b border-white/5 flex items-center justify-between">
         <BrandLogo size="md" className="flex-1" />
         {/* Mobile Close Button */}
-        <button 
+        <button
           onClick={onClose}
           className="lg:hidden p-2 hover:bg-white/5 rounded-xl text-gray-400 hover:text-white transition-colors"
         >
           <X className="w-6 h-6" />
         </button>
       </div>
-      
+
       <nav className="flex-1 p-6 space-y-3 overflow-y-auto">
         {menuItems.map((item) => (
           <NavLink
@@ -60,10 +60,9 @@ const Sidebar = ({ isOpen, onClose }) => {
             to={item.path}
             onClick={onClose}
             className={({ isActive }) =>
-              `flex items-center space-x-4 px-5 py-4 rounded-xl transition-all duration-300 group ${
-                isActive 
-                  ? 'bg-gold/10 text-gold border border-gold/20 shadow-[0_0_20px_rgba(212,175,55,0.1)]' 
-                  : 'text-soft-white/60 hover:bg-white/5 hover:text-soft-white border border-transparent'
+              `flex items-center space-x-4 px-5 py-4 rounded-xl transition-all duration-300 group ${isActive
+                ? 'bg-gold/10 text-gold border border-gold/20 shadow-[0_0_20px_rgba(212,175,55,0.1)]'
+                : 'text-soft-white/60 hover:bg-white/5 hover:text-soft-white border border-transparent'
               }`
             }
           >

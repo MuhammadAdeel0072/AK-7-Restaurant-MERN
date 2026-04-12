@@ -422,7 +422,7 @@ const MenuManagement = () => {
                   <div className="space-y-4">
                     <label className="text-xs font-bold uppercase tracking-widest text-gold opacity-70">Category</label>
                     <select 
-                      className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-soft-white focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all"
+                      className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-soft-white focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all [&>option]:bg-black [&>option]:text-white"
                       value={formData.category}
                       onChange={(e) => setFormData({...formData, category: e.target.value})}
                     >

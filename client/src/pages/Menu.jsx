@@ -20,7 +20,7 @@ const Menu = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [qty, setQty] = useState(1);
   const { dispatch } = useCart();
-  const { user: profile, isSignedIn } = useAuth();
+  const { user: profile, isSignedIn, updateProfile } = useAuth();
   const { siteUpdate } = useSocket();
 
   useEffect(() => {
@@ -126,8 +126,18 @@ const Menu = () => {
       toast.error('Sign in to save favorites');
       return;
     }
-    const isFavorite = profile?.favorites?.includes(productId);
-    toast.success(isFavorite ? 'Removed' : 'Added', { icon: '❤️' });
+    
+    try {
+      const isFavorite = profile?.favorites?.includes(productId);
+      const newFavorites = isFavorite
+        ? profile.favorites.filter(id => id !== productId)
+        : [...(profile.favorites || []), productId];
+        
+      await updateProfile({ favorites: newFavorites });
+      toast.success(isFavorite ? 'Removed from favorites' : 'Added to favorites', { icon: '❤️' });
+    } catch (error) {
+      // Handled by context
+    }
   };
 
   const getDealForProduct = (productId, category) => {
@@ -188,6 +198,17 @@ const Menu = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 items-stretch min-h-[500px]">
           {filteredProducts.map(product => {
             const isFav = profile?.favorites?.includes(product._id);
+            const deal = getDealForProduct(product._id, product.category);
+            let discountedPrice = product.price;
+            if (deal) {
+              if (deal.discountPercentage > 0) {
+                discountedPrice = product.price - (product.price * (deal.discountPercentage / 100));
+              } else if (deal.discountAmount > 0) {
+                discountedPrice = product.price - deal.discountAmount;
+              }
+              discountedPrice = Math.max(0, discountedPrice);
+            }
+
             return (
               <div
                 key={product._id}
@@ -200,25 +221,26 @@ const Menu = () => {
 
                   <button
                     onClick={(e) => toggleFavoriteHandler(product._id, e)}
-                    className={`absolute top-4 left-4 p-2.5 rounded-2xl backdrop-blur-xl transition-all duration-300 ${
-                      isFav ? 'bg-gold text-charcoal' : 'bg-charcoal/60 text-white hover:text-gold border border-white/10'
+                    className={`absolute top-4 left-4 w-10 h-10 flex items-center justify-center rounded-2xl backdrop-blur-xl transition-all duration-300 ${
+                      isFav ? 'bg-white/10 border border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.3)]' : 'bg-charcoal/60 text-white hover:text-red-400 border border-white/10'
                     }`}
                   >
-                    <Heart className={`w-4 h-4 ${isFav ? 'fill-current' : ''}`} />
+                    {isFav ? (
+                      <span className="text-lg leading-none drop-shadow-md transform hover:scale-110 transition-transform">❤️</span>
+                    ) : (
+                      <Heart className="w-4 h-4" />
+                    )}
                   </button>
 
                   <div className="absolute top-4 right-4 flex flex-col gap-2">
-                    {(() => {
-                      const deal = getDealForProduct(product._id, product.category);
-                      return deal ? (
-                        <div className="bg-crimson text-white px-2.5 py-1 rounded-full text-[7px] font-black uppercase tracking-widest shadow-lg border border-crimson/50 whitespace-nowrap">
-                          {deal.discountPercentage > 0 
-                            ? `🔥 ${deal.discountPercentage}% OFF`
-                            : `💰 Rs. ${deal.discountAmount} OFF`
-                          }
-                        </div>
-                      ) : null;
-                    })()}
+                    {deal && (
+                      <div className="bg-crimson text-white px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-lg border border-crimson/50 whitespace-nowrap">
+                        {deal.discountPercentage > 0 
+                          ? `🔥 ${deal.discountPercentage}% OFF`
+                          : `💰 Rs. ${deal.discountAmount} OFF`
+                        }
+                      </div>
+                    )}
                     {product.isBestSeller && (
                       <div className="bg-crimson text-white px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest shadow-lg border border-white/10">
                         Popular
@@ -242,7 +264,16 @@ const Menu = () => {
                 <div className="p-6 flex flex-col flex-grow">
                   <div className="flex justify-between items-start mb-3">
                     <h3 className="text-lg font-serif font-bold text-white group-hover:text-gold transition-colors leading-tight">{product.name}</h3>
-                    <span className="text-gold font-black text-base tracking-tighter shrink-0">Rs. {product.price}</span>
+                    <div className="flex flex-col items-end">
+                      {deal ? (
+                        <>
+                          <span className="text-gray-500 font-bold text-xs line-through shrink-0">Rs. {product.price}</span>
+                          <span className="text-gold font-black text-lg tracking-tighter shrink-0">Rs. {Math.round(discountedPrice)}</span>
+                        </>
+                      ) : (
+                        <span className="text-gold font-black text-lg tracking-tighter shrink-0">Rs. {product.price}</span>
+                      )}
+                    </div>
                   </div>
                   <p className="text-gray-500 text-xs mb-4 line-clamp-2 leading-relaxed font-medium italic">"{product.description}"</p>
 
@@ -255,7 +286,7 @@ const Menu = () => {
                   </div>
 
                   <button
-                    onClick={(e) => addToCartHandler(product, 1, e)}
+                    onClick={(e) => addToCartHandler({ ...product, price: Math.round(discountedPrice) }, 1, e)}
                     className="mt-auto w-full flex items-center justify-between bg-white/5 hover:bg-gold/10 border border-white/5 group-hover:border-gold/30 hover:border-gold/50 px-5 py-3.5 rounded-2xl transition-all duration-300 group/btn"
                   >
                     <span className="text-[11px] font-black uppercase tracking-widest text-white/40 group-hover/btn:text-gold transition-colors">Add to Cart</span>
@@ -282,8 +313,20 @@ const Menu = () => {
 
       {/* Modal - Simplified view for details */}
       <AnimatePresence>
-        {selectedProduct && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-charcoal/80 backdrop-blur-xl">
+        {selectedProduct && (() => {
+          const deal = getDealForProduct(selectedProduct._id, selectedProduct.category);
+          let discountedPrice = selectedProduct.price;
+          if (deal) {
+            if (deal.discountPercentage > 0) {
+              discountedPrice = selectedProduct.price - (selectedProduct.price * (deal.discountPercentage / 100));
+            } else if (deal.discountAmount > 0) {
+              discountedPrice = selectedProduct.price - deal.discountAmount;
+            }
+            discountedPrice = Math.max(0, discountedPrice);
+          }
+
+          return (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-charcoal/80 backdrop-blur-xl">
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -307,9 +350,24 @@ const Menu = () => {
                     <span className="text-gold font-black text-xs uppercase tracking-widest">{selectedProduct.category}</span>
                     <div className="w-1 h-1 rounded-full bg-white/20"></div>
                   </div>
-                  <h2 className="text-4xl font-serif font-black text-white mb-4 leading-tight">{selectedProduct.name}</h2>
+                  <h2 className="text-4xl font-serif font-black text-white mb-4 leading-tight">
+                    {selectedProduct.name}
+                    {deal && (
+                      <span className="ml-4 inline-block align-middle bg-crimson text-white px-3 py-1.5 rounded-full text-sm font-black uppercase tracking-widest shadow-lg border border-crimson/50 whitespace-nowrap">
+                        {deal.discountPercentage > 0 
+                          ? `🔥 ${deal.discountPercentage}% OFF`
+                          : `💰 Rs. ${deal.discountAmount} OFF`
+                        }
+                      </span>
+                    )}
+                  </h2>
                   <p className="text-gray-400 text-base italic leading-relaxed mb-6 font-medium">"{selectedProduct.description}"</p>
-                  <div className="text-3xl font-black text-gold tracking-tighter mb-8">Rs. {selectedProduct.price}</div>
+                  <div className="flex items-center gap-4 mb-8">
+                    {deal && (
+                      <span className="text-gray-500 font-bold text-2xl line-through">Rs. {selectedProduct.price}</span>
+                    )}
+                    <span className="text-4xl font-black text-gold tracking-tighter">Rs. {Math.round(discountedPrice)}</span>
+                  </div>
                 </div>
 
                 <div className="mt-auto space-y-6">
@@ -333,7 +391,7 @@ const Menu = () => {
                   </div>
 
                   <button
-                    onClick={(e) => addToCartHandler(selectedProduct, qty, e)}
+                    onClick={(e) => addToCartHandler({ ...selectedProduct, price: Math.round(discountedPrice) }, qty, e)}
                     className="w-full bg-gold text-charcoal font-black py-5 rounded-[2rem] flex items-center justify-center gap-4 text-lg shadow-[0_20px_40px_rgba(212,175,55,0.3)] hover:scale-[1.02] active:scale-95 transition-all group"
                   >
                     <ShoppingCart className="w-5 h-5 group-hover:rotate-12 transition-transform" />
@@ -353,7 +411,8 @@ const Menu = () => {
               </div>
             </motion.div>
           </div>
-        )}
+          );
+        })()}
       </AnimatePresence>
     </div>
   );

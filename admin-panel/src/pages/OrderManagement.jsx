@@ -154,7 +154,7 @@ const OrderManagement = () => {
                       <td className="px-4 sm:px-8 py-6 sm:py-8 text-right">
                         <div className="flex justify-end gap-2">
                           <select 
-                            className="bg-charcoal border border-white/10 rounded-xl px-4 py-2 text-[10px] font-bold text-soft-white focus:outline-none focus:border-gold/50 transition-all cursor-pointer hover:bg-white/5"
+                            className="bg-charcoal border border-white/10 rounded-xl px-4 py-2 text-[10px] font-bold text-soft-white focus:outline-none focus:border-gold/50 transition-all cursor-pointer hover:bg-white/5 [&>option]:bg-black [&>option]:text-white"
                             value={order.status}
                             onChange={(e) => updateStatus(order._id, e.target.value)}
                           >

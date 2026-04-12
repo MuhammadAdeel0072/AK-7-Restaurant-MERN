@@ -138,8 +138,8 @@ const Checkout = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-16">
+        <div className="lg:col-span-3">
           <AnimatePresence mode="wait">
             {step === 1 && (
               <motion.div
@@ -328,27 +328,27 @@ const Checkout = () => {
           </AnimatePresence>
         </div>
 
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-2">
           <div className="card-premium p-10 sticky top-28 shadow-2xl bg-[#1a1a1a]/40 group hover:border-gold/30">
             <h3 className="text-2xl font-serif font-black text-white mb-10 border-b border-white/10 pb-6 uppercase tracking-widest">Summary</h3>
             <div className="space-y-6 mb-10">
-              <div className="flex justify-between text-gray-500 font-black uppercase tracking-widest text-[10px]">
+              <div className="flex justify-between items-center text-gray-400 font-bold uppercase tracking-widest text-sm">
                 <span>Cart Subtotal</span>
-                <span className="text-white">Rs. {subtotal}</span>
+                <span className="text-white text-base font-black">Rs. {subtotal}</span>
               </div>
-              <div className="flex justify-between text-gray-500 font-black uppercase tracking-widest text-[10px]">
+              <div className="flex justify-between items-center text-gray-400 font-bold uppercase tracking-widest text-sm">
                 <span>Exclusive Tax</span>
-                <span className="text-white">Rs. {tax.toFixed(0)}</span>
+                <span className="text-white text-base font-black">Rs. {tax.toFixed(0)}</span>
               </div>
-              <div className="flex justify-between text-gray-500 font-black uppercase tracking-widest text-[10px]">
+              <div className="flex justify-between items-center text-gray-400 font-bold uppercase tracking-widest text-sm">
                 <span>Delivery Fee</span>
-                <span className={`font-black ${deliveryFee === 0 ? 'text-green-500' : 'text-white'}`}>
+                <span className={`text-base font-black ${deliveryFee === 0 ? 'text-green-500' : 'text-white'}`}>
                   {deliveryFee === 0 ? 'FREE' : `Rs. ${deliveryFee}`}
                 </span>
               </div>
             </div>
             <div className="pt-10 border-t border-white/10 flex flex-col gap-2">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gold/60 mb-2">Total Amount</p>
+              <p className="text-sm font-black uppercase tracking-[0.3em] text-gold/60 mb-2">Total Amount</p>
               <p className="text-6xl font-serif font-black text-gold tracking-tighter leading-none">Rs. {total.toFixed(0)}</p>
             </div>
           </div>

@@ -55,7 +55,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
       lastName: lastName || '',
       email,
       password,
-      role: 'customer', 
+      role: 'customer',
     });
 
     console.log(`✅ User created successfully: ${email}`);
@@ -68,6 +68,10 @@ const registerUser = asyncHandler(async (req, res, next) => {
         lastName: user.lastName,
         email: user.email,
         role: user.role,
+        favorites: user.favorites,
+        addresses: user.addresses,
+        loyaltyPoints: user.loyaltyPoints,
+        loyaltyTier: user.loyaltyTier,
         token: token,
       });
     } else {
@@ -133,6 +137,10 @@ const authUser = asyncHandler(async (req, res, next) => {
       email: user.email,
       role: user.role,
       avatar: user.avatar,
+      favorites: user.favorites,
+      addresses: user.addresses,
+      loyaltyPoints: user.loyaltyPoints,
+      loyaltyTier: user.loyaltyTier,
       token: token,
     });
   } else {
@@ -167,13 +175,14 @@ const updateUserProfile = asyncHandler(async (req, res, next) => {
     throw new Error('User not found');
   }
 
-  const { firstName, lastName, phoneNumber, addresses, avatar, password } = req.body;
+  const { firstName, lastName, phoneNumber, addresses, avatar, password, favorites } = req.body;
   if (firstName !== undefined) user.firstName = firstName;
   if (lastName !== undefined) user.lastName = lastName;
   if (avatar !== undefined) user.avatar = avatar;
-  
+
   if (addresses !== undefined) user.addresses = addresses;
-  
+  if (favorites !== undefined) user.favorites = favorites;
+
   if (password) {
     user.password = password;
   }
@@ -186,6 +195,10 @@ const updateUserProfile = asyncHandler(async (req, res, next) => {
     email: updated.email,
     role: updated.role,
     avatar: updated.avatar,
+    addresses: updated.addresses,
+    favorites: updated.favorites,
+    loyaltyPoints: updated.loyaltyPoints,
+    loyaltyTier: updated.loyaltyTier,
     token: generateToken(updated._id),
   });
 });
@@ -245,16 +258,16 @@ const deleteUserAccount = asyncHandler(async (req, res, next) => {
   try {
     await Cart.findOneAndDelete({ user: userId });
     await LoyaltyTransaction.deleteMany({ user: userId });
-    
+
     if (process.env.NODE_ENV === 'development') {
       await Order.deleteMany({ user: userId });
     }
-    
+
     await User.findByIdAndDelete(userId);
 
-    res.status(200).json({ 
+    res.status(200).json({
       success: true,
-      message: 'Account and all associated data successfully deleted' 
+      message: 'Account and all associated data successfully deleted'
     });
   } catch (error) {
     console.error('Error deleting user data:', error);
@@ -283,7 +296,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
   // Generate 6-digit OTP
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  
+
   // Set OTP and Expiry (10 minutes)
   user.resetPasswordOTP = otp;
   user.resetPasswordExpires = Date.now() + 10 * 60 * 1000;
@@ -292,9 +305,9 @@ const forgotPassword = asyncHandler(async (req, res) => {
   // For development: Log OTP to console
   console.log(`\n🔑 [PASSWORD RESET] OTP for ${email}: ${otp}\n`);
 
-  res.status(200).json({ 
-    success: true, 
-    message: 'OTP sent to your email (simulated)' 
+  res.status(200).json({
+    success: true,
+    message: 'OTP sent to your email (simulated)'
   });
 });
 
@@ -309,7 +322,7 @@ const resetPassword = asyncHandler(async (req, res) => {
     throw new Error('Please provide email, OTP, and new password');
   }
 
-  const user = await User.findOne({ 
+  const user = await User.findOne({
     email,
     resetPasswordOTP: otp,
     resetPasswordExpires: { $gt: Date.now() }
@@ -328,20 +341,20 @@ const resetPassword = asyncHandler(async (req, res) => {
 
   console.log(`✅ Password successfully reset for user: ${email}`);
 
-  res.status(200).json({ 
-    success: true, 
-    message: 'Password reset successful. You can now log in.' 
+  res.status(200).json({
+    success: true,
+    message: 'Password reset successful. You can now log in.'
   });
 });
 
-module.exports = { 
-  registerUser, 
-  authUser, 
-  getUserProfile, 
-  updateUserProfile, 
+module.exports = {
+  registerUser,
+  authUser,
+  getUserProfile,
+  updateUserProfile,
   getCart,
   updateCart,
-  getLoyaltyStatus, 
+  getLoyaltyStatus,
   deleteUserAccount,
   clearCart,
   forgotPassword,

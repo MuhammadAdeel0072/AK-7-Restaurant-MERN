@@ -185,7 +185,7 @@ const Reservations = () => {
                                         <Clock className="w-3 h-3" /> Time
                                     </label>
                                     <select
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 focus:border-gold outline-none text-white transition-all"
+                                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 focus:border-gold outline-none text-white transition-all [&>option]:bg-black [&>option]:text-white"
                                         value={formData.time}
                                         onChange={(e) => setFormData({ ...formData, time: e.target.value })}
                                     >
@@ -269,7 +269,7 @@ const Reservations = () => {
                                     Advance Payment Method
                                 </label>
                                 <select
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 focus:border-gold outline-none text-white transition-all mb-4"
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 focus:border-gold outline-none text-white transition-all mb-4 [&>option]:bg-black [&>option]:text-white"
                                     value={formData.paymentMethod}
                                     onChange={(e) => { setFormData({ ...formData, paymentMethod: e.target.value }); setHasPaid(false); }}
                                 >
@@ -280,64 +280,64 @@ const Reservations = () => {
 
                                 {/* Payment Simulation UI inside form */}
                                 <div className="p-5 bg-gold/5 border border-gold/10 rounded-2xl space-y-4">
-                                    <div className="flex items-center gap-2 text-gold font-bold text-[10px] uppercase tracking-widest">
-                                        <HelpCircle className="w-3 h-3" />
+                                    <div className="flex items-center gap-2 text-gold font-bold text-sm uppercase tracking-widest">
+                                        <HelpCircle className="w-4 h-4" />
                                         Instructions
                                     </div>
 
                                     {formData.paymentMethod === 'EasyPaisa' && (
                                         <div className="space-y-3">
-                                            <p className="text-gray-400 text-[10px]">Send <span className="text-white font-bold">Rs. 1,000</span> to:</p>
-                                            <div className="text-lg font-black text-gold tracking-widest bg-charcoal/50 p-2 rounded-lg border border-white/5 text-center">
+                                            <p className="text-gray-400 text-xs mt-2">Send <span className="text-white font-bold">Rs. 1,000</span> to:</p>
+                                            <div className="text-xl font-black text-gold tracking-widest bg-charcoal/50 p-3 rounded-lg border border-white/5 text-center">
                                                 {paymentConfig?.easypaisaNumber || '0300 1234567'}
                                             </div>
                                             <button 
                                                 type="button"
                                                 onClick={() => window.open('https://easypaisa.com.pk')}
-                                                className="w-full flex items-center justify-center gap-2 bg-gold/10 hover:bg-gold/20 text-gold py-2 rounded-lg border border-gold/20 transition-all text-[9px] font-black uppercase tracking-widest"
+                                                className="w-full flex items-center justify-center gap-2 bg-gold/10 hover:bg-gold/20 text-gold py-3 rounded-lg border border-gold/20 transition-all text-xs font-black uppercase tracking-widest mt-2"
                                             >
-                                                <ExternalLink className="w-3 h-3" /> Open EasyPaisa
+                                                <ExternalLink className="w-4 h-4" /> Open EasyPaisa
                                             </button>
                                         </div>
                                     )}
 
                                     {formData.paymentMethod === 'JazzCash' && (
                                         <div className="space-y-3">
-                                            <p className="text-gray-400 text-[10px]">Send <span className="text-white font-bold">Rs. 1,000</span> to:</p>
-                                            <div className="text-lg font-black text-gold tracking-widest bg-charcoal/50 p-2 rounded-lg border border-white/5 text-center">
+                                            <p className="text-gray-400 text-xs mt-2">Send <span className="text-white font-bold">Rs. 1,000</span> to:</p>
+                                            <div className="text-xl font-black text-gold tracking-widest bg-charcoal/50 p-3 rounded-lg border border-white/5 text-center">
                                                 {paymentConfig?.jazzcashNumber || '0300 7654321'}
                                             </div>
                                             <button 
                                                 type="button"
                                                 onClick={() => window.open('https://jazzcash.com.pk')}
-                                                className="w-full flex items-center justify-center gap-2 bg-gold/10 hover:bg-gold/20 text-gold py-2 rounded-lg border border-gold/20 transition-all text-[9px] font-black uppercase tracking-widest"
+                                                className="w-full flex items-center justify-center gap-2 bg-gold/10 hover:bg-gold/20 text-gold py-3 rounded-lg border border-gold/20 transition-all text-xs font-black uppercase tracking-widest mt-2"
                                             >
-                                                <ExternalLink className="w-3 h-3" /> Open JazzCash
+                                                <ExternalLink className="w-4 h-4" /> Open JazzCash
                                             </button>
                                         </div>
                                     )}
 
                                     {formData.paymentMethod === 'Bank Transfer' && (
                                         <div className="space-y-3">
-                                            <p className="text-gray-400 text-[10px]">Transfer <span className="text-white font-bold">Rs. 1,000</span> to:</p>
-                                            <div className="bg-charcoal/50 p-3 rounded-lg border border-white/5 space-y-2 text-[9px]">
-                                                <div className="flex justify-between">
+                                            <p className="text-gray-400 text-xs mt-2">Transfer <span className="text-white font-bold">Rs. 1,000</span> to:</p>
+                                            <div className="bg-charcoal/50 p-4 rounded-lg border border-white/5 space-y-3 text-xs">
+                                                <div className="flex justify-between items-center">
                                                     <span className="text-gray-500 font-black uppercase">Bank</span>
-                                                    <span className="text-white font-bold">{paymentConfig?.bankName || 'HBL'}</span>
+                                                    <span className="text-white font-bold text-sm">{paymentConfig?.bankName || 'HBL'}</span>
                                                 </div>
-                                                <div className="flex justify-between">
+                                                <div className="flex justify-between items-center">
                                                     <span className="text-gray-500 font-black uppercase">A/C #</span>
-                                                    <span className="text-gold font-bold">{paymentConfig?.bankAccount || '1234...'}</span>
+                                                    <span className="text-gold font-bold text-sm">{paymentConfig?.bankAccount || '1234...'}</span>
                                                 </div>
                                             </div>
                                         </div>
                                     )}
 
-                                    <div className="pt-2 border-t border-white/5">
+                                    <div className="pt-4 mt-2 border-t border-white/5">
                                         <input 
                                             type="text"
                                             placeholder="Transaction ID / Ref"
-                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 focus:border-gold outline-none text-white transition-all text-[11px] mb-3"
+                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-3 focus:border-gold outline-none text-white transition-all text-sm mb-4"
                                             value={paymentRef}
                                             onChange={(e) => setPaymentRef(e.target.value)}
                                         />
@@ -351,7 +351,7 @@ const Reservations = () => {
                                                 setHasPaid(true);
                                                 toast.success('Advance Payment Recorded!', { icon: '💰' });
                                             }}
-                                            className={`w-full py-2.5 rounded-lg font-black text-[9px] uppercase tracking-widest transition-all ${hasPaid ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-gold text-charcoal'}`}
+                                            className={`w-full py-3.5 rounded-lg font-black text-xs uppercase tracking-widest transition-all ${hasPaid ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-gold text-charcoal'}`}
                                         >
                                             {hasPaid ? '✓ Payment Done' : 'I have paid Rs. 1000'}
                                         </button>
