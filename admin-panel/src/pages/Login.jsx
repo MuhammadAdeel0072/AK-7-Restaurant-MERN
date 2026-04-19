@@ -11,24 +11,18 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const handleClear = () => {
-        setEmail('');
-        setPassword('');
-        toast.success('Inputs cleared');
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        const loadingToast = toast.loading('Activating Admin protocol...');
+        const loadingToast = toast.loading('Logging in...');
         try {
             await login(email, password);
             toast.dismiss(loadingToast);
-            toast.success('Welcome to Command Center! 🛡️');
+            toast.success('Login Successful! 🛡️');
             navigate('/');
         } catch (error) {
             toast.dismiss(loadingToast);
-            toast.error(error.response?.data?.message || 'Authentication failed ❌');
+            toast.error(error.response?.data?.message || 'Login Failed ❌');
         } finally {
             setLoading(false);
         }
@@ -46,12 +40,12 @@ const Login = () => {
                         <Coffee className="text-gold" size={32} />
                     </div>
                     <h1 className="text-3xl font-bold text-white tracking-tight mb-2">AK-7 <span className="text-gold">Admin</span></h1>
-                    <p className="text-xs font-medium text-white/40 uppercase tracking-[0.3em]">Command Center Authorization</p>
+                    <p className="text-xs font-medium text-white/40 uppercase tracking-[0.3em]">Admin Login</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6 relative" autoComplete="off">
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-white/60 uppercase tracking-widest ml-1">Admin Identity</label>
+                        <label className="text-[10px] font-bold text-white/60 uppercase tracking-widest ml-1">Email Address</label>
                         <div className="relative group/input">
                             <User className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within/input:text-gold transition-colors" size={20} />
                             <input
@@ -76,7 +70,7 @@ const Login = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-white/60 uppercase tracking-widest ml-1">Master Key</label>
+                        <label className="text-[10px] font-bold text-white/60 uppercase tracking-widest ml-1">Password</label>
                         <div className="relative group/input">
                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within/input:text-gold transition-colors" size={20} />
                             <input
@@ -109,25 +103,18 @@ const Login = () => {
                         {loading ? <div className="w-5 h-5 border-2 border-[#0f1115]/30 border-t-[#0f1115] rounded-full animate-spin"></div> : (
                             <>
                                 <ShieldCheck size={20} />
-                                Authenticate
+                                Login
                             </>
                         )}
                     </button>
 
-                    <button
-                        type="button"
-                        onClick={handleClear}
-                        className="w-full text-xs font-bold text-white/30 uppercase tracking-[0.2em] hover:text-crimson transition-all pt-3 flex items-center justify-center gap-2"
-                    >
-                        <XCircle size={14} />
-                        Clear Entries
-                    </button>
+                    
                 </form>
 
                 <div className="mt-10 pt-6 border-t border-white/5 flex items-center justify-center gap-4 text-[9px] font-bold text-white/20 uppercase tracking-widest">
                     <span>V3.0 Secure</span>
                     <span className="w-1 h-1 bg-white/10 rounded-full"></span>
-                    <span>Admin Protocol</span>
+                    <span>Admin Panel</span>
                 </div>
             </div>
         </div>

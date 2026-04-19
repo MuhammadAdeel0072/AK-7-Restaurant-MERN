@@ -212,12 +212,12 @@ const DealManagement = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-white/5 text-soft-white/40 text-[8px] sm:text-[10px] uppercase tracking-[0.2em]">
-                <th className="px-4 sm:px-8 py-4 sm:py-5 font-bold">Deal Title</th>
-                <th className="px-4 sm:px-8 py-4 sm:py-5 font-bold">Target</th>
-                <th className="px-4 sm:px-8 py-4 sm:py-5 font-bold text-center">Discount</th>
-                <th className="px-4 sm:px-8 py-4 sm:py-5 font-bold text-center">Status</th>
-                <th className="px-4 sm:px-8 py-4 sm:py-5 font-bold text-right">Actions</th>
+              <tr className="bg-white/5 border-b border-white/10">
+                <th className="text-left py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Deal Title</th>
+                <th className="text-left py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Target</th>
+                <th className="text-center py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Discount</th>
+                <th className="text-center py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Status</th>
+                <th className="text-right py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">

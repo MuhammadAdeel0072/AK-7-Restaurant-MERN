@@ -29,7 +29,7 @@ const UserManagement = () => {
       className="space-y-10"
     >
       <header>
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-black text-soft-white tracking-tighter">Patron <span className="text-gold">Directory</span></h1>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-black text-soft-white tracking-tighter">User <span className="text-gold">Directory</span></h1>
         <p className="text-soft-white/50 mt-1 sm:mt-2 uppercase text-[7px] sm:text-[9px] md:text-[10px] font-bold tracking-[0.2em]">AK-7 REST USER MANAGEMENT</p>
       </header>
 
@@ -37,19 +37,19 @@ const UserManagement = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-white/5 text-soft-white/40 text-[8px] sm:text-[10px] uppercase tracking-[0.2em]">
-                <th className="px-4 sm:px-8 py-4 sm:py-6 font-bold">Patron Identity</th>
-                <th className="px-4 sm:px-8 py-4 sm:py-6 font-bold text-center">Protocol Level</th>
-                <th className="px-4 sm:px-8 py-4 sm:py-6 font-bold text-center">Loyalty Standing</th>
-                <th className="px-4 sm:px-8 py-4 sm:py-6 font-bold">Inducted On</th>
-                <th className="px-4 sm:px-8 py-4 sm:py-6 font-bold"></th>
+              <tr className="bg-white/5 border-b border-white/10">
+                <th className="text-left py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Customer Name</th>
+                <th className="text-center py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">User Role</th>
+                <th className="text-center py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Status</th>
+                <th className="text-left py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Joined Date</th>
+                <th className="text-right py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {loading ? (
                 <tr><td colSpan="5" className="px-8 py-20 text-center"><div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto"></div></td></tr>
               ) : users.length === 0 ? (
-                <tr><td colSpan="5" className="px-8 py-20 text-center text-soft-white/30 italic">No patrons registered yet.</td></tr>
+                <tr><td colSpan="5" className="px-8 py-20 text-center text-soft-white/30 italic">No users registered yet.</td></tr>
               ) : (
                 <AnimatePresence>
                   {users.map((user) => (
@@ -84,7 +84,7 @@ const UserManagement = () => {
                           ) : (
                             <>
                               <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-soft-white/30" />
-                              <span className="text-[8px] sm:text-[10px] font-bold text-soft-white/40 uppercase tracking-widest">Patron</span>
+                              <span className="text-[8px] sm:text-[10px] font-bold text-soft-white/40 uppercase tracking-widest">User</span>
                             </>
                           )}
                         </div>

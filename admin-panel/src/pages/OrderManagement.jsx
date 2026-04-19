@@ -108,11 +108,11 @@ const OrderManagement = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-white/5 text-soft-white/40 text-[8px] sm:text-[10px] uppercase tracking-[0.2em]">
-                <th className="px-4 sm:px-8 py-4 sm:py-6 font-bold">Customer & Order ID</th>
-                <th className="px-4 sm:px-8 py-4 sm:py-6 font-bold">Total Price</th>
-                <th className="px-4 sm:px-8 py-4 sm:py-6 font-bold">Order Status</th>
-                <th className="px-4 sm:px-8 py-4 sm:py-6 font-bold text-right">Action</th>
+              <tr className="bg-white/5 border-b border-white/10">
+                <th className="text-left py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Customer & Order ID</th>
+                <th className="text-left py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Total Price</th>
+                <th className="text-left py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Order Status</th>
+                <th className="text-right py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">

@@ -2,7 +2,7 @@
 
 **A Premium, Full-Stack Dining Experience meticulously crafted for the digital age.**
 
-AK-7 REST is a luxury restaurant management ecosystem built on the **MERN** stack. It combines cutting-edge performance with a bespoke "**Midnight Gourmet**" aesthetic to deliver a seamless, high-end experience across three specialized front-end modules—Client, Admin, and Chef—all powered by a robust, real-time Backend Server.
+AK-7 REST is a luxury restaurant management ecosystem built on the **MERN** stack. It combines cutting-edge performance with a bespoke "**Midnight Gourmet**" aesthetic to deliver a seamless, high-end experience across four specialized front-end modules—Client, Admin, Chef, and Rider—all powered by a robust, real-time Backend Server.
 
 ---
 
@@ -10,7 +10,7 @@ AK-7 REST is a luxury restaurant management ecosystem built on the **MERN** stac
 
 The system is designed around a premium visual language ensuring a spectacular user experience across all modules:
 - **Luxury Aesthetic**: A deep charcoal canvas accented with brushed gold and crimson highlights.
-- **Glassmorphism**: UI components utilize high-end backdrop blurs and tacranslucent borders for deep visual immersion.
+- **Glassmorphism**: UI components utilize high-end backdrop blurs and translucent borders for deep visual immersion.
 - **Dynamic Micro-interactions**: Powered by `framer-motion`, every interaction—from menu selection to checkout to drag-and-drop order management—feels fluid, responsive, and alive.
 - **Sharp Iconography**: Consistent and minimalist icons using `lucide-react` for a state-of-the-art look.
 
@@ -36,16 +36,24 @@ A production-grade, industry-standard real-time kitchen management system design
 ### 3. 🛡️ Enterprise Admin Panel
 The centralized command center for holistic restaurant operations.
 - **Role-Based Security**: Integrated authentication ensuring strict, role-based access control (RBAC).
+- **Staff Management**: Full lifecycle management of restaurant staff with performance metrics and datatable exports (PDF/Excel).
 - **Complete Inventory Control**: Powerful CRUD interfaces to add, edit, or remove gourmet menu items and categories.
 - **Comprehensive Order Monitoring**: Live, bird's-eye view of all active, pending, and historical orders.
-- **System-Wide Sync**: Maintains absolute real-time state synchronization with both Chef and Client modules.
+- **System-Wide Sync**: Maintains absolute real-time state synchronization with all connected modules.
 
-### 4. 🧠 Backend Infrastructure
+### 4. 🛵 Dedicated Rider Panel
+A streamlined delivery management interface designed exclusively for the deployment fleet.
+- **Real-Time Delivery Tracking**: Live updates of order progression instantly synchronized via Socket.IO.
+- **Interactive Fulfillment**: Intuitive feedback gestures and tactile UI toggle actions to mark orders as "Out for Delivery" or "Delivered".
+- **Optimized Layout**: High legibility, large typography, and mobile-responsive layouts tailored for on-the-go usage.
+- **Multilingual Output**: Seamless translation support (English/Urdu) for an inclusive delivery workforce.
+
+### 5. 🧠 Backend Infrastructure
 The unseen, high-performance engine powering the entire ecosystem.
 - **Real-Time Gateway**: Built with Socket.IO (v4) for zero-latency, bi-directional event emission across all modular nodes.
 - **Secure Auth API**: Tightly coupled with custom JWT validation and proprietary middleware to ensure endpoint safety.
 - **Data Persistence**: MongoDB with Mongoose ODM for structured, scalable, and relationship-driven data storage.
-- **Automated Workflows**: Configured for automated email notifications (Nodemailer) and PDF invoice generation (PDFKit).
+- **Automated Workflows**: Configured for automated email notifications (Nodemailer) and dynamic exports.
 
 ---
 
@@ -58,7 +66,7 @@ The unseen, high-performance engine powering the entire ecosystem.
 | **Backend Frameworks** | Node.js, Express 5 |
 | **Real-Time Comm.** | Socket.IO 4 |
 | **Database** | MongoDB (Mongoose 9) |
-| **Authentication** | Custom JWT (Email + Password) |
+| **Authentication** | Custom JWT (Email + Password), Clerk |
 | **Payment Gateway** | Stripe |
 | **Localization (i18n)** | react-i18next (English / Urdu RTL) |
 | **Deployment** | Vercel (Frontends), Render/Railway (Backend) |
@@ -80,13 +88,17 @@ Each of the project modules requires its own `.env` file. You must set up config
 - `client/.env.local`
 - `admin-panel/.env.local`
 - `chef-panel/.env.local`
+- `rider-panel/.env.local`
 - `server/.env`
 
 *(Refer to each folder's respective `.env.example` where applicable for exact key names).*
 
 ### 3. Install Dependencies
-Quickly install dependencies for all modules:
+Install dependencies for the root orchestrator and all individual system modules:
 ```bash
+# Root
+npm install
+
 # Backend Server
 cd server && npm install
 
@@ -98,29 +110,17 @@ cd ../admin-panel && npm install
 
 # Chef Panel
 cd ../chef-panel && npm install
+
+# Rider Panel
+cd ../rider-panel && npm install
 ```
 
 ### 4. Run the Ecosystem Locally
-For the full experience, run all four modules concurrently in four separate terminal instances:
+You can power up the complete multi-module ecosystem (Server, Client, Admin, Chef, and Rider) concurrently using a single command from the project root:
 
-**Terminal 1: Backend Server**
 ```bash
-cd server && npm run dev
-```
-
-**Terminal 2: Client Application**
-```bash
-cd client && npm run dev
-```
-
-**Terminal 3: Admin Panel**
-```bash
-cd admin-panel && npm run dev
-```
-
-**Terminal 4: Chef Panel**
-```bash
-cd chef-panel && npm run dev
+cd .. # Return to the root directory
+npm run dev
 ```
 
 ---

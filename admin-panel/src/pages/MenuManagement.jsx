@@ -273,8 +273,8 @@ const MenuManagement = () => {
     >
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-black text-soft-white tracking-tighter">Menu <span className="text-gold">Registry</span></h1>
-          <p className="text-soft-white/50 mt-1 sm:mt-2 uppercase text-[7px] sm:text-[9px] md:text-[10px] font-bold tracking-[0.2em]">AK-7 REST CULINARY DATABASE</p>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-black text-soft-white tracking-tighter">Menu <span className="text-gold">Management</span></h1>
+          <p className="text-soft-white/50 mt-1 sm:mt-2 uppercase text-[7px] sm:text-[9px] md:text-[10px] font-bold tracking-[0.2em]">AK-7 REST MENU MANAGEMENT</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
           <button 
@@ -289,7 +289,7 @@ const MenuManagement = () => {
             className="btn-gold flex items-center justify-center space-x-2 py-3 px-6 rounded-2xl w-full sm:w-auto"
           >
             <Plus className="w-5 h-5" />
-            <span className="text-sm font-bold uppercase tracking-widest">Add Masterpiece</span>
+            <span className="text-sm font-bold uppercase tracking-widest">Add Menu Item</span>
           </button>
         </div>
       </header>
@@ -300,7 +300,7 @@ const MenuManagement = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gold w-5 h-5 opacity-70" />
             <input
               type="text"
-              placeholder="Search delicacies..."
+              placeholder="Search menu items..."
               className="w-full pl-12 pr-6 py-3 rounded-2xl bg-charcoal border border-white/10 text-soft-white focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -311,19 +311,19 @@ const MenuManagement = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-white/5 text-soft-white/40 text-[8px] sm:text-[10px] uppercase tracking-[0.2em]">
-                <th className="px-4 sm:px-8 py-4 sm:py-5 font-bold">Item Details</th>
-                <th className="px-4 sm:px-8 py-4 sm:py-5 font-bold">Category</th>
-                <th className="px-4 sm:px-8 py-4 sm:py-5 font-bold text-center">Price</th>
-                <th className="px-4 sm:px-8 py-4 sm:py-5 font-bold text-center">In Stock</th>
-                <th className="px-4 sm:px-8 py-4 sm:py-5 font-bold text-right">Refinement</th>
+              <tr className="bg-white/5 border-b border-white/10">
+                <th className="text-left py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Item Name</th>
+                <th className="text-left py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Category</th>
+                <th className="text-center py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Price</th>
+                <th className="text-center py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">In Stock</th>
+                <th className="text-right py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {loading ? (
                 <tr><td colSpan="5" className="px-8 py-20 text-center"><div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto"></div></td></tr>
               ) : filteredItems.length === 0 ? (
-                <tr><td colSpan="5" className="px-8 py-20 text-center text-soft-white/30 italic">No delicacies match your search.</td></tr>
+                <tr><td colSpan="5" className="px-8 py-20 text-center text-soft-white/30 italic">No items match your search.</td></tr>
               ) : (
                 filteredItems.map((item) => (
                   <tr key={item._id} className="hover:bg-white/[0.02] transition-colors group">
@@ -399,7 +399,7 @@ const MenuManagement = () => {
             >
               <div className="sticky top-0 bg-charcoal/80 backdrop-blur-xl p-5 md:p-8 border-b border-white/5 flex items-center justify-between z-20">
                 <h2 className="text-xl md:text-3xl font-serif font-bold text-gold tracking-tighter">
-                  {editingItem ? 'Refine Delicacy' : 'New Culinary Piece'}
+                  {editingItem ? 'Edit Menu Item' : 'New Menu Item'}
                 </h2>
                 <button onClick={handleCloseModal} className="p-2 md:p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors text-soft-white/50 hover:text-soft-white">
                   <X className="w-5 h-5 md:w-6 md:h-6" />
@@ -529,7 +529,7 @@ const MenuManagement = () => {
                     className="flex-1 sm:flex-none btn-gold px-12 py-3 text-sm md:text-lg flex items-center justify-center gap-3 rounded-2xl"
                   >
                     <Save className="w-5 h-5 md:w-6 md:h-6" />
-                    <span>{editingItem ? 'Update Piece' : 'Seal Creation'}</span>
+                    <span>{editingItem ? 'Update Item' : 'Save Item'}</span>
                   </button>
                 </div>
               </form>

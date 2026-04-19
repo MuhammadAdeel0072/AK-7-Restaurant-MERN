@@ -194,7 +194,7 @@ const ReportManagement = () => {
                             <KPI data={reportData.finalProfit} label="Profit" format="Rs. " color="text-gold" />
                         </div>
                         <Table
-                            headers={['Ref Name', 'Financial Value', 'Type']}
+                            headers={['Ref Name', 'Amount', 'Type']}
                             rows={[
                                 ...(Array.isArray(reportData.orders) ? reportData.orders.map(o => [o.number, `Rs. ${o.amount}`, 'REVENUE']) : []),
                                 ...(Array.isArray(reportData.expenses) ? reportData.expenses.map(e => [e.title, `Rs. ${e.amount}`, 'EXPENSE']) : [])
@@ -212,7 +212,7 @@ const ReportManagement = () => {
             {/* Heading - Left Aligned for consistency */}
             <div className="text-left space-y-1">
                 <h1 className="text-4xl font-serif font-black tracking-tighter text-soft-white uppercase">REPORTS <span className="text-gold">CENTER</span></h1>
-                <p className="text-soft-white/30 text-[10px] font-bold uppercase tracking-[0.4em] ml-1">Operational Intel & System Data</p>
+                <p className="text-soft-white/30 text-[10px] font-bold uppercase tracking-[0.4em] ml-1">System Reports</p>
             </div>
 
             {/* Simple Horizontal Tabs */}
@@ -239,7 +239,7 @@ const ReportManagement = () => {
                         onClick={() => setDateRange({ startDate: '', endDate: '' })}
                         className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full border transition-all ${!dateRange.startDate && !dateRange.endDate ? 'bg-gold text-charcoal border-gold' : 'border-white/10 text-soft-white/40 hover:border-gold/30 hover:text-gold'}`}
                     >
-                        Lifetime Audit
+                        All Time
                     </button>
                     
                     <div className="h-4 w-px bg-white/10 hidden md:block" />
@@ -301,12 +301,12 @@ const Table = ({ headers, rows }) => (
     <div className="overflow-x-auto rounded-[32px] border border-white/5 bg-black/40">
         <table className="w-full text-left min-w-max">
             <thead>
-                <tr className="bg-white/5">
+                <tr className="bg-white/5 border-b border-white/10">
                     {headers.map((h, i) => {
                         const hLower = String(h).toLowerCase();
                         const isPrimary = hLower.includes('name') || hLower.includes('title') || hLower.includes('customer') || hLower.includes('item');
                         return (
-                            <th key={i} className={`px-8 py-6 text-[10px] uppercase tracking-widest font-black text-gold/40 ${!isPrimary ? 'whitespace-nowrap' : 'min-w-[150px]'}`}>
+                            <th key={i} className={`text-left py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold ${!isPrimary ? 'whitespace-nowrap' : 'min-w-[150px]'}`}>
                                 {h}
                             </th>
                         );
