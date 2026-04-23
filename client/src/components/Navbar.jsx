@@ -1,6 +1,6 @@
 import { ShoppingCart, Menu as MenuIcon, LogIn, User as UserIcon, ShoppingBag, Calendar, LogOut, X, AlertTriangle, Settings as SettingsIcon, ChevronRight, HelpCircle } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { Link } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,6 +15,7 @@ const Navbar = () => {
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const dropdownRef = useRef(null);
+  const location = useLocation();
 
   const navLinks = [
     { name: 'Home', path: '/' },
@@ -71,7 +72,16 @@ const Navbar = () => {
         {/* Desktop Nav links */}
         <div className="hidden md:flex gap-8 items-center text-sm font-black uppercase tracking-widest">
           {navLinks.map(link => (
-            <Link key={link.path} to={link.path} className="text-gray-300 hover:text-gold transition-colors">{link.name}</Link>
+            <NavLink 
+              key={link.path} 
+              to={link.path} 
+              end={link.path === '/'}
+              className={({ isActive }) => 
+                `transition-colors ${isActive ? 'text-gold' : 'text-gray-300 hover:text-gold'}`
+              }
+            >
+              {link.name}
+            </NavLink>
           ))}
         </div>
 
@@ -201,20 +211,23 @@ const Navbar = () => {
                 >
                   <div className="flex flex-col gap-8">
                     {navLinks.map((link) => (
-                      <Link
+                      <NavLink
                         key={link.path}
                         to={link.path}
+                        end={link.path === '/'}
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="text-3xl font-serif font-black text-gray-400 hover:text-white transition-colors flex items-center justify-between group py-2"
+                        className={({ isActive }) => 
+                          `text-3xl font-serif font-black transition-colors flex items-center justify-between group py-2 ${isActive ? 'text-gold' : 'text-gray-400 hover:text-white'}`
+                        }
                       >
                         <span className="group-hover:translate-x-2 transition-transform duration-300">{link.name}</span>
                         <motion.div
                           whileHover={{ x: 5 }}
-                          className="text-gold group-hover:scale-125 transition-transform"
+                          className={`group-hover:scale-125 transition-transform ${location.pathname === link.path ? 'text-gold' : 'text-gold'}`}
                         >
                           <ChevronRight className="w-7 h-7" />
                         </motion.div>
-                      </Link>
+                      </NavLink>
                     ))}
                     {isSignedIn && (
                       <Link

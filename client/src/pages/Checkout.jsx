@@ -35,6 +35,7 @@ const Checkout = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasPaid, setHasPaid] = useState(false);
   const [paymentRef, setPaymentRef] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
 
   useEffect(() => {
     const fetchConfig = async () => {
@@ -54,10 +55,10 @@ const Checkout = () => {
   const total = subtotal + tax + deliveryFee;
 
   useEffect(() => {
-    if (cartItems.length === 0) {
+    if (cartItems.length === 0 && !isSuccess) {
       navigate('/cart');
     }
-  }, [cartItems, navigate]);
+  }, [cartItems, navigate, isSuccess]);
 
   const nextStep = () => setStep(s => s + 1);
   const prevStep = () => setStep(s => s - 1);
@@ -95,10 +96,11 @@ const Checkout = () => {
       };
 
       const createdOrder = await createOrder(orderData);
+      setIsSuccess(true);
       toast.dismiss(loadingToast);
       toast.success('Order placed successfully 🎉');
       dispatch({ type: 'CLEAR_CART' });
-      navigate(`/order-success?id=${createdOrder._id}&total=${total.toFixed(0)}`);
+      navigate('/orders');
     } catch (error) {
       toast.dismiss(loadingToast);
       const errorMsg = error.response?.data?.message || error.message || 'Order placement failed ❌';

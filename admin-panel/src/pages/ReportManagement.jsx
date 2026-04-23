@@ -14,6 +14,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api, { socket } from '../services/api';
 import toast from 'react-hot-toast';
 
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+};
+const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1, transition: { duration: 0.4 } }
+};
+
 const ReportManagement = () => {
     const [reportType, setReportType] = useState('sales');
     const [dateRange, setDateRange] = useState({
@@ -23,7 +32,8 @@ const ReportManagement = () => {
     const [reportData, setReportData] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const fetchReportData = async () => {
+    const fetchReportData = async (reset = false) => {
+        if (reset) setReportData(null);
         setLoading(true);
         // Do not reset reportData here to avoid flickering during real-time updates
 
@@ -39,12 +49,12 @@ const ReportManagement = () => {
     };
 
     useEffect(() => {
-        fetchReportData();
+        fetchReportData(true); // Reset data when reportType changes
 
         // 📡 Real-time Synchronization Listeners
         const handleLiveUpdate = () => {
             console.log('📡 Real-time update detected. Refreshing intelligence data...');
-            fetchReportData();
+            fetchReportData(false); // Don't reset for real-time updates
         };
 
         socket.on('NEW_ORDER', handleLiveUpdate);
@@ -150,8 +160,8 @@ const ReportManagement = () => {
                         rows={Array.isArray(reportData) ? reportData.map(s => [
                             s.name,
                             s.role?.toUpperCase(),
-                            s.ordersCount,
-                            `Rs. ${s.totalValue.toLocaleString()}`,
+                            s.ordersCount || 0,
+                            `Rs. ${(s.totalValue || 0).toLocaleString()}`,
                             <span className="text-emerald-400">{s.attendance?.Present || 0}</span>,
                             <span className="text-crimson">{s.attendance?.Absent || 0}</span>,
                             <span className="text-gold">{s.attendance?.Late || 0}</span>
@@ -208,36 +218,41 @@ const ReportManagement = () => {
     };
 
     return (
-        <div className="max-w-6xl mx-auto pt-2 pb-10 px-4 space-y-10">
+        <motion.div 
+            variants={containerVariants} 
+            initial="hidden" 
+            animate="visible" 
+            className="max-w-6xl mx-auto pt-2 pb-10 px-4 space-y-10"
+        >
             {/* Heading - Left Aligned for consistency */}
-            <div className="text-left space-y-1">
+            <motion.div variants={itemVariants} className="text-left space-y-1">
                 <h1 className="text-4xl font-serif font-black tracking-tighter text-soft-white uppercase">REPORTS <span className="text-gold">CENTER</span></h1>
                 <p className="text-soft-white/30 text-[10px] font-bold uppercase tracking-[0.4em] ml-1">System Reports</p>
-            </div>
+            </motion.div>
 
-            {/* Simple Horizontal Tabs */}
-            <div className="flex justify-center flex-wrap gap-2 py-4 border-y border-white/5">
+            {/* Tab Navigation - Updated to match Staff Management */}
+            <motion.div variants={itemVariants} className="flex flex-wrap gap-2">
                 {tabs.map(tab => (
                     <button
                         key={tab.id}
                         onClick={() => setReportType(tab.id)}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold transition-all ${reportType === tab.id
-                            ? 'bg-gold text-charcoal shadow-lg shadow-gold/20'
-                            : 'bg-white/5 text-soft-white/40 hover:text-soft-white hover:bg-white/10'
+                        className={`flex items-center gap-3 px-6 py-3.5 rounded-xl text-base font-bold transition-all duration-300 border ${reportType === tab.id
+                            ? 'bg-gold/10 text-gold border-gold/20 shadow-[0_0_20px_rgba(212,175,55,0.15)]'
+                            : 'text-soft-white/50 border-white/5 hover:bg-white/5 hover:text-soft-white/80'
                             }`}
                     >
-                        <tab.icon className="w-4 h-4" />
-                        {tab.name}
+                        <tab.icon className="w-5 h-5" />
+                        <span>{tab.name}</span>
                     </button>
                 ))}
-            </div>
+            </motion.div>
 
             {/* Simple Actions Row */}
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6 bg-white/5 p-6 rounded-3xl border border-white/5">
+            <motion.div variants={itemVariants} className="flex flex-col md:flex-row justify-between items-center gap-6 bg-white/5 p-6 rounded-3xl border border-white/5">
                 <div className="flex items-center gap-4 flex-wrap">
                     <button
                         onClick={() => setDateRange({ startDate: '', endDate: '' })}
-                        className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full border transition-all ${!dateRange.startDate && !dateRange.endDate ? 'bg-gold text-charcoal border-gold' : 'border-white/10 text-soft-white/40 hover:border-gold/30 hover:text-gold'}`}
+                        className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl border transition-all ${!dateRange.startDate && !dateRange.endDate ? 'bg-gold/10 text-gold border-gold/20' : 'border-white/10 text-soft-white/40 hover:border-gold/30 hover:text-gold'}`}
                     >
                         All Time
                     </button>
@@ -276,13 +291,13 @@ const ReportManagement = () => {
                         <FileText className="w-4 h-4" /> EXCEL
                     </button>
                 </div>
-            </div>
+            </motion.div>
 
             {/* Main Content Area */}
             <div className="animate-in fade-in slide-in-from-bottom-5 duration-700">
                 {renderContent()}
             </div>
-        </div>
+        </motion.div>
     );
 };
 

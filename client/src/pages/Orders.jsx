@@ -126,7 +126,7 @@ const Orders = () => {
                   <Info className="w-4 h-4" /> Details
                 </button>
                 <Link
-                  to={`/order-tracker?id=${order._id}`}
+                  to={`/track/${order._id}`}
                   className="flex-shrink-0 flex items-center justify-center gap-2 bg-gold hover:bg-yellow-400 text-charcoal px-6 py-3.5 rounded-2xl font-bold text-sm transition-all group/btn"
                 >
                   Track Order <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
