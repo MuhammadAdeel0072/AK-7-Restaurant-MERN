@@ -57,9 +57,17 @@ const Reservations = () => {
     };
 
     const handlePhoneChange = (e) => {
-        const val = e.target.value;
-        setFormData({ ...formData, phone: val });
-        if (val && !/^03\d{2}-\d{7}$/.test(val)) {
+        let val = e.target.value.replace(/\D/g, ''); // Remove non-digits
+        if (val.length > 11) val = val.slice(0, 11); // Limit to 11 digits
+        
+        let formatted = val;
+        if (val.length > 4) {
+            formatted = val.slice(0, 4) + '-' + val.slice(4);
+        }
+        
+        setFormData({ ...formData, phone: formatted });
+        
+        if (formatted && !/^03\d{2}-\d{7}$/.test(formatted)) {
             setPhoneError('Format: 03xx-xxxxxxx');
         } else {
             setPhoneError('');

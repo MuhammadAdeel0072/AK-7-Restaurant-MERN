@@ -8,7 +8,9 @@ import {
     Package,
     DollarSign,
     RefreshCcw,
-    ChevronDown
+    ChevronDown,
+    ChevronLeft,
+    ChevronRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api, { socket } from '../services/api';
@@ -311,48 +313,136 @@ const KPI = ({ data, label, format = '', color = 'text-soft-white' }) => (
     </div>
 );
 
-// Reusable Simple Table
-const Table = ({ headers, rows }) => (
-    <div className="overflow-x-auto glass rounded-2xl border border-white/5 overflow-hidden shadow-2xl">
-        <table className="w-full text-left min-w-max border-separate border-spacing-0">
-            <thead>
-                <tr className="bg-[#1A1A1A]">
-                    {headers.map((h, i) => {
-                        const hLower = String(h).toLowerCase();
-                        const isPrimary = hLower.includes('name') || hLower.includes('title') || hLower.includes('customer') || hLower.includes('item');
-                        return (
-                            <th 
-                                key={i} 
-                                className={`text-left py-6 px-8 text-sm font-black uppercase tracking-[0.2em] text-gold border-b border-white/5 ${i === 0 ? 'rounded-tl-2xl' : ''} ${i === headers.length - 1 ? 'rounded-tr-2xl' : ''} ${!isPrimary ? 'whitespace-nowrap' : 'min-w-[150px]'}`}
+const Table = ({ headers, rows }) => {
+    const [page, setPage] = React.useState(1);
+    const [limit, setLimit] = React.useState(10);
+    
+    React.useEffect(() => {
+        setPage(1);
+    }, [rows.length, limit]);
+
+    const totalRecords = rows.length;
+    const totalPages = Math.ceil(totalRecords / limit) || 1;
+    const currentRows = rows.slice((page - 1) * limit, page * limit);
+
+    return (
+        <div className="glass rounded-2xl border border-white/5 overflow-hidden shadow-2xl">
+            <div className="overflow-x-auto">
+                <table className="w-full text-left min-w-max border-separate border-spacing-0">
+                    <thead>
+                        <tr className="bg-[#1A1A1A]">
+                            {headers.map((h, i) => {
+                                const hLower = String(h).toLowerCase();
+                                const isPrimary = hLower.includes('name') || hLower.includes('title') || hLower.includes('customer') || hLower.includes('item');
+                                return (
+                                    <th 
+                                        key={i} 
+                                        className={`text-left py-6 px-8 text-sm font-black uppercase tracking-[0.2em] text-gold border-b border-white/5 ${i === 0 ? 'rounded-tl-2xl' : ''} ${i === headers.length - 1 ? 'rounded-tr-2xl' : ''} ${!isPrimary ? 'whitespace-nowrap' : 'min-w-[150px]'}`}
+                                    >
+                                        {h}
+                                    </th>
+                                );
+                            })}
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                        {currentRows.map((row, i) => (
+                            <tr key={i} className="hover:bg-white/[0.02] transition-colors group">
+                                {row.map((cell, j) => {
+                                    const hLower = String(headers[j] || '').toLowerCase();
+                                    const isPrimary = hLower.includes('name') || hLower.includes('title') || hLower.includes('customer') || hLower.includes('item');
+                                    return (
+                                        <td key={j} className={`px-8 py-6 text-[13px] font-medium text-soft-white group-hover:text-gold transition-colors ${!isPrimary ? 'whitespace-nowrap' : 'break-words min-w-[150px] leading-relaxed'}`}>
+                                            {cell}
+                                        </td>
+                                    );
+                                })}
+                            </tr>
+                        ))}
+                        {currentRows.length === 0 && (
+                            <tr>
+                                <td colSpan={headers.length} className="px-8 py-16 text-center text-xs uppercase font-black tracking-[0.3em] text-soft-white/10">No data found in selected range</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Pagination */}
+            {totalRecords > 0 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-white/5 gap-4 bg-[#1A1A1A]">
+                    <div className="flex items-center gap-3">
+                        <span className="text-[11px] font-bold text-soft-white/40 uppercase tracking-widest">Show</span>
+                        <div className="relative group">
+                            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gold/60 pointer-events-none" />
+                            <select 
+                                value={limit} 
+                                onChange={e => setLimit(Number(e.target.value))}
+                                className="bg-charcoal border border-white/10 rounded-lg pl-3 pr-8 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-gold/40 hover:border-white/20 transition-all cursor-pointer appearance-none"
                             >
-                                {h}
-                            </th>
-                        );
-                    })}
-                </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
-                {rows.map((row, i) => (
-                    <tr key={i} className="hover:bg-white/[0.02] transition-colors group">
-                        {row.map((cell, j) => {
-                            const hLower = String(headers[j] || '').toLowerCase();
-                            const isPrimary = hLower.includes('name') || hLower.includes('title') || hLower.includes('customer') || hLower.includes('item');
-                            return (
-                                <td key={j} className={`px-8 py-6 text-[13px] font-medium text-soft-white group-hover:text-gold transition-colors ${!isPrimary ? 'whitespace-nowrap' : 'break-words min-w-[150px] leading-relaxed'}`}>
-                                    {cell}
-                                </td>
-                            );
-                        })}
-                    </tr>
-                ))}
-                {rows.length === 0 && (
-                    <tr>
-                        <td colSpan={headers.length} className="px-8 py-16 text-center text-xs uppercase font-black tracking-[0.3em] text-soft-white/10">No data found in selected range</td>
-                    </tr>
-                )}
-            </tbody>
-        </table>
-    </div>
-);
+                                {[5, 10, 25, 50].map(size => (
+                                    <option key={size} value={size} className="bg-black text-white">{size}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <span className="text-[11px] font-bold text-soft-white/40 uppercase tracking-widest">entries</span>
+                    </div>
+                    
+                    <div className="text-[11px] font-bold text-soft-white/40 uppercase tracking-widest">
+                        Showing {Math.min((page - 1) * limit + 1, totalRecords)}–{Math.min(page * limit, totalRecords)} of <span className="text-white">{totalRecords}</span> entries
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                        <button 
+                            disabled={page <= 1} 
+                            onClick={() => setPage(p => p - 1)}
+                            className="flex items-center justify-center h-8 px-3 rounded-lg border border-white/10 text-[11px] font-bold uppercase tracking-wider text-soft-white/70 hover:bg-white/5 disabled:opacity-20 disabled:hover:bg-transparent transition-all"
+                        >
+                            Prev
+                        </button>
+                        
+                        <div className="flex items-center px-2 gap-1">
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNum => {
+                                if (
+                                    pageNum === 1 || 
+                                    pageNum === totalPages || 
+                                    (pageNum >= page - 1 && pageNum <= page + 1)
+                                ) {
+                                    return (
+                                        <button
+                                            key={pageNum}
+                                            onClick={() => setPage(pageNum)}
+                                            className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold transition-all ${
+                                                pageNum === page 
+                                                    ? 'bg-gold text-charcoal' 
+                                                    : 'text-soft-white/60 hover:bg-white/5 hover:text-white'
+                                            }`}
+                                        >
+                                            {pageNum}
+                                        </button>
+                                    );
+                                } else if (
+                                    pageNum === page - 2 || 
+                                    pageNum === page + 2
+                                ) {
+                                    return <span key={pageNum} className="text-soft-white/30 text-xs px-1">...</span>;
+                                }
+                                return null;
+                            })}
+                        </div>
+
+                        <button 
+                            disabled={page >= totalPages} 
+                            onClick={() => setPage(p => p + 1)}
+                            className="flex items-center justify-center h-8 px-3 rounded-lg border border-white/10 text-[11px] font-bold uppercase tracking-wider text-soft-white/70 hover:bg-white/5 disabled:opacity-20 disabled:hover:bg-transparent transition-all"
+                        >
+                            Next
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
 
 export default ReportManagement;

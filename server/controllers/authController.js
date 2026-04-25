@@ -67,6 +67,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        phone: user.phone,
         role: user.role,
         favorites: user.favorites,
         addresses: user.addresses,
@@ -135,6 +136,7 @@ const authUser = asyncHandler(async (req, res, next) => {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
+      phone: user.phone,
       role: user.role,
       avatar: user.avatar,
       favorites: user.favorites,
@@ -175,10 +177,12 @@ const updateUserProfile = asyncHandler(async (req, res, next) => {
     throw new Error('User not found');
   }
 
-  const { firstName, lastName, phoneNumber, addresses, avatar, password, favorites } = req.body;
+  const { firstName, lastName, phone, phoneNumber, addresses, avatar, password, favorites } = req.body;
   if (firstName !== undefined) user.firstName = firstName;
   if (lastName !== undefined) user.lastName = lastName;
   if (avatar !== undefined) user.avatar = avatar;
+  if (phone !== undefined) user.phone = phone;
+  if (phoneNumber !== undefined && phone === undefined) user.phone = phoneNumber;
 
   if (addresses !== undefined) user.addresses = addresses;
   if (favorites !== undefined) user.favorites = favorites;
@@ -193,6 +197,7 @@ const updateUserProfile = asyncHandler(async (req, res, next) => {
     firstName: updated.firstName,
     lastName: updated.lastName,
     email: updated.email,
+    phone: updated.phone,
     role: updated.role,
     avatar: updated.avatar,
     addresses: updated.addresses,

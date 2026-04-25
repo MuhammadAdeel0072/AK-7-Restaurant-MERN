@@ -7,7 +7,7 @@ import {
   Search, Filter, ChevronLeft, ChevronRight, Edit3, Trash2, Eye, X,
   Check, AlertCircle, Calendar, Star, Award, Briefcase, Phone, Mail,
   CheckCircle, XCircle, AlertTriangle, Save, RefreshCw, Activity, Download,
-  FileText, FileSpreadsheet
+  FileText, FileSpreadsheet, ChevronDown
 } from 'lucide-react';
 import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend
@@ -56,6 +56,8 @@ const StaffManagement = () => {
   const [roleFilter, setRoleFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalRecords, setTotalRecords] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [showModal, setShowModal] = useState(null); // 'view' | 'edit' | 'delete' | null
@@ -64,13 +66,14 @@ const StaffManagement = () => {
   // ── Fetch staff list ──
   const fetchStaff = async () => {
     try {
-      const params = new URLSearchParams({ page, limit: 10 });
+      const params = new URLSearchParams({ page, limit });
       if (search) params.append('search', search);
       if (roleFilter !== 'All') params.append('role', roleFilter);
       if (statusFilter !== 'All') params.append('status', statusFilter);
       const { data } = await api.get(`/staff?${params}`);
       setStaffList(data.staff);
       setTotalPages(data.pages);
+      setTotalRecords(data.total);
     } catch (err) {
       toast.error('Failed to load staff');
     }
@@ -106,7 +109,7 @@ const StaffManagement = () => {
     load();
   }, []);
 
-  useEffect(() => { fetchStaff(); }, [page, search, roleFilter, statusFilter]);
+  useEffect(() => { fetchStaff(); }, [page, search, roleFilter, statusFilter, limit]);
 
   // ── Socket listeners ──
   useEffect(() => {
@@ -200,10 +203,11 @@ const StaffManagement = () => {
           {activeTab === 'dashboard' && <DashboardTab stats={stats} />}
           {activeTab === 'list' && (
             <ListTab
-              staffList={staffList} search={search} setSearch={setSearch}
-              roleFilter={roleFilter} setRoleFilter={setRoleFilter}
-              statusFilter={statusFilter} setStatusFilter={setStatusFilter}
+              staffList={staffList} search={search} setSearch={(v) => { setSearch(v); setPage(1); }}
+              roleFilter={roleFilter} setRoleFilter={(v) => { setRoleFilter(v); setPage(1); }}
+              statusFilter={statusFilter} setStatusFilter={(v) => { setStatusFilter(v); setPage(1); }}
               page={page} setPage={setPage} totalPages={totalPages}
+              limit={limit} setLimit={(v) => { setLimit(v); setPage(1); }} totalRecords={totalRecords}
               onView={s => { setSelectedStaff(s); setShowModal('view'); }}
               onEdit={s => { setSelectedStaff(s); setEditForm({ name: s.name, email: s.email, phone: s.phone, role: s.role, status: s.status }); setShowModal('edit'); }}
               onDelete={s => { setSelectedStaff(s); setShowModal('delete'); }}
@@ -451,7 +455,7 @@ const DashboardTab = ({ stats }) => {
 // ═══════════════════════════════════════════
 // TAB 2: STAFF LIST
 // ═══════════════════════════════════════════
-const ListTab = ({ staffList, search, setSearch, roleFilter, setRoleFilter, statusFilter, setStatusFilter, page, setPage, totalPages, onView, onEdit, onDelete, fetchAllStaff }) => {
+const ListTab = ({ staffList, search, setSearch, roleFilter, setRoleFilter, statusFilter, setStatusFilter, page, setPage, totalPages, limit, setLimit, totalRecords, onView, onEdit, onDelete, fetchAllStaff }) => {
   const [exporting, setExporting] = useState(false);
 
   const handleExport = async (type) => {
@@ -614,19 +618,76 @@ const ListTab = ({ staffList, search, setSearch, roleFilter, setRoleFilter, stat
         </div>
 
         {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-4 border-t border-white/5">
-            <span className="text-xs text-soft-white/30">Page {page} of {totalPages}</span>
-            <div className="flex gap-2">
-              <button disabled={page <= 1} onClick={() => setPage(p => p - 1)}
-                className="p-2 rounded-lg border border-white/10 hover:bg-white/5 disabled:opacity-20 transition-all"
-              ><ChevronLeft className="w-4 h-4 text-soft-white/60" /></button>
-              <button disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}
-                className="p-2 rounded-lg border border-white/10 hover:bg-white/5 disabled:opacity-20 transition-all"
-              ><ChevronRight className="w-4 h-4 text-soft-white/60" /></button>
+        <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-white/5 gap-4 bg-[#1A1A1A]">
+          <div className="flex items-center gap-3">
+            <span className="text-[11px] font-bold text-soft-white/40 uppercase tracking-widest">Show</span>
+            <div className="relative group">
+              <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gold/60 pointer-events-none" />
+              <select 
+                value={limit} 
+                onChange={e => setLimit(Number(e.target.value))}
+                className="bg-charcoal border border-white/10 rounded-lg pl-3 pr-8 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-gold/40 hover:border-white/20 transition-all cursor-pointer appearance-none"
+              >
+                {[5, 10, 25, 50].map(size => (
+                  <option key={size} value={size} className="bg-black text-white">{size}</option>
+                ))}
+              </select>
             </div>
+            <span className="text-[11px] font-bold text-soft-white/40 uppercase tracking-widest">entries</span>
           </div>
-        )}
+          
+          <div className="text-[11px] font-bold text-soft-white/40 uppercase tracking-widest">
+            Showing {totalRecords === 0 ? 0 : Math.min((page - 1) * limit + 1, totalRecords)}–{Math.min(page * limit, totalRecords)} of <span className="text-white">{totalRecords}</span> entries
+          </div>
+
+          <div className="flex items-center gap-1">
+            <button 
+              disabled={page <= 1} 
+              onClick={() => setPage(p => p - 1)}
+              className="flex items-center justify-center h-8 px-3 rounded-lg border border-white/10 text-[11px] font-bold uppercase tracking-wider text-soft-white/70 hover:bg-white/5 disabled:opacity-20 disabled:hover:bg-transparent transition-all"
+            >
+              Prev
+            </button>
+            
+            <div className="flex items-center px-2 gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNum => {
+                if (
+                  pageNum === 1 || 
+                  pageNum === totalPages || 
+                  (pageNum >= page - 1 && pageNum <= page + 1)
+                ) {
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setPage(pageNum)}
+                      className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold transition-all ${
+                        pageNum === page 
+                          ? 'bg-gold text-charcoal' 
+                          : 'text-soft-white/60 hover:bg-white/5 hover:text-white'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                } else if (
+                  pageNum === page - 2 || 
+                  pageNum === page + 2
+                ) {
+                  return <span key={pageNum} className="text-soft-white/30 text-xs px-1">...</span>;
+                }
+                return null;
+              })}
+            </div>
+
+            <button 
+              disabled={page >= totalPages} 
+              onClick={() => setPage(p => p + 1)}
+              className="flex items-center justify-center h-8 px-3 rounded-lg border border-white/10 text-[11px] font-bold uppercase tracking-wider text-soft-white/70 hover:bg-white/5 disabled:opacity-20 disabled:hover:bg-transparent transition-all"
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </motion.div>
     </motion.div>
   );

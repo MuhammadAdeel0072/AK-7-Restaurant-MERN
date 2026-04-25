@@ -20,9 +20,15 @@ const NotificationTray = () => {
     localStorage.setItem('admin_unread_count', unreadCount.toString());
   }, [notifications, unreadCount]);
 
+  const processedOrders = React.useRef(new Set());
+
   useEffect(() => {
     // Listen for real-time events from server
     const handleNewOrder = (order) => {
+      if (!order || !order.orderNumber) return;
+      if (processedOrders.current.has(order.orderNumber)) return;
+      processedOrders.current.add(order.orderNumber);
+
       const customerName = order.shippingAddress?.fullName || 'Valued Customer';
       
       // Immediate Toast Notification
@@ -41,12 +47,7 @@ const NotificationTray = () => {
         color: 'text-gold'
       };
       
-      setNotifications(prev => {
-        // Prevent duplicate notifications in the tray
-        const exists = prev.find(n => n.message.includes(order.orderNumber));
-        if (exists) return prev;
-        return [newNotif, ...prev].slice(0, 10);
-      });
+      setNotifications(prev => [newNotif, ...prev].slice(0, 10));
       setUnreadCount(prev => prev + 1);
     };
 

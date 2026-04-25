@@ -13,7 +13,7 @@ const {
 const getAvailableOrders = asyncHandler(async (req, res) => {
     // Only show orders ready for delivery that aren't assigned to anyone yet
     const orders = await Order.find({
-        status: 'READY_FOR_DELIVERY',
+        status: { $in: ['READY_FOR_DELIVERY', 'DISPATCHED'] },
         rider: { $exists: false }
     })
     .populate('user', 'firstName lastName email')
@@ -30,7 +30,7 @@ const getNearbyOrders = asyncHandler(async (req, res) => {
     
     // 1. Get all ready orders
     const readyOrders = await Order.find({
-        status: 'READY_FOR_DELIVERY',
+        status: { $in: ['READY_FOR_DELIVERY', 'DISPATCHED'] },
         rider: { $exists: false }
     }).populate('user', 'firstName lastName email');
 
@@ -141,7 +141,7 @@ const addToRoute = asyncHandler(async (req, res) => {
 const claimOrder = asyncHandler(async (req, res) => {
     const order = await Order.findById(req.params.orderId);
 
-    if (!order || order.rider || order.status !== 'READY_FOR_DELIVERY') {
+    if (!order || order.rider || !['READY_FOR_DELIVERY', 'DISPATCHED'].includes(order.status)) {
         res.status(400);
         throw new Error('Mission already assigned or not ready');
     }

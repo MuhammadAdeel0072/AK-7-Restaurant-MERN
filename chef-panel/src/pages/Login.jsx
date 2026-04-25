@@ -103,7 +103,7 @@ const Login = () => {
                         {loading ? <div className="w-5 h-5 border-2 border-[#0f1115]/30 border-t-[#0f1115] rounded-full animate-spin"></div> : (
                             <>
                                 <Utensils size={20} />
-                                LOGIN
+                                Login
                             </>
                         )}
                     </button>

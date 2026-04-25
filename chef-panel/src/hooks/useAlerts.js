@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import socket from '../services/socket';
 import soundService from '../services/soundService';
 import toast from 'react-hot-toast';
@@ -22,17 +22,26 @@ const useAlerts = () => {
         }
     }, []);
 
+    const processedOrders = useRef(new Set());
+
     useEffect(() => {
         if (!socket) return;
 
-        socket.on('incomingOrder', (order) => {
+        const handleNewOrder = (order) => {
+            if (!order || !order.orderNumber) return;
+            if (processedOrders.current.has(order.orderNumber)) return;
+            processedOrders.current.add(order.orderNumber);
+
             addAlert({
                 type: 'new-order',
                 title: 'New Incoming Culinary Request',
                 message: `Order #${order.orderNumber || order._id.slice(-6).toUpperCase()} received.`,
                 priority: order.priority || 'normal'
             });
-        });
+        };
+
+        socket.on('NEW_ORDER', handleNewOrder);
+        socket.on('newOrder', handleNewOrder);
 
         socket.on('orderUpdate', (order) => {
             // Check for specific updates that need alerts (e.g., cancelled)
@@ -47,7 +56,8 @@ const useAlerts = () => {
         });
 
         return () => {
-            socket.off('incomingOrder');
+            socket.off('NEW_ORDER', handleNewOrder);
+            socket.off('newOrder', handleNewOrder);
             socket.off('orderUpdate');
         };
     }, [addAlert]);

@@ -7,7 +7,7 @@ const { emitEvent } = require('../services/socketService');
 // @access  Private/Chef
 const getActiveOrders = asyncHandler(async (req, res) => {
   const orders = await Order.find({
-    status: { $in: ['confirmed', 'preparing', 'placed', 'ready', 'PLACED', 'CONFIRMED', 'PREPARING', 'READY'] }
+    status: { $in: ['PENDING', 'PLACED', 'PREPARING', 'READY_FOR_DELIVERY', 'confirmed', 'preparing', 'placed', 'ready', 'PLACED', 'CONFIRMED', 'PREPARING', 'READY'] }
   })
   .populate('user', 'firstName lastName email')
   .sort({ priority: 1, createdAt: 1 }); // Urgent and VIP first, then FIFO
@@ -20,7 +20,7 @@ const getActiveOrders = asyncHandler(async (req, res) => {
 // @access  Private/Chef
 const getReadyOrders = asyncHandler(async (req, res) => {
   const orders = await Order.find({
-    status: 'ready'
+    status: 'READY_FOR_DELIVERY'
   })
   .populate('user', 'firstName lastName email')
   .sort({ updatedAt: -1 });
@@ -41,16 +41,18 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   }
 
   // Define allowed transitions for Chef
-  const allowedStatuses = ['preparing', 'ready', 'delivered', 'cancelled'];
-  if (!allowedStatuses.includes(status)) {
+  const allowedStatuses = ['PREPARING', 'READY_FOR_DELIVERY', 'DELIVERED', 'CANCELLED'];
+  const normalizedStatus = status.toUpperCase();
+  
+  if (!allowedStatuses.includes(normalizedStatus)) {
     res.status(400);
     throw new Error('Invalid status transition for Chef');
   }
 
   // Update order status
-  order.status = status;
+  order.status = normalizedStatus;
   
-  if (status === 'preparing' && !order.preparationStartTime) {
+  if (normalizedStatus === 'PREPARING' && !order.preparationStartTime) {
     order.preparationStartTime = Date.now();
     // Also start preparing items if not already
     order.orderItems.forEach(item => {
@@ -58,7 +60,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     });
   }
   
-  if (status === 'ready') {
+  if (normalizedStatus === 'READY_FOR_DELIVERY') {
     order.preparationEndTime = Date.now();
     order.readyAt = Date.now();
     // Mark all items as ready if order is ready
@@ -142,9 +144,9 @@ const getKitchenStats = asyncHandler(async (req, res) => {
 
   const stats = {
     totalToday: ordersToday.length,
-    pending: ordersToday.filter(o => o.status === 'confirmed' || o.status === 'placed').length,
-    preparing: ordersToday.filter(o => o.status === 'preparing').length,
-    ready: ordersToday.filter(o => o.status === 'ready').length,
+    pending: ordersToday.filter(o => o.status === 'PENDING' || o.status === 'PLACED' || o.status === 'CONFIRMED' || o.status === 'confirmed' || o.status === 'placed').length,
+    preparing: ordersToday.filter(o => o.status === 'PREPARING' || o.status === 'preparing').length,
+    ready: ordersToday.filter(o => o.status === 'READY_FOR_DELIVERY' || o.status === 'ready').length,
     delayed: 0,
     avgPrepTime: 0
   };

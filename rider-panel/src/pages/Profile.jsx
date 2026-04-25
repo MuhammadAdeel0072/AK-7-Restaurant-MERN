@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { User, Phone, Mail, Shield, LogOut, Award, Camera, Lock, CheckCircle } from 'lucide-react';
+import { User, Phone, Mail, Shield, LogOut, Award, Camera, Lock, CheckCircle, Edit2, Check, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import api from '../services/api';
@@ -16,6 +16,43 @@ const Profile = () => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+    const [isEditingPhone, setIsEditingPhone] = useState(false);
+    const [phoneInput, setPhoneInput] = useState('');
+    const [isUpdatingPhone, setIsUpdatingPhone] = useState(false);
+
+    const handleEditPhone = () => {
+        let currentPhone = user?.phone || '';
+        if (currentPhone.startsWith('+92 ')) currentPhone = currentPhone.substring(4);
+        else if (currentPhone.startsWith('+92')) currentPhone = currentPhone.substring(3);
+        setPhoneInput(currentPhone.trim());
+        setIsEditingPhone(true);
+    };
+
+    const handleSavePhone = async () => {
+        if (!phoneInput) return;
+        
+        const numericPhone = phoneInput.replace(/\D/g, '');
+        if (numericPhone.length !== 10) {
+            toast.error('Please enter exactly 10 digits (e.g. 300 1234567)');
+            return;
+        }
+
+        setIsUpdatingPhone(true);
+        const loadingToast = toast.loading('Updating phone number...');
+        try {
+            const formattedPhone = `+92 ${phoneInput.trim()}`;
+            await updateProfile({ phone: formattedPhone });
+            toast.dismiss(loadingToast);
+            toast.success('Phone number updated ✅');
+            setIsEditingPhone(false);
+        } catch (err) {
+            toast.dismiss(loadingToast);
+            toast.error('Failed to update phone number');
+        } finally {
+            setIsUpdatingPhone(false);
+        }
+    };
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -183,9 +220,35 @@ const Profile = () => {
                             <div className="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center border border-white/10">
                                 <Phone className="w-5 h-5 text-gold/40" />
                             </div>
-                            <div>
+                            <div className="flex-1">
                                 <p className="text-[9px] font-black uppercase tracking-widest text-gold/40 mb-0.5">Contact Number</p>
-                                <p className="text-xs font-bold text-white">{user?.phone || '+92 3XX XXXXXXX'}</p>
+                                {isEditingPhone ? (
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <div className="flex-1 flex items-center bg-white/[0.05] border border-white/10 rounded focus-within:border-gold overflow-hidden transition-all">
+                                            <span className="px-2.5 py-1.5 text-xs font-bold text-white/50 bg-white/5 border-r border-white/10">+92</span>
+                                            <input 
+                                                type="tel" 
+                                                value={phoneInput} 
+                                                onChange={(e) => setPhoneInput(e.target.value.replace(/\D/g, '').slice(0, 10))} 
+                                                className="flex-1 bg-transparent px-2.5 py-1.5 text-xs font-bold text-white outline-none placeholder:text-white/20"
+                                                placeholder="3XX XXXXXXX"
+                                            />
+                                        </div>
+                                        <button onClick={handleSavePhone} disabled={isUpdatingPhone} className="p-1.5 bg-green-500/20 text-green-500 hover:bg-green-500 hover:text-white rounded transition-colors shrink-0">
+                                            <Check className="w-3.5 h-3.5" />
+                                        </button>
+                                        <button onClick={() => setIsEditingPhone(false)} disabled={isUpdatingPhone} className="p-1.5 bg-crimson/20 text-crimson hover:bg-crimson hover:text-white rounded transition-colors">
+                                            <X className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-xs font-bold text-white">{user?.phone || '+92 3XX XXXXXXX'}</p>
+                                        <button onClick={handleEditPhone} className="p-1.5 text-white/40 hover:text-gold transition-colors">
+                                            <Edit2 className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
 

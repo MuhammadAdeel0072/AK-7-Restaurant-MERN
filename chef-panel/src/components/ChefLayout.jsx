@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import { Menu as MenuIcon, Clock, Bell } from "lucide-react";
+import { Menu as MenuIcon, Clock } from "lucide-react";
 import { joinKitchen } from "../services/socket";
-import { useAlertContext } from "../context/AlertContext";
+import NotificationTray from "./NotificationTray";
 
 const ChefLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const { alerts, markRead, clearAll } = useAlertContext();
 
   useEffect(() => {
     try {
@@ -20,8 +19,6 @@ const ChefLayout = () => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
-
-  const unreadCount = alerts.filter(a => !a.read).length;
 
   return (
     <div className="flex min-h-screen bg-charcoal text-soft-white selection:bg-gold selection:text-charcoal relative">
@@ -49,15 +46,8 @@ const ChefLayout = () => {
         {/* Top Header Stats */}
         <header className="hidden lg:flex items-center justify-end px-10 py-6 border-b border-white/5 bg-charcoal/50 backdrop-blur-xl sticky top-0 z-10">
           <div className="flex items-center gap-6">
-            {/* Notification Bubble */}
-            <div className="relative group cursor-pointer" onClick={() => window.location.href='/alerts'}>
-              <Bell className={`w-5 h-5 ${unreadCount > 0 ? 'text-gold animate-pulse' : 'text-soft-white/40'}`} />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-crimson text-white text-[8px] font-black flex items-center justify-center rounded-full border border-charcoal">
-                  {unreadCount}
-                </span>
-              )}
-            </div>
+            {/* Notification Tray */}
+            <NotificationTray />
 
             <div className="w-px h-8 bg-white/10 mx-2"></div>
 
