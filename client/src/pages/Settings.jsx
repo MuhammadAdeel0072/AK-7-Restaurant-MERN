@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import {
-  User, Camera, Loader2, X, AlertTriangle, Shield
+  User, Camera, Loader2, X, AlertTriangle, Shield, Trophy, Star, RefreshCw, Zap
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -149,6 +149,40 @@ const Settings = () => {
                     </p>
                 </div>
             </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <div className="card-premium p-10 bg-gold/5 border-gold/20 shadow-[0_30px_60px_rgba(0,0,0,0.4)] group overflow-hidden relative">
+                    <div className="flex justify-between items-start mb-8 relative z-10">
+                        <div className="p-4 bg-gold/10 rounded-2xl border border-gold/20">
+                            <Trophy className="w-8 h-8 text-gold" />
+                        </div>
+                        <div className="text-right">
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gold/60 mb-1">Tier Status</p>
+                            <span className="bg-gold text-charcoal px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase">{user?.loyaltyTier || 'Bronze'}</span>
+                        </div>
+                    </div>
+                    <h3 className="text-4xl font-serif font-black text-white mb-2 italic tracking-tighter relative z-10">
+                        {user?.loyaltyPoints || 0} <span className="text-gold">Points</span>
+                    </h3>
+                    <div className="w-full bg-white/5 h-1.5 rounded-full mb-4 overflow-hidden border border-white/5 relative z-10">
+                        <motion.div 
+                            initial={{ width: 0 }}
+                            animate={{ width: `${(user?.loyaltyPoints % 1000) / 10}%` }}
+                            className="h-full bg-gold shadow-[0_0_15px_rgba(212,175,55,0.5)]"
+                        />
+                    </div>
+                </div>
+
+                <div className="card-premium p-10 bg-white/[0.02] border-white/10 group hover:border-gold/40 transition-all cursor-pointer overflow-hidden relative" onClick={() => navigate('/subscriptions')}>
+                    <div className="p-4 bg-white/5 rounded-2xl border border-white/10 w-fit mb-8 group-hover:bg-gold/10 group-hover:border-gold/20 transition-all">
+                        <Zap className="w-8 h-8 text-white group-hover:text-gold transition-colors" />
+                    </div>
+                    <h3 className="text-2xl font-serif font-black text-white mb-2 italic">Smart Automation</h3>
+                    <div className="flex items-center gap-3 text-gold font-black text-[10px] uppercase tracking-widest group-hover:translate-x-2 transition-transform">
+                        Manage Subscriptions
+                    </div>
+                </div>
+            </div>
 
             <div className="space-y-4">
                 {/* ── PROFILE ── */}

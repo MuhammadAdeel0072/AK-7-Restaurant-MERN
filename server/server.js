@@ -8,6 +8,7 @@ const rateLimit = require('express-rate-limit');
 
 const connectDB = require('./config/db');
 const { init } = require('./services/socketService');
+const { initSubscriptionScheduler } = require('./services/SubscriptionService');
 const { errorHandler } = require('./middleware/errorHandler');
 
 // Load environment variables
@@ -18,6 +19,9 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 const io = init(server);
+
+// Initialize Subscription Scheduler
+initSubscriptionScheduler();
 
 // ======================
 // ⚙️ CORE BRIDGE & HANDSHAKE (ABSOLUTE TOP)
@@ -82,6 +86,8 @@ const dealRoutes = require('./routes/dealRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const staffRoutes = require('./routes/staffRoutes');
+const subscriptionRoutes = require('./routes/subscriptionRoutes');
+const recommendationRoutes = require('./routes/recommendationRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
@@ -98,6 +104,8 @@ app.use('/api/rider', riderRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/staff', staffRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/api/recommendations', recommendationRoutes);
 
 // ======================
 // 🏠 ROOT ROUTE

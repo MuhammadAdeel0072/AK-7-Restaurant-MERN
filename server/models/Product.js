@@ -21,6 +21,12 @@ const productSchema = new mongoose.Schema({
     customizations: [
         {
             name: String,
+            type: {
+                type: String,
+                enum: ['select', 'multi-select', 'slider', 'checkbox'],
+                default: 'select'
+            },
+            isRequired: { type: Boolean, default: false },
             options: [
                 {
                     name: String,

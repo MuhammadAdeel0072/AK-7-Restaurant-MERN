@@ -44,6 +44,10 @@ const orderSchema = new mongoose.Schema({
     specialInstructions: { type: String },
     chefFeedback: { type: String },
     estimatedPrepTime: { type: Number, default: 20 }, // in minutes
+    actualStartTime: { type: Date },
+    deliveryStartTime: { type: Date },
+    estimatedDeliveryTime: { type: Date },
+    prepTime: { type: Number }, // Actual prep time in minutes
     shippingAddress: {
         fullName: { type: String },
         phoneNumber: { type: String, required: true },
@@ -74,17 +78,20 @@ const orderSchema = new mongoose.Schema({
     status: {
         type: String,
         enum: [
-            'PENDING', 
-            'PLACED',
-            'PREPARING', 
-            'READY_FOR_DELIVERY', 
+            'PENDING',
+            'RECEIVED',
+            'PREPARING',
+            'COOKED',
+            'PACKED',
+            'OUT_FOR_DELIVERY',
+            'DELIVERED',
+            'CANCELLED',
+            'READY_FOR_DELIVERY', // Keeping for backward compatibility if needed
             'DISPATCHED',
-            'ASSIGNED', 
-            'ACCEPTED', 
-            'PICKED_UP', 
-            'ARRIVED', 
-            'DELIVERED', 
-            'CANCELLED'
+            'ASSIGNED',
+            'ACCEPTED',
+            'PICKED_UP',
+            'ARRIVED'
         ],
         default: 'PENDING'
     },

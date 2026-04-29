@@ -3,6 +3,7 @@ import { useCart } from '../context/CartContext';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag, CheckCircle } from 'lucide-react';
+import SmartCartSuggestions from '../components/SmartCartSuggestions';
 
 const Cart = () => {
   const { state, dispatch } = useCart();
@@ -104,6 +105,9 @@ const Cart = () => {
                 </div>
               </div>
             ))}
+
+            {/* Smart Recommendations */}
+            <SmartCartSuggestions />
           </div>
 
           {/* Summary */}

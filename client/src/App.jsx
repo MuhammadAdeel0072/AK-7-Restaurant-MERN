@@ -15,10 +15,11 @@ import AuthGuard from './components/AuthGuard';
 import Orders from './pages/Orders';
 import OrderHistory from './pages/OrderHistory';
 import SignIn from './pages/SignIn';
-import OrderTracker from './pages/OrderTracker';
+import TrackOrderPage from './pages/TrackOrderPage';
 import Help from './pages/Help';
 import Reservations from './pages/Reservations';
 import Settings from './pages/Settings';
+import SubscriptionManager from './pages/SubscriptionManager';
 
 function App() {
   return (
@@ -66,12 +67,17 @@ function App() {
                 } />
                 <Route path="/track/:id" element={
                   <AuthGuard>
-                    <OrderTracker />
+                    <TrackOrderPage />
                   </AuthGuard>
                 } />
                 <Route path="/settings" element={
                   <AuthGuard>
                     <Settings />
+                  </AuthGuard>
+                } />
+                <Route path="/subscriptions" element={
+                  <AuthGuard>
+                    <SubscriptionManager />
                   </AuthGuard>
                 } />
                 <Route path="/admin" element={<AdminDashboard />} />

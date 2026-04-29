@@ -7,6 +7,8 @@ const Cart = require('../models/Cart');
 const { generateReceipt } = require('../services/pdfService');
 const { emitEvent } = require('../services/socketService');
 const { deductStock } = require('../services/inventoryService');
+const { calculateETA } = require('../services/ETAService');
+const { awardPoints } = require('../services/LoyaltyService');
 const Transaction = require('../models/Transaction');
 const asyncHandler = require('express-async-handler');
 
@@ -99,30 +101,17 @@ const addOrderItems = asyncHandler(async (req, res) => {
 
     const createdOrder = await order.save();
 
-    // 📡 Immediate Response - Send before loyalty syncing to prevent timeouts
+    // 📡 Trigger Smart ETA calculation
+    calculateETA(createdOrder._id).catch(err => console.error('ETA Calculation Failure:', err));
+
+    // 📡 Immediate Response
     res.status(201).json(createdOrder);
 
     // --- Loyalty Sync & Real-time Sockets (Background Phase) ---
     // This allows the client to receive confirmation instantly while we finish bookkeeping
     try {
-      const pointsEarned = Math.floor(normalizedTotalPrice * 10);
-
-      // req.user is now a full Mongoose Document from authMiddleware
-      req.user.loyaltyPoints += pointsEarned;
-
-      if (req.user.loyaltyPoints >= 5000) req.user.loyaltyTier = 'Platinum';
-      else if (req.user.loyaltyPoints >= 2500) req.user.loyaltyTier = 'Gold';
-      else if (req.user.loyaltyPoints >= 1000) req.user.loyaltyTier = 'Silver';
-
-      await req.user.save();
-
-      await LoyaltyTransaction.create({
-        user: req.user._id,
-        type: 'earned',
-        points: pointsEarned,
-        description: `Earned from mission ${orderNumber}`,
-        order: createdOrder._id
-      });
+      // Award points on order placement (initial deposit)
+      await awardPoints(req.user._id, normalizedTotalPrice);
 
       // 📡 Real-time Synchronization
       // 📡 Real-time Synchronization (Staff Alert)
@@ -166,10 +155,28 @@ const getOrderReceipt = asyncHandler(async (req, res) => {
 // @route   GET /api/orders/:id
 // @access  Private
 const getOrderById = asyncHandler(async (req, res) => {
-  const order = await Order.findById(req.params.id).populate('user', 'firstName lastName email').lean();
+  const order = await Order.findById(req.params.id)
+    .populate('user', 'firstName lastName email')
+    .populate('rider', 'firstName lastName phoneNumber')
+    .lean();
 
   if (order) {
-    res.json(order);
+    // Return a clean structure for the tracking system
+    res.json({
+      orderId: order._id,
+      orderNumber: order.orderNumber,
+      status: order.status,
+      estimatedDeliveryTime: order.estimatedDeliveryTime,
+      rider: order.rider ? {
+        name: `${order.rider.firstName} ${order.rider.lastName}`,
+        phone: order.rider.phoneNumber
+      } : null,
+      shippingAddress: order.shippingAddress,
+      orderItems: order.orderItems,
+      totalPrice: order.totalPrice,
+      isPaid: order.isPaid,
+      createdAt: order.createdAt
+    });
   } else {
     res.status(404);
     throw new Error('Order not found');
@@ -206,12 +213,15 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     order.status = status;
     order.statusHistory.push({ status });
 
-    if (status === 'delivered') {
+    if (status === 'delivered' || status === 'DELIVERED') {
       order.deliveredAt = Date.now();
       if (order.paymentMethod === 'cod') {
         order.isPaid = true;
         order.paidAt = Date.now();
       }
+      
+      // Award additional loyalty points on successful delivery completion
+      awardPoints(order.user, order.totalPrice).catch(err => console.error('Loyalty Award Failure:', err));
     }
 
     const updatedOrder = await order.save();
@@ -235,12 +245,13 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     }
 
     // Emit real-time status update to user and admin
-    emitEvent(order.user.toString(), 'orderUpdate', {
+    emitEvent(order.user.toString(), 'orderStatusUpdated', {
       orderId: order._id,
       status: order.status,
-      orderNumber: order.orderNumber
+      orderNumber: order.orderNumber,
+      estimatedDeliveryTime: order.estimatedDeliveryTime
     });
-    emitEvent(null, 'adminAction', { type: 'orderUpdate', orderId: order._id, status: order.status });
+    emitEvent(null, 'adminAction', { type: 'orderStatusUpdated', orderId: order._id, status: order.status });
 
     res.json(updatedOrder);
   } else {

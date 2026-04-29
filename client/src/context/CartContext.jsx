@@ -68,27 +68,6 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('cartItems', JSON.stringify(state.cartItems));
   }, [state.cartItems]);
 
-  // Clear cart on sign-in or sign-out
-  useEffect(() => {
-    const resetCart = async () => {
-      // 1. Clear local state
-      dispatch({ type: 'CLEAR_CART' });
-      
-      // 2. Clear backend if we have a session
-      if (isSignedIn) {
-        try {
-          // Standardized Cart Endpoint synchronization
-          await apiClient.delete('/cart');
-          console.log('Backend Cart Protocol: Cleared successfully');
-        } catch (error) {
-          console.error('Failed to clear backend cart on auth change', error);
-        }
-      }
-    };
-
-    resetCart();
-  }, [isSignedIn]);
-
   return (
     <CartContext.Provider value={{ state, dispatch }}>
       {children}

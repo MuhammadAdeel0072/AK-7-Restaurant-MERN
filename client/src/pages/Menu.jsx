@@ -18,6 +18,7 @@ const Menu = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [customizations, setCustomizations] = useState({});
   const [qty, setQty] = useState(1);
   const { dispatch } = useCart();
   const { user: profile, isSignedIn, updateProfile } = useAuth();
@@ -99,7 +100,7 @@ const Menu = () => {
     }
   }, [siteUpdate]);
 
-  const addToCartHandler = (product, quantity = 1, e) => {
+  const addToCartHandler = (product, quantity = 1, e, finalCustoms = []) => {
     if (e) e.stopPropagation();
     dispatch({
       type: 'ADD_TO_CART',
@@ -107,7 +108,7 @@ const Menu = () => {
         ...product,
         product: product._id,
         qty: quantity,
-        customizations: []
+        customizations: finalCustoms
       },
     });
     toast.success(`${product.name} added!`, {
@@ -117,6 +118,7 @@ const Menu = () => {
     if (selectedProduct) {
       setSelectedProduct(null);
       setQty(1);
+      setCustomizations({});
     }
   };
 
@@ -370,7 +372,59 @@ const Menu = () => {
                   </div>
                 </div>
 
-                <div className="mt-auto space-y-6">
+                <div className="mt-auto space-y-6 overflow-y-auto no-scrollbar max-h-[40vh] pr-2">
+                  {/* Dynamic Customizations */}
+                  {selectedProduct.customizations?.length > 0 && (
+                    <div className="space-y-6">
+                      {selectedProduct.customizations.map((custom, idx) => (
+                        <div key={idx} className="space-y-3">
+                          <label className="text-xs font-black uppercase tracking-widest text-gold/60 flex justify-between">
+                            {custom.name}
+                            {custom.isRequired && <span className="text-crimson">* Required</span>}
+                          </label>
+                          
+                          {custom.type === 'multi-select' ? (
+                            <div className="grid grid-cols-2 gap-2">
+                              {custom.options.map((opt, oIdx) => (
+                                <button
+                                  key={oIdx}
+                                  onClick={() => {
+                                    const currentSelections = customizations[custom.name] || [];
+                                    const isSelected = currentSelections.includes(opt.name);
+                                    const newSelections = isSelected
+                                      ? currentSelections.filter(s => s !== opt.name)
+                                      : [...currentSelections, opt.name];
+                                    setCustomizations({ ...customizations, [custom.name]: newSelections });
+                                  }}
+                                  className={`px-4 py-3 rounded-2xl border text-[10px] font-black uppercase tracking-widest transition-all ${
+                                    (customizations[custom.name] || []).includes(opt.name)
+                                      ? 'bg-gold/20 border-gold text-gold'
+                                      : 'bg-white/5 border-white/10 text-gray-400 hover:border-gold/30'
+                                  }`}
+                                >
+                                  {opt.name} {opt.extraPrice > 0 && `(+${opt.extraPrice})`}
+                                </button>
+                              ))}
+                            </div>
+                          ) : (
+                            <select
+                              value={customizations[custom.name] || ''}
+                              onChange={(e) => setCustomizations({ ...customizations, [custom.name]: e.target.value })}
+                              className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-white text-xs outline-none focus:border-gold transition-all"
+                            >
+                              <option value="">Select {custom.name}</option>
+                              {custom.options.map((opt, oIdx) => (
+                                <option key={oIdx} value={opt.name}>
+                                  {opt.name} {opt.extraPrice > 0 ? `(+Rs. ${opt.extraPrice})` : ''}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   <div className="flex items-center justify-between bg-white/5 p-4 rounded-3xl border border-white/10">
                     <span className="text-xs font-black uppercase tracking-widest text-gold/60">Portions</span>
                     <div className="flex items-center gap-6">
@@ -391,11 +445,18 @@ const Menu = () => {
                   </div>
 
                   <button
-                    onClick={(e) => addToCartHandler({ ...selectedProduct, price: Math.round(discountedPrice) }, qty, e)}
+                    onClick={(e) => {
+                      const finalCustoms = Object.entries(customizations).map(([name, selection]) => ({
+                        name,
+                        selection: Array.isArray(selection) ? selection.join(', ') : selection,
+                        extraPrice: 0 // In a real app, calculate this
+                      }));
+                      addToCartHandler({ ...selectedProduct, price: Math.round(discountedPrice) }, qty, e, finalCustoms);
+                    }}
                     className="w-full bg-gold text-charcoal font-black py-5 rounded-[2rem] flex items-center justify-center gap-4 text-lg shadow-[0_20px_40px_rgba(212,175,55,0.3)] hover:scale-[1.02] active:scale-95 transition-all group"
                   >
                     <ShoppingCart className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                    ADD TO CART
+                    ADD TO CART (Rs. {Math.round(discountedPrice * qty)})
                   </button>
 
                   <div className="flex justify-center gap-8 text-[10px] items-center">
