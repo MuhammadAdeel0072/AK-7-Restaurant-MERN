@@ -61,8 +61,8 @@ const OrderSuccess = () => {
             </motion.div>
             
             <div className="text-center max-w-3xl border-b border-white/5 pb-16 mb-16">
-                <h1 className="text-5xl font-serif font-black mb-6 text-white uppercase tracking-tighter italic">Order Placed Successfully 🎉</h1>
-                <p className="text-xl text-gray-400 font-medium leading-relaxed italic">
+                <h1 className="text-5xl font-serif font-black mb-6 text-white uppercase tracking-tighter">Order Placed Successfully 🎉</h1>
+                <p className="text-xl text-gray-400 font-medium leading-relaxed">
                     Your order has been sent to our kitchen. We'll start preparing it right away!
                 </p>
             </div>
@@ -73,7 +73,7 @@ const OrderSuccess = () => {
                         <Clock className="w-6 h-6 text-gold" />
                     </div>
                     <p className="text-[10px] font-black uppercase tracking-widest text-gold/40 mb-2">Estimated Arrival</p>
-                    <h3 className="text-xl font-serif font-bold text-white italic">{getETA()}</h3>
+                    <h3 className="text-xl font-serif font-bold text-white">{getETA()}</h3>
                 </div>
 
                 <div className="card-premium p-8 flex flex-col items-center text-center">
@@ -81,7 +81,7 @@ const OrderSuccess = () => {
                         <CreditCard className="w-6 h-6 text-gold" />
                     </div>
                     <p className="text-[10px] font-black uppercase tracking-widest text-gold/40 mb-2">Total Amount</p>
-                    <h3 className="text-xl font-serif font-bold text-white italic">Rs. {order?.totalPrice?.toFixed(0)}</h3>
+                    <h3 className="text-xl font-serif font-bold text-white">Rs. {order?.totalPrice?.toFixed(0)}</h3>
                 </div>
 
                 <div className="card-premium p-8 flex flex-col items-center text-center">
@@ -89,7 +89,7 @@ const OrderSuccess = () => {
                         <MapPin className="w-6 h-6 text-gold" />
                     </div>
                     <p className="text-[10px] font-black uppercase tracking-widest text-gold/40 mb-2">Order ID</p>
-                    <h3 className="text-xl font-serif font-bold text-white italic">#{order?.orderNumber}</h3>
+                    <h3 className="text-xl font-serif font-bold text-white">#{order?.orderNumber}</h3>
                 </div>
             </div>
             

@@ -28,7 +28,12 @@ const orderSchema = new mongoose.Schema({
                     selection: String,
                     extraPrice: Number
                 }
-            ]
+            ],
+            selectedSize: {
+                name: String,
+                price: Number,
+                prepTime: Number
+            }
         }
     ],
     orderType: {
@@ -110,6 +115,9 @@ const orderSchema = new mongoose.Schema({
     arrivedAt: { type: Date },
     deliveredAt: { type: Date },
     orderNumber: { type: String, unique: true },
+    isSubscriptionOrder: { type: Boolean, default: false },
+    scheduledFor: { type: Date },
+    prepStartAt: { type: Date },
     loyaltyPointsEarned: { type: Number, default: 0 },
     // --- Smart Batching Fields ---
     routeGroupId: { type: String },
@@ -134,6 +142,25 @@ const orderSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
+
+// Update status enum
+orderSchema.path('status').enumValues = [
+    'SCHEDULED',
+    'PENDING',
+    'RECEIVED',
+    'PREPARING',
+    'COOKED',
+    'PACKED',
+    'OUT_FOR_DELIVERY',
+    'DELIVERED',
+    'CANCELLED',
+    'READY_FOR_DELIVERY',
+    'DISPATCHED',
+    'ASSIGNED',
+    'ACCEPTED',
+    'PICKED_UP',
+    'ARRIVED'
+];
 
 // Indexes for performance
 orderSchema.index({ status: 1 });

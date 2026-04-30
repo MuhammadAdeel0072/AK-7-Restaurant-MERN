@@ -43,6 +43,7 @@ const userSchema = new mongoose.Schema({
         }
     ],
     favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+    walletBalance: { type: Number, default: 0 },
     loyaltyPoints: { type: Number, default: 0 },
     loyaltyTier: {
         type: String,

@@ -80,6 +80,7 @@ const Checkout = () => {
             qty: item.qty,
             image: item.image,
             price: item.price,
+            selectedSize: item.selectedSize,
             customizations: item.customizations || []
           })),
         shippingAddress: {
@@ -226,7 +227,7 @@ const Checkout = () => {
                   {paymentMethod !== 'cod' && (
                     <div className="mt-10 p-8 card-premium bg-gold/5 border border-gold/20 rounded-[2.5rem] animate-in fade-in slide-in-from-bottom-4">
                       <div className="text-center space-y-6">
-                        <p className="text-gray-500 text-xs font-medium italic">Please send the total amount to the number below</p>
+                        <p className="text-gray-500 text-xs font-medium">Please send the total amount to the number below</p>
                         <div className="text-3xl font-black text-gold tracking-[0.2em] bg-black/40 p-6 rounded-2xl border border-white/5 shadow-inner">
                           0300 0000000
                         </div>

@@ -101,7 +101,7 @@ const TrackOrderPage = () => {
                             </div>
                         ) : (
                             <div>
-                                <p className="text-sm text-gray-500 font-medium italic">
+                                <p className="text-sm text-gray-500 font-medium">
                                     A professional rider will be assigned shortly as your order enters the delivery phase.
                                 </p>
                             </div>

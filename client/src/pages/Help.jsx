@@ -36,7 +36,7 @@ const Help = () => {
                 <h1 className="text-6xl font-serif font-black text-white mb-3">Help Center</h1>
                 <div className="flex items-center justify-center sm:justify-start gap-4">
                     <span className="h-[1px] w-12 bg-gold/40"></span>
-                    <p className="text-gold/60 text-[10px] font-black uppercase tracking-[0.4em] italic">
+                    <p className="text-gold/60 text-[10px] font-black uppercase tracking-[0.4em]">
                         Premium Member Support
                     </p>
                 </div>

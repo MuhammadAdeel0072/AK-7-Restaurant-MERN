@@ -55,6 +55,37 @@ const Home = () => {
           </div>
         </div>
       </section>
+      
+      {/* Subscription Banner */}
+      <section className="relative py-12 px-6 overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-gradient-to-r from-gold/20 via-charcoal to-crimson/20 border border-gold/30 rounded-[3rem] p-10 md:p-16 relative overflow-hidden group shadow-[0_30px_60px_rgba(0,0,0,0.4)]">
+             <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-gold/10 rounded-full blur-[100px] group-hover:bg-gold/20 transition-all duration-700"></div>
+             <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12">
+               <div className="lg:w-2/3 text-center lg:text-left">
+                  <span className="bg-gold text-charcoal px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] mb-6 inline-block">Exclusive Meal Plans</span>
+                  <h2 className="text-4xl md:text-5xl font-serif font-bold text-white mb-6">Set Your <span className="text-gold">Weekly Meal Plan</span> & Relax</h2>
+                  <p className="text-gray-400 text-lg md:text-xl font-medium mb-10 max-w-2xl leading-relaxed">Automate your favorites. Schedule your orders for any day of the week and we will deliver them precisely when you are hungry.</p>
+                  <Link to="/plans" className="inline-flex items-center gap-4 bg-gold text-charcoal px-10 py-5 rounded-[2rem] font-bold text-sm uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-gold/30 group/btn">
+                    Get Started <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-2 transition-transform" />
+                  </Link>
+               </div>
+               <div className="lg:w-1/3 flex justify-center">
+                  <div className="relative w-64 h-64">
+                    <div className="absolute inset-0 bg-gold/20 rounded-[3rem] rotate-12 group-hover:rotate-6 transition-transform duration-700"></div>
+                    <div className="absolute inset-0 bg-white/[0.05] border border-white/10 rounded-[3rem] backdrop-blur-xl flex flex-col items-center justify-center p-8 group-hover:-translate-y-4 transition-transform duration-700">
+                       <Pizza className="w-20 h-20 text-gold mb-4 group-hover:scale-110 transition-transform" />
+                       <div className="text-center">
+                          <p className="text-white font-black text-xl font-serif">Mondays</p>
+                          <p className="text-gold/60 font-black text-xs uppercase tracking-widest">at 8:00 PM</p>
+                       </div>
+                    </div>
+                  </div>
+               </div>
+             </div>
+          </div>
+        </div>
+      </section>
 
       {/* Reorder Your Favorites Section */}
       {isSignedIn && (

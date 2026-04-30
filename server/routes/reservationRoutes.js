@@ -5,9 +5,13 @@ const {
   getMyReservations,
   getReservations,
   updateReservationStatus,
+  clearOutdatedReservations,
 } = require('../controllers/reservationController');
 const { protect } = require('../middleware/authMiddleware');
 const { admin } = require('../middleware/adminMiddleware');
+
+router.route('/outdated')
+  .delete(protect, admin, clearOutdatedReservations);
 
 router.route('/')
   .post(protect, createReservation)

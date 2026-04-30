@@ -49,9 +49,27 @@ const ReservationManagement = () => {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-10"
     >
-      <header>
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-black text-soft-white tracking-tighter">Table <span className="text-gold">Archives</span></h1>
-        <p className="text-soft-white/50 mt-1 sm:mt-2 uppercase text-[7px] sm:text-[9px] md:text-[10px] font-bold tracking-[0.2em]">AK-7 REST RESERVATION CONTROL</p>
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-black text-soft-white tracking-tighter">Table <span className="text-gold">Archives</span></h1>
+          <p className="text-soft-white/50 mt-1 sm:mt-2 uppercase text-[7px] sm:text-[9px] md:text-[10px] font-bold tracking-[0.2em]">AK-7 REST RESERVATION CONTROL</p>
+        </div>
+        <button
+          onClick={async () => {
+            if (window.confirm('Are you sure you want to remove all outdated reservations from the system?')) {
+              try {
+                const { data } = await api.delete('/reservations/outdated');
+                toast.success(data.message);
+                fetchReservations();
+              } catch (error) {
+                toast.error('Failed to clear outdated reservations');
+              }
+            }
+          }}
+          className="bg-crimson/10 hover:bg-crimson/20 text-crimson border border-crimson/20 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
+        >
+          Clear Outdated
+        </button>
       </header>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">

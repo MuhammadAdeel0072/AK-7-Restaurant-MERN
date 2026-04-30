@@ -7,7 +7,7 @@ const { emitEvent } = require('../services/socketService');
 // @access  Private/Chef
 const getActiveOrders = asyncHandler(async (req, res) => {
   const orders = await Order.find({
-    status: { $in: ['PENDING', 'PLACED', 'PREPARING', 'READY_FOR_DELIVERY', 'confirmed', 'preparing', 'placed', 'ready', 'PLACED', 'CONFIRMED', 'PREPARING', 'READY'] }
+    status: { $in: ['PENDING', 'RECEIVED', 'PLACED', 'PREPARING', 'READY_FOR_DELIVERY', 'confirmed', 'preparing', 'placed', 'ready', 'CONFIRMED', 'PREPARING', 'READY'] }
   })
   .populate('user', 'firstName lastName email')
   .sort({ priority: 1, createdAt: 1 }); // Urgent and VIP first, then FIFO

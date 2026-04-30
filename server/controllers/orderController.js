@@ -447,6 +447,7 @@ const reorderItems = asyncHandler(async (req, res) => {
       image: currentProduct.image,
       price: currentProduct.price,
       qty: item.qty,
+      selectedSize: item.selectedSize,
       customizations: item.customizations || []
     });
   }

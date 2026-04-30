@@ -21,7 +21,7 @@ const Navbar = () => {
     { name: 'Home', path: '/' },
     { name: 'Menu', path: '/menu' },
     { name: 'Orders', path: '/orders' },
-    { name: 'History', path: '/order-history' },
+    { name: 'Plans', path: '/plans' },
     { name: 'Table', path: '/reservation' },
   ];
 
@@ -145,12 +145,12 @@ const Navbar = () => {
                           <span>Booking</span>
                         </Link>
                         <Link
-                          to="/help"
+                          to="/order-history"
                           onClick={() => setDropdownOpen(false)}
                           className="flex items-center gap-3 px-5 py-3.5 text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm font-medium group/item border-l-2 border-transparent hover:border-gold"
                         >
-                          <HelpCircle className="w-4 h-4 text-gold/50 group-hover/item:text-gold transition-colors" />
-                          <span>Help</span>
+                          <ShoppingBag className="w-4 h-4 text-gold/50 group-hover/item:text-gold transition-colors" />
+                          <span>History</span>
                         </Link>
                         <Link
                           to="/settings"
@@ -159,6 +159,14 @@ const Navbar = () => {
                         >
                           <SettingsIcon className="w-4 h-4 text-gold/50 group-hover/item:text-gold transition-colors" />
                           <span>Settings</span>
+                        </Link>
+                        <Link
+                          to="/help"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-3 px-5 py-3.5 text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm font-medium group/item border-l-2 border-transparent hover:border-gold"
+                        >
+                          <HelpCircle className="w-4 h-4 text-gold/50 group-hover/item:text-gold transition-colors" />
+                          <span>Help</span>
                         </Link>
                       </div>
 

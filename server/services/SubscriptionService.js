@@ -1,86 +1,153 @@
 const cron = require('node-cron');
 const Subscription = require('../models/Subscription');
 const Order = require('../models/Order');
+const User = require('../models/User');
 const { calculateETA } = require('./ETAService');
+const { emitEvent } = require('./socketService');
 
 /**
- * Initialize the subscription scheduler
- * Runs every minute to check for scheduled orders
+ * Initialize the subscription scheduler with dual-job logic
  */
 const initSubscriptionScheduler = () => {
     // Run every minute
     cron.schedule('* * * * *', async () => {
         const now = new Date();
-        const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' });
-        const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-
-        try {
-            // Find active subscriptions scheduled for this day and time
-            const subscriptions = await Subscription.find({
-                isActive: true,
-                'schedule.day': currentDay,
-                'schedule.time': currentTime,
-                $or: [
-                    { lastOrderedAt: { $lt: new Date(now.setSeconds(0, 0)) } },
-                    { lastOrderedAt: { $exists: false } }
-                ]
-            }).populate('schedule.items.product');
-
-            for (const sub of subscriptions) {
-                // Filter the specific schedule item for today and this time
-                const scheduledTask = sub.schedule.find(s => s.day === currentDay && s.time === currentTime);
-                
-                if (scheduledTask) {
-                    await createOrderFromSubscription(sub, scheduledTask);
-                }
-            }
-        } catch (error) {
-            console.error('Subscription Scheduler Error:', error);
-        }
+        
+        // Job A: Create SCHEDULED orders for the future
+        await handleOrderCreation(now);
+        
+        // Job B: Trigger Chef 40 minutes before delivery
+        await handleChefTriggers(now);
     });
 
-    console.log('✅ Subscription Scheduler initialized');
+    console.log('✅ Production Subscription Scheduler initialized');
 };
 
 /**
- * Create a real order from a subscription schedule
+ * Job A: Create scheduled orders for active subscriptions
+ * We look for schedules matching current day/time
  */
-const createOrderFromSubscription = async (subscription, scheduleItem) => {
+const handleOrderCreation = async (now) => {
+    const currentDay = now.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'Asia/Karachi' });
+    const currentTime = now.toLocaleTimeString('en-GB', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: false, 
+        timeZone: 'Asia/Karachi' 
+    });
+
     try {
+        const subscriptions = await Subscription.find({
+            isActive: true,
+            status: 'ACTIVE',
+            'schedule.day': currentDay,
+            'schedule.time': currentTime,
+            $or: [
+                { lastRunAt: { $lt: new Date(now.setSeconds(0, 0)) } },
+                { lastRunAt: { $exists: false } }
+            ]
+        }).populate('schedule.items.product');
+
+        for (const sub of subscriptions) {
+            const scheduledTask = sub.schedule.find(s => s.day === currentDay && s.time === currentTime);
+            if (scheduledTask) {
+                await createScheduledOrder(sub, scheduledTask, now);
+            }
+        }
+    } catch (error) {
+        console.error('Job A Error (Order Creation):', error);
+    }
+};
+
+/**
+ * Create a SCHEDULED order from a subscription
+ */
+const createScheduledOrder = async (subscription, scheduleItem, now) => {
+    try {
+        const user = await User.findById(subscription.user);
+        if (!user) return;
+
         const orderItems = scheduleItem.items.map(item => ({
-            name: item.product.name,
+            name: item.name || item.product.name,
             qty: item.qty,
             image: item.product.image,
-            price: item.product.price,
+            price: item.price || item.product.price,
             product: item.product._id,
+            selectedSize: {
+                name: item.size,
+                price: item.price
+            },
             customizations: item.customizations
         }));
 
         const totalPrice = orderItems.reduce((acc, item) => acc + (item.price * item.qty), 0);
 
+        // Wallet deduction (Prepaid model)
+        if (user.walletBalance < totalPrice) {
+            console.warn(`Insufficient balance for subscription ${subscription._id}. Skipping.`);
+            return;
+        }
+
+        user.walletBalance -= totalPrice;
+        await user.save();
+
+        // Calculate delivery time (scheduledFor)
+        const scheduledFor = new Date(now);
+        scheduledFor.setSeconds(0, 0);
+        
+        // prepStartAt is 40 minutes before delivery
+        const prepStartAt = new Date(scheduledFor.getTime() - 40 * 60000);
+
         const order = new Order({
             user: subscription.user,
             orderItems,
             totalPrice,
-            paymentMethod: 'Subscription', // Or use a wallet system
-            isPaid: true, // Assuming prepaid
-            status: 'RECEIVED',
-            orderType: 'delivery',
+            paymentMethod: 'Wallet',
+            isPaid: true,
+            status: 'SCHEDULED',
+            isSubscriptionOrder: true,
+            scheduledFor,
+            prepStartAt,
+            shippingAddress: user.shippingAddress || { phoneNumber: user.phoneNumber, address: 'Profile Address' },
             orderNumber: `SUB-${Date.now()}-${subscription._id.toString().slice(-4)}`
         });
 
         await order.save();
 
-        // Update subscription
-        subscription.lastOrderedAt = new Date();
+        // Update subscription tracking
+        subscription.lastRunAt = now;
+        // Compute next run: this is simplified; in production use a more robust logic for next occurrence
+        subscription.nextRunAt = new Date(now.getTime() + 7 * 24 * 60 * 60000); 
         await subscription.save();
 
-        // Trigger ETA calculation
-        await calculateETA(order._id);
-
-        console.log(`✅ Automated Order Created: ${order.orderNumber} for User: ${subscription.user}`);
+        emitEvent(subscription.user.toString(), 'subscriptionUpdated', { message: 'Upcoming order scheduled', orderId: order._id });
+        console.log(`✅ Order SCHEDULED: ${order.orderNumber} for ${scheduledFor}`);
     } catch (error) {
-        console.error('Error creating order from subscription:', error);
+        console.error('Error creating scheduled order:', error);
+    }
+};
+
+/**
+ * Job B: Promote SCHEDULED orders to RECEIVED 40m before delivery
+ */
+const handleChefTriggers = async (now) => {
+    try {
+        const ordersToTrigger = await Order.find({
+            status: 'SCHEDULED',
+            prepStartAt: { $lte: now }
+        });
+
+        for (const order of ordersToTrigger) {
+            order.status = 'RECEIVED';
+            order.statusHistory.push({ status: 'RECEIVED', timestamp: now });
+            await order.save();
+
+            // Emit to Chef
+            emitEvent('kitchen', 'newOrderForChef', order);
+            console.log(`🔥 Chef Triggered for Order ${order.orderNumber}`);
+        }
+    } catch (error) {
+        console.error('Job B Error (Chef Trigger):', error);
     }
 };
 

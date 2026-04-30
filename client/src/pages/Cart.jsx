@@ -43,7 +43,7 @@ const Cart = () => {
       <div className="flex flex-col lg:flex-row justify-between items-end mb-12 gap-6">
         <div>
           <h1 className="text-5xl font-serif font-bold text-white mb-2">My Cart</h1>
-          <p className="text-gold/60 font-medium tracking-widest uppercase text-xs italic">Order Summary</p>
+          <p className="text-gold/60 font-medium tracking-widest uppercase text-xs">Order Summary</p>
         </div>
         <Link to="/menu" className="flex items-center gap-2 text-gray-400 hover:text-gold transition-colors font-medium">
           <ArrowLeft className="w-4 h-4" /> Menu
@@ -72,11 +72,18 @@ const Cart = () => {
                 </div>
                 
                 <div className="flex-1 w-full">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
                     <h3 className="text-3xl font-serif font-black text-white group-hover:text-gold transition-colors">{item.name}</h3>
                     <div className="text-3xl font-black text-gold">Rs. {(item.qty * item.price).toFixed(0)}</div>
                   </div>
-                  <p className="text-gray-500 text-sm mb-8 line-clamp-2 italic font-medium">"{item.description}"</p>
+                  {item.selectedSize && (
+                    <div className="mb-4">
+                      <span className="bg-gold/10 border border-gold/20 text-gold text-lg font-black uppercase tracking-widest px-4 py-2 rounded-xl">
+                        Size: {item.selectedSize.name}
+                      </span>
+                    </div>
+                  )}
+                  <p className="text-gray-500 text-sm mb-8 line-clamp-2 font-medium">"{item.description}"</p>
                   
                   <div className="flex items-center justify-center md:justify-start gap-8">
                     <div className="flex items-center gap-5 bg-white/[0.03] p-2 rounded-[1.5rem] border border-white/10 shadow-inner">
@@ -152,7 +159,7 @@ const Cart = () => {
                 <ArrowLeft className="w-5 h-5 rotate-180 group-hover:translate-x-2 transition-transform duration-300" />
               </button>
               
-              <p className="text-center text-[9px] text-gray-600 mt-8 uppercase tracking-[0.3em] font-black italic">Encrypted Secure Transaction</p>
+              <p className="text-center text-[9px] text-gray-600 mt-8 uppercase tracking-[0.3em] font-black">Encrypted Secure Transaction</p>
             </div>
           </div>
         </div>

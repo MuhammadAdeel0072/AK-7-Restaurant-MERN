@@ -80,4 +80,44 @@ const updateUserRole = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { getAdminStats, getAllUsers, updateUserRole };
+const Subscription = require('../models/Subscription');
+
+// @desc    Get all subscriptions
+// @route   GET /api/admin/subscriptions
+// @access  Private/Admin
+const getAllSubscriptions = asyncHandler(async (req, res) => {
+    const { status, day } = req.query;
+    const query = {};
+    if (status) query.status = status;
+    if (day) query['schedule.day'] = day;
+
+    const subscriptions = await Subscription.find(query)
+        .populate('user', 'firstName lastName email')
+        .populate('schedule.items.product');
+    res.json(subscriptions);
+});
+
+// @desc    Update subscription status (Admin)
+// @route   PUT /api/admin/subscriptions/:id/status
+// @access  Private/Admin
+const updateSubscriptionStatus = asyncHandler(async (req, res) => {
+    const { status } = req.body;
+    const subscription = await Subscription.findById(req.params.id);
+
+    if (subscription) {
+        subscription.status = status;
+        await subscription.save();
+        res.json(subscription);
+    } else {
+        res.status(404);
+        throw new Error('Subscription not found');
+    }
+});
+
+module.exports = { 
+    getAdminStats, 
+    getAllUsers, 
+    updateUserRole,
+    getAllSubscriptions,
+    updateSubscriptionStatus
+};

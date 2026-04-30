@@ -35,6 +35,13 @@ const productSchema = new mongoose.Schema({
             ]
         }
     ],
+    sizes: [
+        {
+            name: { type: String, required: true },
+            price: { type: Number, required: true },
+            prepTime: { type: Number, default: 20 }
+        }
+    ],
 }, {
     timestamps: true
 });

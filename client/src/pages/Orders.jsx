@@ -5,6 +5,7 @@ import { ShoppingBag, Clock, ChevronRight, Package, Info } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useSocket } from '../context/SocketContext';
 import OrderDetailModal from '../components/OrderDetailModal';
+import NextDeliveryBanner from '../components/NextDeliveryBanner';
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -42,6 +43,8 @@ const Orders = () => {
       case 'ASSIGNED':         return 'text-blue-300 bg-blue-300/10 border-blue-300/20';
       case 'READY_FOR_DELIVERY': return 'text-gold bg-gold/10 border-gold/20';
       case 'PREPARING':        return 'text-orange-300 bg-orange-300/10 border-orange-300/20';
+      case 'RECEIVED':         return 'text-indigo-400 bg-indigo-400/10 border-indigo-400/20';
+      case 'SCHEDULED':        return 'text-gray-400 bg-white/5 border-white/10';
       case 'PENDING':          return 'text-purple-400 bg-purple-400/10 border-purple-400/20';
       case 'CANCELLED':        return 'text-red-400 bg-red-400/10 border-red-400/20';
       default:                 return 'text-gray-400 bg-white/5 border-white/10';
@@ -57,8 +60,10 @@ const Orders = () => {
     <div className="container mx-auto px-6 py-12 max-w-6xl">
       <div className="mb-12">
         <h1 className="text-5xl font-serif font-bold text-white mb-2">My Orders</h1>
-        <p className="text-gold/60 font-medium tracking-widest uppercase text-xs italic">Active Orders - Track Your Status</p>
+        <p className="text-gold/60 font-medium tracking-widest uppercase text-xs">Active Orders - Track Your Status</p>
       </div>
+
+      <NextDeliveryBanner />
 
       {loading ? (
         <div className="space-y-6">

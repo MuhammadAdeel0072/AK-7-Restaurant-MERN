@@ -100,9 +100,25 @@ const updateReservationStatus = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc    Clear outdated reservations
+// @route   DELETE /api/reservations/outdated
+// @access  Private/Staff
+const clearOutdatedReservations = asyncHandler(async (req, res) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Find and remove all reservations where date is before today
+  const result = await Reservation.deleteMany({
+    reservationDate: { $lt: today }
+  });
+
+  res.json({ message: `Cleared ${result.deletedCount} outdated reservations` });
+});
+
 module.exports = {
   createReservation,
   getMyReservations,
   getReservations,
   updateReservationStatus,
+  clearOutdatedReservations
 };

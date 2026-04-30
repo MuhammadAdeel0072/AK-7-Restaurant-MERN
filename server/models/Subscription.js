@@ -24,7 +24,14 @@ const subscriptionSchema = new mongoose.Schema({
                         ref: 'Product',
                         required: true
                     },
+                    name: String,
                     qty: { type: Number, required: true },
+                    size: {
+                        type: String,
+                        enum: ['Small', 'Regular', 'Large'],
+                        required: true
+                    },
+                    price: { type: Number, required: true },
                     customizations: [
                         {
                             name: String,
@@ -36,15 +43,22 @@ const subscriptionSchema = new mongoose.Schema({
             ]
         }
     ],
+    timezone: { type: String, default: 'Asia/Karachi' },
     startDate: { type: Date, default: Date.now },
     endDate: { type: Date },
     isActive: { type: Boolean, default: true },
+    status: {
+        type: String,
+        enum: ['ACTIVE', 'PAUSED', 'CANCELLED'],
+        default: 'ACTIVE'
+    },
     paymentStatus: {
         type: String,
-        enum: ['pending', 'paid', 'failed'],
-        default: 'pending'
+        enum: ['PENDING', 'PAID', 'FAILED'],
+        default: 'PAID'
     },
-    lastOrderedAt: { type: Date }
+    nextRunAt: { type: Date },
+    lastRunAt: { type: Date }
 }, {
     timestamps: true
 });

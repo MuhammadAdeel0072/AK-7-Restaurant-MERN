@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import {
-  User, Camera, Loader2, X, AlertTriangle, Shield, Trophy, Star, RefreshCw, Zap
+  User, Camera, Loader2, X, AlertTriangle, Shield, Trophy, Star, RefreshCw, Zap, Wallet
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -144,7 +144,7 @@ const Settings = () => {
                 <h1 className="text-4xl font-serif font-black text-white mb-3">Settings</h1>
                 <div className="flex items-center justify-center sm:justify-start gap-4">
                     <span className="h-[1px] w-12 bg-gold/40"></span>
-                    <p className="text-gold/60 text-[10px] font-black uppercase tracking-[0.4em] italic">
+                    <p className="text-gold/60 text-[10px] font-black uppercase tracking-[0.4em]">
                         Your Account Settings
                     </p>
                 </div>
@@ -154,30 +154,37 @@ const Settings = () => {
                 <div className="card-premium p-10 bg-gold/5 border-gold/20 shadow-[0_30px_60px_rgba(0,0,0,0.4)] group overflow-hidden relative">
                     <div className="flex justify-between items-start mb-8 relative z-10">
                         <div className="p-4 bg-gold/10 rounded-2xl border border-gold/20">
-                            <Trophy className="w-8 h-8 text-gold" />
+                            <Wallet className="w-8 h-8 text-gold" />
                         </div>
-                        <div className="text-right">
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gold/60 mb-1">Tier Status</p>
-                            <span className="bg-gold text-charcoal px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase">{user?.loyaltyTier || 'Bronze'}</span>
-                        </div>
+                        <button 
+                            onClick={async () => {
+                                const amount = prompt('Enter top-up amount:');
+                                if (!amount || isNaN(amount) || amount <= 0) return;
+                                try {
+                                    const response = await apiClient.post('/subscriptions/wallet/topup', { amount });
+                                    if (response.data) {
+                                        toast.success('Wallet topped up! 💰');
+                                        refreshProfile();
+                                    }
+                                } catch (error) { toast.error('Top-up failed'); }
+                            }}
+                            className="bg-gold text-charcoal px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-gold/10"
+                        >
+                            TOP UP
+                        </button>
                     </div>
-                    <h3 className="text-4xl font-serif font-black text-white mb-2 italic tracking-tighter relative z-10">
-                        {user?.loyaltyPoints || 0} <span className="text-gold">Points</span>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gold/60 mb-1 relative z-10">Wallet Balance</p>
+                    <h3 className="text-4xl font-serif font-black text-white mb-2 tracking-tighter relative z-10">
+                        Rs. {user?.walletBalance || 0}
                     </h3>
-                    <div className="w-full bg-white/5 h-1.5 rounded-full mb-4 overflow-hidden border border-white/5 relative z-10">
-                        <motion.div 
-                            initial={{ width: 0 }}
-                            animate={{ width: `${(user?.loyaltyPoints % 1000) / 10}%` }}
-                            className="h-full bg-gold shadow-[0_0_15px_rgba(212,175,55,0.5)]"
-                        />
-                    </div>
+                    <p className="text-gray-500 text-[10px] font-medium relative z-10">Ready for automated gourmet orders</p>
                 </div>
 
                 <div className="card-premium p-10 bg-white/[0.02] border-white/10 group hover:border-gold/40 transition-all cursor-pointer overflow-hidden relative" onClick={() => navigate('/subscriptions')}>
                     <div className="p-4 bg-white/5 rounded-2xl border border-white/10 w-fit mb-8 group-hover:bg-gold/10 group-hover:border-gold/20 transition-all">
                         <Zap className="w-8 h-8 text-white group-hover:text-gold transition-colors" />
                     </div>
-                    <h3 className="text-2xl font-serif font-black text-white mb-2 italic">Smart Automation</h3>
+                    <h3 className="text-2xl font-serif font-black text-white mb-2">Meal Plans</h3>
                     <div className="flex items-center gap-3 text-gold font-black text-[10px] uppercase tracking-widest group-hover:translate-x-2 transition-transform">
                         Manage Subscriptions
                     </div>
@@ -226,7 +233,7 @@ const Settings = () => {
 
                     <div className="space-y-3 mb-12">
                         <label className="text-[10px] font-black uppercase tracking-widest text-gold/60 ml-2">Email Address</label>
-                        <div className="w-full bg-white/[0.01] border border-white/5 rounded-2xl p-5 text-gray-500 font-bold flex items-center justify-between italic">
+                        <div className="w-full bg-white/[0.01] border border-white/5 rounded-2xl p-5 text-gray-500 font-bold flex items-center justify-between">
                             {user?.email || 'Not available'}
                             <span className="text-[8px] bg-white/5 border border-white/10 px-3 py-1 rounded-full uppercase not-italic">Saved</span>
                         </div>
@@ -243,7 +250,7 @@ const Settings = () => {
 
                 {/* ── ACCOUNT SECURITY ── */}
                 <Section title="Login & Security" icon={Shield}>
-                    <p className="text-gray-500 text-sm mb-10 leading-relaxed font-medium italic">
+                    <p className="text-gray-500 text-sm mb-10 leading-relaxed font-medium">
                         Change your password or manage your account.
                     </p>
 
@@ -326,7 +333,7 @@ const Settings = () => {
                                 <Shield className="w-10 h-10 text-gold" />
                             </div>
                             <h2 className="text-4xl font-serif font-black text-white mb-4">Sign Out?</h2>
-                             <p className="text-gray-500 mb-10 text-sm leading-relaxed font-medium italic">
+                             <p className="text-gray-500 mb-10 text-sm leading-relaxed font-medium">
                                 Are you sure you want to sign out?
                             </p>
                             <div className="flex gap-4">
@@ -355,7 +362,7 @@ const Settings = () => {
                                 <AlertTriangle className="w-10 h-10 text-red-500" />
                             </div>
                             <h2 className="text-4xl font-serif font-black text-white mb-4">Delete Account?</h2>
-                            <p className="text-gray-500 mb-8 text-sm leading-relaxed font-medium italic">
+                            <p className="text-gray-500 mb-8 text-sm leading-relaxed font-medium">
                                 Are you sure you want to delete your account? This action cannot be undone. All your data will be permanently removed.
                             </p>
 

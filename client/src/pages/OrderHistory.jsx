@@ -106,7 +106,7 @@ const OrderHistory = () => {
     <div className="container mx-auto px-6 py-12 max-w-6xl">
       <div className="mb-12">
         <h1 className="text-5xl font-serif font-bold text-white mb-2">Order History</h1>
-        <p className="text-gold/60 font-medium tracking-widest uppercase text-xs italic">Your Completed Orders</p>
+        <p className="text-gold/60 font-medium tracking-widest uppercase text-xs">Your Completed Orders</p>
       </div>
 
       {loading ? (

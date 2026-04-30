@@ -19,7 +19,8 @@ import TrackOrderPage from './pages/TrackOrderPage';
 import Help from './pages/Help';
 import Reservations from './pages/Reservations';
 import Settings from './pages/Settings';
-import SubscriptionManager from './pages/SubscriptionManager';
+import PlansPage from './pages/PlansPage';
+import PlanEditor from './pages/PlanEditor';
 
 function App() {
   return (
@@ -75,9 +76,24 @@ function App() {
                     <Settings />
                   </AuthGuard>
                 } />
+                <Route path="/plans" element={
+                  <AuthGuard>
+                    <PlansPage />
+                  </AuthGuard>
+                } />
+                <Route path="/plans/new" element={
+                  <AuthGuard>
+                    <PlanEditor />
+                  </AuthGuard>
+                } />
+                <Route path="/plans/edit/:id" element={
+                  <AuthGuard>
+                    <PlanEditor />
+                  </AuthGuard>
+                } />
                 <Route path="/subscriptions" element={
                   <AuthGuard>
-                    <SubscriptionManager />
+                    <PlansPage />
                   </AuthGuard>
                 } />
                 <Route path="/admin" element={<AdminDashboard />} />

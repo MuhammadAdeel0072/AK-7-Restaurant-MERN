@@ -19,6 +19,7 @@ const Menu = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [customizations, setCustomizations] = useState({});
+  const [selectedSize, setSelectedSize] = useState(null);
   const [qty, setQty] = useState(1);
   const { dispatch } = useCart();
   const { user: profile, isSignedIn, updateProfile } = useAuth();
@@ -108,7 +109,8 @@ const Menu = () => {
         ...product,
         product: product._id,
         qty: quantity,
-        customizations: finalCustoms
+        customizations: finalCustoms,
+        selectedSize: product.selectedSize
       },
     });
     toast.success(`${product.name} added!`, {
@@ -119,6 +121,7 @@ const Menu = () => {
       setSelectedProduct(null);
       setQty(1);
       setCustomizations({});
+      setSelectedSize(null);
     }
   };
 
@@ -277,7 +280,7 @@ const Menu = () => {
                       )}
                     </div>
                   </div>
-                  <p className="text-gray-500 text-xs mb-4 line-clamp-2 leading-relaxed font-medium italic">"{product.description}"</p>
+                  <p className="text-gray-500 text-xs mb-4 line-clamp-2 leading-relaxed font-medium">"{product.description}"</p>
 
                   <div className="flex flex-wrap gap-1.5 mb-4">
                     {product.dietaryInfo?.map(info => (
@@ -327,6 +330,8 @@ const Menu = () => {
             discountedPrice = Math.max(0, discountedPrice);
           }
 
+          const currentPrice = selectedSize ? selectedSize.price : discountedPrice;
+
           return (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-charcoal/80 backdrop-blur-xl">
             <motion.div
@@ -363,16 +368,45 @@ const Menu = () => {
                       </span>
                     )}
                   </h2>
-                  <p className="text-gray-400 text-base italic leading-relaxed mb-6 font-medium">"{selectedProduct.description}"</p>
+                  <p className="text-gray-400 text-base leading-relaxed mb-6 font-medium">"{selectedProduct.description}"</p>
                   <div className="flex items-center gap-4 mb-8">
-                    {deal && (
+                    {deal && !selectedSize && (
                       <span className="text-gray-500 font-bold text-2xl line-through">Rs. {selectedProduct.price}</span>
                     )}
-                    <span className="text-4xl font-black text-gold tracking-tighter">Rs. {Math.round(discountedPrice)}</span>
+                    <span className="text-4xl font-black text-gold tracking-tighter">Rs. {Math.round(currentPrice)}</span>
                   </div>
                 </div>
 
                 <div className="mt-auto space-y-6 overflow-y-auto no-scrollbar max-h-[40vh] pr-2">
+                  {/* Size Selection */}
+                  {selectedProduct.sizes?.length > 0 && (
+                    <div className="space-y-4">
+                      <label className="text-xs font-black uppercase tracking-widest text-gold/60 flex justify-between">
+                        Select Size
+                        <span className="text-crimson">* Required</span>
+                      </label>
+                      <div className="grid grid-cols-3 gap-3">
+                        {selectedProduct.sizes.map((size, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setSelectedSize(size)}
+                            className={`flex flex-col items-center justify-center p-6 rounded-2xl border transition-all ${
+                              selectedSize?.name === size.name
+                                ? 'bg-gold/20 border-gold shadow-[0_0_15px_rgba(212,175,55,0.2)]'
+                                : 'bg-white/5 border-white/10 hover:border-gold/30'
+                            }`}
+                          >
+                            <span className={`text-lg font-black uppercase tracking-widest mb-1 ${selectedSize?.name === size.name ? 'text-gold' : 'text-gray-400'}`}>
+                              {size.name}
+                            </span>
+                            <span className="text-lg font-semibold text-white">Rs. {size.price}</span>
+                            {idx === 1 && <span className="absolute -top-2 bg-gold text-charcoal text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest">Popular</span>}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Dynamic Customizations */}
                   {selectedProduct.customizations?.length > 0 && (
                     <div className="space-y-6">
@@ -446,17 +480,25 @@ const Menu = () => {
 
                   <button
                     onClick={(e) => {
+                      if (selectedProduct.sizes?.length > 0 && !selectedSize) {
+                        toast.error('Please select a size first');
+                        return;
+                      }
                       const finalCustoms = Object.entries(customizations).map(([name, selection]) => ({
                         name,
                         selection: Array.isArray(selection) ? selection.join(', ') : selection,
                         extraPrice: 0 // In a real app, calculate this
                       }));
-                      addToCartHandler({ ...selectedProduct, price: Math.round(discountedPrice) }, qty, e, finalCustoms);
+                      addToCartHandler({ 
+                        ...selectedProduct, 
+                        price: Math.round(currentPrice),
+                        selectedSize: selectedSize 
+                      }, qty, e, finalCustoms);
                     }}
                     className="w-full bg-gold text-charcoal font-black py-5 rounded-[2rem] flex items-center justify-center gap-4 text-lg shadow-[0_20px_40px_rgba(212,175,55,0.3)] hover:scale-[1.02] active:scale-95 transition-all group"
                   >
                     <ShoppingCart className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                    ADD TO CART (Rs. {Math.round(discountedPrice * qty)})
+                    ADD TO CART (Rs. {Math.round(currentPrice * qty)})
                   </button>
 
                   <div className="flex justify-center gap-8 text-[10px] items-center">
