@@ -10,7 +10,8 @@ const {
     pickupOrder,
     arrivedAtDestination,
     confirmDelivery,
-    getRiderStats
+    getRiderStats,
+    updateRiderLocation
 } = require('../controllers/riderController');
 const { protect } = require('../middleware/authMiddleware');
 const { riderMiddleware } = require('../middleware/riderMiddleware');
@@ -29,6 +30,7 @@ router.post('/accept/:orderId', acceptOrder);
 router.post('/pickup/:orderId', pickupOrder);
 router.post('/arrived/:orderId', arrivedAtDestination);
 router.post('/delivered/:orderId', confirmDelivery);
+router.post('/location', updateRiderLocation);
 
 // Smart Batching
 router.post('/add-to-route/:orderId', addToRoute);

@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Utensils, 
-  LogOut, 
-  X, 
-  CheckCircle, 
+import {
+  LayoutDashboard,
+  Utensils,
+  LogOut,
+  X,
+  CheckCircle,
   Bell,
   Settings,
   Activity
@@ -35,9 +35,9 @@ const Sidebar = ({ isOpen, onClose }) => {
   ];
 
   return (
-    <motion.aside 
+    <motion.aside
       initial={false}
-      animate={{ 
+      animate={{
         x: isOpen || isDesktop ? 0 : -300,
         opacity: isOpen || isDesktop ? 1 : 0
       }}
@@ -54,14 +54,14 @@ const Sidebar = ({ isOpen, onClose }) => {
           <BrandLogo size="md" />
           <span className={`${typographyClasses.labelSmall} mt-2`}>PRO KITCHEN STATION</span>
         </div>
-        <button 
+        <button
           onClick={onClose}
           className="lg:hidden p-2 hover:bg-white/5 rounded-xl text-gray-400 hover:text-white transition-colors"
         >
           <X className="w-6 h-6" />
         </button>
       </div>
-      
+
       <nav className="flex-1 p-6 space-y-3 overflow-y-auto">
         {menuItems?.map((item, idx) => (
           <NavLink
@@ -69,10 +69,9 @@ const Sidebar = ({ isOpen, onClose }) => {
             to={item?.path || '#'}
             onClick={onClose}
             className={({ isActive }) =>
-              `flex items-center space-x-4 px-5 py-4 rounded-xl transition-all duration-300 group ${
-                isActive 
-                  ? 'bg-gold/10 text-gold border border-gold/20 shadow-[0_0_20px_rgba(212,175,55,0.1)]' 
-                  : 'text-soft-white/60 hover:bg-white/5 hover:text-soft-white border border-transparent'
+              `flex items-center space-x-4 px-5 py-4 rounded-xl transition-all duration-300 group ${isActive
+                ? 'bg-gold/10 text-gold border border-gold/20 shadow-[0_0_20px_rgba(212,175,55,0.1)]'
+                : 'text-soft-white/60 hover:bg-white/5 hover:text-soft-white border border-transparent'
               }`
             }
           >

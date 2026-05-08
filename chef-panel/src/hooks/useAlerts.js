@@ -14,7 +14,7 @@ const useAlerts = () => {
             ...alert
         };
         setAlerts(prev => [newAlert, ...prev].slice(0, 50)); // Keep last 50
-        
+
         if (alert.type === 'new-order') {
             soundService.playNewOrder();
         } else if (alert.type === 'delayed' || alert.type === 'priority') {

@@ -167,15 +167,16 @@ const OrderCard = ({
                     <button 
                         onClick={() => onAction(order._id, action.type)}
                         disabled={actionLoading}
-                        className={action.class}
+                        className={`${action.class} relative overflow-hidden group/btn active:scale-95 transition-all`}
                     >
                         {actionLoading ? (
                             <div className="w-5 h-5 border-2 border-charcoal/30 border-t-charcoal rounded-full animate-spin"></div>
                         ) : (
                             <>
+                                <div className="absolute inset-0 bg-white/10 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></div>
                                 {action.icon}
-                                <span>{action.label}</span>
-                                <ChevronRight className="w-4 h-4 ml-auto opacity-30" />
+                                <span className="relative z-10">{action.label}</span>
+                                <ChevronRight className="w-4 h-4 ml-auto opacity-30 group-hover/btn:translate-x-1 transition-transform relative z-10" />
                             </>
                         )}
                     </button>

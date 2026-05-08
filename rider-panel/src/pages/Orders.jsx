@@ -37,6 +37,17 @@ const Orders = () => {
     const [viewMode, setViewMode] = useState('list'); // 'list' | 'map'
 
     const handleAction = async (orderId, type) => {
+        let payload = {};
+        
+        if (type === 'deliver') {
+            const order = myOrders.find(o => o._id === orderId);
+            if (order && order.paymentMethod === 'cod') {
+                const confirmed = window.confirm(`CASH COLLECTION VERIFICATION:\n\nHave you collected Rs. ${order.totalPrice} from the customer?`);
+                if (!confirmed) return;
+                payload.cashCollected = true;
+            }
+        }
+
         setActionLoading(true);
         try {
             switch(type) {
@@ -45,7 +56,7 @@ const Orders = () => {
                 case 'accept': await accept(orderId); break;
                 case 'pickup': await pickup(orderId); break;
                 case 'arrive': await arrive(orderId); break;
-                case 'deliver': await deliver(orderId); break;
+                case 'deliver': await deliver(orderId, payload.cashCollected); break;
                 default: throw new Error("Invalid action");
             }
             toast.success(`Mission updated! ✅`);

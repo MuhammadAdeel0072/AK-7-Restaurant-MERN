@@ -1,11 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Check, Package, Clock, ShoppingBag, Truck, MapPin } from 'lucide-react';
+import { Check, Package, Clock, ShoppingBag, Truck, MapPin, ClipboardCheck, UserCheck } from 'lucide-react';
 
 const STAGES = [
-    { status: 'RECEIVED', label: 'Order Received', icon: ShoppingBag },
     { status: 'PREPARING', label: 'Preparing', icon: Clock },
-    { status: 'PACKED', label: 'Packed', icon: Package },
+    { status: 'READY_FOR_DELIVERY', label: 'Dispatch Ready', icon: Package },
+    { status: 'ASSIGNED', label: 'Rider Assigned', icon: UserCheck },
     { status: 'OUT_FOR_DELIVERY', label: 'Out for Delivery', icon: Truck },
     { status: 'DELIVERED', label: 'Delivered', icon: MapPin },
 ];
@@ -14,12 +14,25 @@ const OrderStatusStepper = ({ currentStatus }) => {
     // Determine current index, handling fallbacks for transitional statuses
     const getStatusIndex = (status) => {
         const normalized = status?.toUpperCase();
-        if (['PENDING', 'RECEIVED'].includes(normalized)) return 0;
-        if (['PREPARING', 'COOKED'].includes(normalized)) return 1;
-        if (['PACKED', 'READY_FOR_DELIVERY'].includes(normalized)) return 2;
-        if (['OUT_FOR_DELIVERY', 'DISPATCHED', 'PICKED_UP'].includes(normalized)) return 3;
-        if (normalized === 'DELIVERED') return 4;
-        return 0;
+        const stageMap = {
+            'PENDING': 0,
+            'RECEIVED': 0,
+            'ACCEPTED': 0,
+            'CONFIRMED': 0,
+            'PREPARING': 0,
+            'COOKING': 0,
+            'READY_FOR_DELIVERY': 1,
+            'READY': 1,
+            'PACKED': 1,
+            'ASSIGNED': 2,
+            'RIDER_ASSIGNED': 2,
+            'OUT_FOR_DELIVERY': 3,
+            'DISPATCHED': 3,
+            'PICKED_UP': 3,
+            'DELIVERED': 4,
+            'COMPLETED': 4
+        };
+        return stageMap[normalized] ?? 0;
     };
 
     const currentIndex = getStatusIndex(currentStatus);

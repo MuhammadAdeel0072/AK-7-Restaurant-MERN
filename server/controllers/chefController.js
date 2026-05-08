@@ -63,10 +63,13 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   if (normalizedStatus === 'READY_FOR_DELIVERY') {
     order.preparationEndTime = Date.now();
     order.readyAt = Date.now();
+    order.dispatchReadyAt = Date.now();
     // Mark all items as ready if order is ready
     order.orderItems.forEach(item => {
       item.status = 'ready';
     });
+    // Specific event for Rider Dispatch
+    emitEvent('rider', 'orderDispatchReady', order);
   }
 
   // Record history

@@ -42,6 +42,21 @@ const getAdminStats = asyncHandler(async (req, res) => {
     { $limit: 10 }
   ]);
 
+  // Get subscription statistics
+  const activeSubscriptions = await Subscription.countDocuments({ status: 'ACTIVE' });
+  const pausedSubscriptions = await Subscription.countDocuments({ status: 'PAUSED' });
+  const expiringSubscriptions = await Subscription.countDocuments({ 
+    status: 'ACTIVE', 
+    remainingDays: { $lte: 3 } 
+  });
+
+  // Get subscription revenue (Only PAID)
+  const subRevenueResult = await Subscription.aggregate([
+    { $match: { paymentStatus: 'PAID' } },
+    { $group: { _id: null, total: { $sum: '$totalPrice' } } }
+  ]);
+  const subRevenue = subRevenueResult.length > 0 ? subRevenueResult[0].total : 0;
+
   res.json({
     totalUsers,
     totalOrders,
@@ -51,7 +66,13 @@ const getAdminStats = asyncHandler(async (req, res) => {
     totalSales: totalRevenue, // Alias for frontend compatibility
     recentOrders,
     orderStats: orderStatsResult,
-    popularItems: popularItemsResult
+    popularItems: popularItemsResult,
+    subscriptionStats: {
+        active: activeSubscriptions,
+        paused: pausedSubscriptions,
+        expiring: expiringSubscriptions,
+        revenue: subRevenue
+    }
   });
 });
 

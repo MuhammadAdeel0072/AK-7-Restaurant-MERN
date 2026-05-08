@@ -21,7 +21,7 @@ const Alerts = () => {
                     </h1>
                     <p className="text-soft-white/40 tracking-[0.2em] uppercase text-[10px] font-bold italic">Real-time Kitchen Operational Pulse</p>
                 </div>
-                <button 
+                <button
                     onClick={clearAll}
                     className="flex items-center gap-2 px-4 py-2 bg-crimson/10 text-crimson rounded-xl border border-crimson/20 text-[10px] font-bold uppercase tracking-widest hover:bg-crimson hover:text-white transition-all shadow-lg active:scale-95"
                 >
@@ -32,8 +32,8 @@ const Alerts = () => {
             <div className="space-y-4">
                 <AnimatePresence mode="popLayout">
                     {alerts.length === 0 ? (
-                        <motion.div 
-                            initial={{ opacity: 0 }} 
+                        <motion.div
+                            initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             className="py-20 text-center glass rounded-[3rem] border border-white/5"
                         >
@@ -58,7 +58,7 @@ const Alerts = () => {
                                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border border-white/5 ${alert.read ? 'bg-white/5' : 'bg-gold/10'}`}>
                                     {getIcon(alert.type, alert.priority)}
                                 </div>
-                                
+
                                 <div className="flex-1 text-left">
                                     <div className="flex items-center justify-between mb-1">
                                         <h3 className={`font-bold text-lg tracking-tight ${alert.read ? 'text-soft-white/60' : 'text-white'}`}>

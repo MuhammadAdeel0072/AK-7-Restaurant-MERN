@@ -55,8 +55,13 @@ export const arrivedAtDestination = async (orderId) => {
     return data;
 };
 
-export const confirmDelivery = async (orderId) => {
-    const { data } = await api.post(`/rider/delivered/${orderId}`);
+export const confirmDelivery = async (orderId, payload = {}) => {
+    const { data } = await api.post(`/rider/delivered/${orderId}`, payload);
+    return data;
+};
+
+export const updateLocation = async (orderId, lat, lng) => {
+    const { data } = await api.post('/rider/location', { orderId, lat, lng });
     return data;
 };
 

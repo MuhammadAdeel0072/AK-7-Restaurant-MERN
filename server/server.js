@@ -83,6 +83,7 @@ const reportRoutes = require('./routes/reportRoutes');
 const staffRoutes = require('./routes/staffRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const recommendationRoutes = require('./routes/recommendationRoutes');
+const scheduleRoutes = require('./routes/scheduleRoutes');
 
 // Diagnostic: Verify all routes are correctly loaded
 console.log('--- Initializing Dynamic Route Protocols ---');
@@ -124,6 +125,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/recommendations', recommendationRoutes);
+app.use('/api/schedule', scheduleRoutes);
 
 // ======================
 // 🏠 ROOT ROUTE

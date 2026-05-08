@@ -2,22 +2,22 @@ import { useState, useEffect } from 'react';
 import { getKitchenStats } from '../services/api';
 import socket from '../services/socket';
 import { motion } from 'framer-motion';
-import { 
-    ShoppingBag, 
-    Clock, 
-    CheckCircle, 
-    Flame, 
-    AlertTriangle, 
+import {
+    ShoppingBag,
+    Clock,
+    CheckCircle,
+    Flame,
+    AlertTriangle,
     Activity,
     Utensils,
     Timer
 } from 'lucide-react';
 
 const Dashboard = () => {
-    const [stats, setStats] = useState({ 
+    const [stats, setStats] = useState({
         totalToday: 0,
-        pending: 0, 
-        preparing: 0, 
+        pending: 0,
+        preparing: 0,
         ready: 0,
         delayed: 0,
         avgPrepTime: 0
@@ -54,17 +54,17 @@ const Dashboard = () => {
     useEffect(() => {
         if (socket) {
             let debounceTimer = null;
-            
+
             const handleUpdate = () => {
                 if (debounceTimer) clearTimeout(debounceTimer);
                 debounceTimer = setTimeout(() => {
                     fetchStats();
                 }, 500);
             };
-            
+
             socket.on('orderUpdate', handleUpdate);
             socket.on('incomingOrder', handleUpdate);
-            
+
             return () => {
                 if (debounceTimer) clearTimeout(debounceTimer);
                 socket.off('orderUpdate', handleUpdate);
@@ -87,7 +87,7 @@ const Dashboard = () => {
     ];
 
     return (
-        <motion.div 
+        <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="space-y-6 md:space-y-10"
@@ -107,11 +107,10 @@ const Dashboard = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
                 {cards.map((card, idx) => (
-                    <div 
-                        key={idx} 
-                        className={`glass p-5 md:p-8 rounded-3xl border flex flex-col justify-between h-32 md:h-44 transition-all duration-500 group relative overflow-hidden ${
-                            card.title === 'Late Orders' && stats.delayed > 0 ? 'border-crimson/30 shadow-[0_0_40px_rgba(220,38,38,0.1)]' : 'border-white/5'
-                        }`}
+                    <div
+                        key={idx}
+                        className={`glass p-5 md:p-8 rounded-3xl border flex flex-col justify-between h-32 md:h-44 transition-all duration-500 group relative overflow-hidden ${card.title === 'Late Orders' && stats.delayed > 0 ? 'border-crimson/30 shadow-[0_0_40px_rgba(220,38,38,0.1)]' : 'border-white/5'
+                            }`}
                     >
                         <div className="flex items-center justify-between relative z-10">
                             <span className="text-soft-white/40 text-[10px] md:text-xs font-bold uppercase tracking-widest">{card.title}</span>
@@ -140,7 +139,7 @@ const Dashboard = () => {
                                     <span className="font-sans font-black text-xl text-white">{stat.count}</span>
                                 </div>
                                 <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5 p-[1px]">
-                                    <motion.div 
+                                    <motion.div
                                         initial={{ width: 0 }}
                                         animate={{ width: `${(stat.count / Math.max(stats.totalToday || (stats.pending + stats.preparing + stats.ready), 1)) * 100}%` }}
                                         transition={{ duration: 1.5 }}

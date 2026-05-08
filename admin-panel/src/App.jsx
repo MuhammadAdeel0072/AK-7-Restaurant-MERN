@@ -11,6 +11,7 @@ import PaymentManagement from './pages/PaymentManagement';
 import StaffManagement from './pages/StaffManagement';
 import UserManagement from './pages/UserManagement';
 import ReportManagement from './pages/ReportManagement';
+import MealSchedule from './pages/MealSchedule';
 import Login from './pages/Login';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Toaster } from 'react-hot-toast';
@@ -47,6 +48,7 @@ function App() {
               <Route path="/menu" element={<MenuManagement />} />
               <Route path="/deals" element={<DealManagement />} />
               <Route path="/orders" element={<OrderManagement />} />
+              <Route path="/schedule" element={<MealSchedule />} />
               <Route path="/reservations" element={<ReservationManagement />} />
               <Route path="/payments" element={<PaymentManagement />} />
               <Route path="/staff" element={<StaffManagement />} />

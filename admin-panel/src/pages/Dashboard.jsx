@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api, { socket } from '../services/api';
-import { ShoppingBag, DollarSign, Users, TrendingUp } from 'lucide-react';
+import { ShoppingBag, DollarSign, Users, TrendingUp, Calendar, Pause, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Dashboard = () => {
@@ -24,26 +24,28 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    // Debounce multiple socket events to prevent spam
     let debounceTimer = null;
 
     const handleUpdate = () => {
       if (debounceTimer) clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
         fetchStats();
-      }, 500); // Wait 500ms after last event before fetching
+      }, 500);
     };
 
-    // Listen for real-time updates to refresh analytics (debounced)
     socket.on('orderUpdate', handleUpdate);
     socket.on('incomingOrder', handleUpdate);
     socket.on('reservationUpdated', handleUpdate);
+    socket.on('subscription_updated', handleUpdate);
+    socket.on('subscription_created', handleUpdate);
 
     return () => {
       if (debounceTimer) clearTimeout(debounceTimer);
       socket.off('orderUpdate', handleUpdate);
       socket.off('incomingOrder', handleUpdate);
       socket.off('reservationUpdated', handleUpdate);
+      socket.off('subscription_updated', handleUpdate);
+      socket.off('subscription_created', handleUpdate);
     };
   }, []);
 
@@ -66,11 +68,18 @@ const Dashboard = () => {
     visible: { y: 0, opacity: 1 }
   };
 
-  const cards = [
-    { title: 'Total Revenue', value: `Rs. ${stats?.totalSales?.toLocaleString() || 0}`, icon: DollarSign, color: 'text-gold' },
+  const mainCards = [
+    { title: 'Total Revenue', value: `Rs. ${(stats?.totalSales + (stats?.subscriptionStats?.revenue || 0))?.toLocaleString() || 0}`, icon: DollarSign, color: 'text-gold' },
     { title: 'Total Users', value: stats?.totalUsers || 0, icon: Users, color: 'text-blue-400' },
+    { title: 'Active Plans', value: stats?.subscriptionStats?.active || 0, icon: Calendar, color: 'text-green-400' },
     { title: 'Orders Today', value: stats?.orderStats?.find(s => s._id === 'placed')?.count || 0, icon: ShoppingBag, color: 'text-orange-400' },
-    { title: 'Popular Item', value: stats?.popularItems?.[0]?._id || 'N/A', icon: TrendingUp, color: 'text-purple-400' },
+  ];
+
+  const subCards = [
+    { title: 'Active Plans', value: stats?.subscriptionStats?.active || 0, icon: Calendar, color: 'text-green-400' },
+    { title: 'Paused Plans', value: stats?.subscriptionStats?.paused || 0, icon: Pause, color: 'text-orange-400' },
+    { title: 'Ending Soon', value: stats?.subscriptionStats?.expiring || 0, icon: AlertCircle, color: 'text-crimson' },
+    { title: 'Plan Sales', value: `Rs. ${stats?.subscriptionStats?.revenue?.toLocaleString() || 0}`, icon: DollarSign, color: 'text-gold' },
   ];
 
   return (
@@ -87,8 +96,9 @@ const Dashboard = () => {
         <p className="text-soft-white/40 tracking-[0.4em] uppercase text-[8px] md:text-[10px] font-black">Culinary Control Center</p>
       </header>
 
+      {/* Main Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-        {cards.map((card, idx) => (
+        {mainCards.map((card, idx) => (
           <motion.div
             key={idx}
             variants={itemVariants}
@@ -98,10 +108,37 @@ const Dashboard = () => {
               <span className="text-soft-white/40 text-[10px] md:text-xs font-bold uppercase tracking-widest">{card.title}</span>
               <card.icon className={`w-5 h-5 ${card.color} opacity-70 group-hover:scale-110 transition-transform`} />
             </div>
-            <h3 className="text-3xl font-bold font-sans text-soft-white mt-4">{card.value}</h3>
+            <h3 className="text-2xl md:text-3xl font-bold font-sans text-soft-white mt-4">{card.value}</h3>
           </motion.div>
         ))}
       </div>
+
+      {/* Subscription Insights Section */}
+      <section className="space-y-6">
+        <div className="flex items-center gap-4">
+          <div className="h-px bg-white/5 flex-1"></div>
+          <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-gold/60 whitespace-nowrap">Plan Overview</h2>
+          <div className="h-px bg-white/5 flex-1"></div>
+        </div>
+        
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          {subCards.map((card, idx) => (
+            <motion.div
+              key={idx}
+              variants={itemVariants}
+              className="bg-white/5 p-4 md:p-6 rounded-2xl border border-white/5 flex items-center gap-4 hover:border-white/10 transition-all"
+            >
+              <div className={`p-3 rounded-xl bg-white/5 ${card.color}`}>
+                <card.icon className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-soft-white/30 text-[9px] font-black uppercase tracking-widest">{card.title}</p>
+                <h4 className="text-lg md:text-xl font-bold text-soft-white">{card.value}</h4>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-10">
         <motion.div variants={itemVariants} className="glass p-5 md:p-8 rounded-3xl border border-white/5 relative overflow-hidden group">

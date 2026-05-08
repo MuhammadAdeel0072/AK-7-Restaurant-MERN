@@ -131,6 +131,12 @@ const orderSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
+    riderName: { type: String },
+    riderPhone: { type: String },
+    dispatchReadyAt: { type: Date },
+    codAmount: { type: Number },
+    codCollected: { type: Boolean, default: false },
+    estimatedArrival: { type: Date },
     riderLocation: {
         lat: { type: Number },
         lng: { type: Number },

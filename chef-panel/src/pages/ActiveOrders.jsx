@@ -3,10 +3,10 @@ import toast from "react-hot-toast";
 import { useOrderContext } from "../context/OrderContext";
 import { startCookingOrder, markOrderReady } from "../services/api";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  ChefHat, 
-  Activity,
-  AlertCircle
+import {
+    ChefHat,
+    Activity,
+    AlertCircle
 } from "lucide-react";
 import OrderCard from "../components/OrderCard";
 
@@ -68,7 +68,7 @@ const ActiveOrders = () => {
                     </h1>
                     <p className="text-soft-white/40 tracking-[0.2em] uppercase text-[10px] font-bold italic">Awaiting Preparation</p>
                 </div>
-                
+
                 <div className="flex flex-wrap items-center gap-4">
                     <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
                         {[
@@ -79,9 +79,8 @@ const ActiveOrders = () => {
                             <button
                                 key={f.id}
                                 onClick={() => setFilter(f.id)}
-                                className={`px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${
-                                    filter === f.id ? 'bg-gold text-charcoal shadow-lg' : 'text-soft-white/30 hover:text-soft-white'
-                                }`}
+                                className={`px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${filter === f.id ? 'bg-gold text-charcoal shadow-lg' : 'text-soft-white/30 hover:text-soft-white'
+                                    }`}
                             >
                                 {f.label}
                             </button>
@@ -98,8 +97,8 @@ const ActiveOrders = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-8">
                 <AnimatePresence mode="popLayout">
                     {filteredOrders.length === 0 ? (
-                        <motion.div 
-                            initial={{ opacity: 0 }} 
+                        <motion.div
+                            initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             className="col-span-full py-20 text-center glass rounded-[3rem] border border-white/5"
                         >
@@ -109,9 +108,9 @@ const ActiveOrders = () => {
                         </motion.div>
                     ) : (
                         filteredOrders.map((order) => (
-                            <OrderCard 
-                                key={order._id} 
-                                order={order} 
+                            <OrderCard
+                                key={order._id}
+                                order={order}
                                 actionText={order.status?.toUpperCase() === 'PREPARING' ? "Mark as Ready" : "Start Cooking"}
                                 onMainAction={() => order.status?.toUpperCase() === 'PREPARING' ? handleMarkReady(order._id) : handleStartCooking(order._id)}
                             />

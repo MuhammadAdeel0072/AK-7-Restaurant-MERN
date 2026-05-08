@@ -116,11 +116,28 @@ const createScheduledOrder = async (subscription, scheduleItem, now) => {
 
         // Update subscription tracking
         subscription.lastRunAt = now;
-        // Compute next run: this is simplified; in production use a more robust logic for next occurrence
-        subscription.nextRunAt = new Date(now.getTime() + 7 * 24 * 60 * 60000); 
+        
+        // Decrement remaining days
+        if (subscription.remainingDays > 0) {
+            subscription.remainingDays -= 1;
+        }
+
+        // Check if plan is completed
+        if (subscription.remainingDays <= 0) {
+            subscription.status = 'COMPLETED';
+            subscription.historyLogs.push({
+                action: 'COMPLETED',
+                date: now,
+                note: 'Subscription completed all scheduled days',
+                performedBy: 'System'
+            });
+            emitEvent(subscription.user.toString(), 'subscriptionCompleted', { message: 'Your meal plan has been completed!', subscriptionId: subscription._id });
+        }
+
         await subscription.save();
 
-        emitEvent(subscription.user.toString(), 'subscriptionUpdated', { message: 'Upcoming order scheduled', orderId: order._id });
+        emitEvent(subscription.user.toString(), 'subscriptionUpdated', { message: 'Upcoming order scheduled', orderId: order._id, remainingDays: subscription.remainingDays });
+        emitEvent('admin', 'subscriptionUpdated', subscription);
         console.log(`✅ Order SCHEDULED: ${order.orderNumber} for ${scheduledFor}`);
     } catch (error) {
         console.error('Error creating scheduled order:', error);

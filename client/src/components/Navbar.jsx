@@ -137,12 +137,20 @@ const Navbar = () => {
                       <div className="py-2">
 
                         <Link
+                          to="/profile"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-3 px-5 py-3.5 text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm font-medium group/item border-l-2 border-transparent hover:border-gold"
+                        >
+                          <UserIcon className="w-4 h-4 text-gold/50 group-hover/item:text-gold transition-colors" />
+                          <span>My Profile</span>
+                        </Link>
+                        <Link
                           to="/reservation"
                           onClick={() => setDropdownOpen(false)}
                           className="flex items-center gap-3 px-5 py-3.5 text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm font-medium group/item border-l-2 border-transparent hover:border-gold"
                         >
                           <Calendar className="w-4 h-4 text-gold/50 group-hover/item:text-gold transition-colors" />
-                          <span>Booking</span>
+                          <span>My Bookings</span>
                         </Link>
                         <Link
                           to="/order-history"
@@ -150,15 +158,7 @@ const Navbar = () => {
                           className="flex items-center gap-3 px-5 py-3.5 text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm font-medium group/item border-l-2 border-transparent hover:border-gold"
                         >
                           <ShoppingBag className="w-4 h-4 text-gold/50 group-hover/item:text-gold transition-colors" />
-                          <span>History</span>
-                        </Link>
-                        <Link
-                          to="/settings"
-                          onClick={() => setDropdownOpen(false)}
-                          className="flex items-center gap-3 px-5 py-3.5 text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm font-medium group/item border-l-2 border-transparent hover:border-gold"
-                        >
-                          <SettingsIcon className="w-4 h-4 text-gold/50 group-hover/item:text-gold transition-colors" />
-                          <span>Settings</span>
+                          <span>My Orders</span>
                         </Link>
                         <Link
                           to="/help"
@@ -166,7 +166,7 @@ const Navbar = () => {
                           className="flex items-center gap-3 px-5 py-3.5 text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm font-medium group/item border-l-2 border-transparent hover:border-gold"
                         >
                           <HelpCircle className="w-4 h-4 text-gold/50 group-hover/item:text-gold transition-colors" />
-                          <span>Help</span>
+                          <span>Help Center</span>
                         </Link>
                       </div>
 
@@ -239,11 +239,11 @@ const Navbar = () => {
                     ))}
                     {isSignedIn && (
                       <Link
-                        to="/settings"
+                        to="/profile"
                         onClick={() => setIsMobileMenuOpen(false)}
                         className="text-3xl font-serif font-black text-white hover:text-gold transition-colors flex items-center justify-between group py-2 border-t border-white/5 pt-8"
                       >
-                        <span className="group-hover:translate-x-2 transition-transform duration-300">Settings</span>
+                        <span className="group-hover:translate-x-2 transition-transform duration-300">Profile & Settings</span>
                         <motion.div
                           whileHover={{ x: 5 }}
                           className="text-gold group-hover:scale-125 transition-transform"

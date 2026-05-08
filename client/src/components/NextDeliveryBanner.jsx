@@ -14,7 +14,7 @@ const NextDeliveryBanner = () => {
           // Find the earliest active subscription
           const active = data.filter(s => s.status === 'ACTIVE');
           if (active.length > 0) {
-             setNextSub(active[0]);
+            setNextSub(active[0]);
           }
         }
       } catch (err) {

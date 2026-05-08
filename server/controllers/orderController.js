@@ -323,10 +323,17 @@ const markReady = asyncHandler(async (req, res) => {
     order.status = 'READY_FOR_DELIVERY';
     order.statusHistory.push({ status: 'READY_FOR_DELIVERY', timestamp: Date.now() });
     order.readyAt = Date.now();
+    order.dispatchReadyAt = Date.now();
     order.preparationEndTime = Date.now();
+    
     const updatedOrder = await order.save();
-    emitEvent(null, 'orderUpdated', updatedOrder);
-    emitEvent('rider', 'order:ready', updatedOrder);
+    
+    // Broadcast for real-time sync
+    emitEvent(null, 'orderDispatchReady', updatedOrder);
+    emitEvent(order.user.toString(), 'orderDispatchReady', updatedOrder);
+    emitEvent('rider', 'orderDispatchReady', updatedOrder);
+    emitEvent('admin', 'orderUpdate', updatedOrder);
+    
     res.json(updatedOrder);
   } else {
     res.status(404);
@@ -341,15 +348,22 @@ const dispatchOrder = asyncHandler(async (req, res) => {
   const { chefFeedback } = req.body;
   const order = await Order.findById(req.params.id);
   if (order) {
-    order.status = 'DISPATCHED';
-    order.statusHistory.push({ status: 'DISPATCHED', timestamp: Date.now() });
-    order.pickedUpAt = Date.now();
+    // If chef manually dispatches, it usually means ready for rider pickup
+    order.status = 'READY_FOR_DELIVERY';
+    order.statusHistory.push({ status: 'READY_FOR_DELIVERY', timestamp: Date.now() });
+    order.dispatchReadyAt = Date.now();
+    
     if (chefFeedback) {
       order.chefFeedback = chefFeedback;
     }
+    
     const updatedOrder = await order.save();
-    emitEvent(null, 'orderUpdated', updatedOrder);
-    emitEvent('rider', 'order:ready', updatedOrder);
+    
+    emitEvent(null, 'orderDispatchReady', updatedOrder);
+    emitEvent(order.user.toString(), 'orderDispatchReady', updatedOrder);
+    emitEvent('rider', 'orderDispatchReady', updatedOrder);
+    emitEvent('admin', 'orderUpdate', updatedOrder);
+    
     res.json(updatedOrder);
   } else {
     res.status(404);

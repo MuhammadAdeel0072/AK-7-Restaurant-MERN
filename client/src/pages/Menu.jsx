@@ -18,10 +18,6 @@ const Menu = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedOptions, setSelectedOptions] = useState({}); // { groupName: [{ name, price }] }
-  const [selectedVariant, setSelectedVariant] = useState(null);
-  const [qty, setQty] = useState(1);
   
   const { dispatch } = useCart();
   const { user: profile, isSignedIn, updateProfile } = useAuth();
@@ -128,11 +124,6 @@ const Menu = () => {
       icon: '🛒',
       duration: 3000,
     });
-    if (selectedProduct) {
-      setSelectedProduct(null);
-      setQty(1);
-      setSelectedOptions({});
-    }
   };
 
   const toggleFavoriteHandler = async (productId, e) => {
@@ -172,27 +163,7 @@ const Menu = () => {
     return matchesCategory && matchesSearch;
   });
 
-  const handleOptionToggle = (group, option) => {
-    const groupName = group.name;
-    const isSingle = group.type === 'single';
-    
-    setSelectedOptions(prev => {
-        const currentGroupSelections = prev[groupName] || [];
-        
-        if (isSingle) {
-            // For single select, replace the selection
-            return { ...prev, [groupName]: [{ name: option.name, price: option.price }] };
-        } else {
-            // For multi-select, toggle the selection
-            const isSelected = currentGroupSelections.some(o => o.name === option.name);
-            if (isSelected) {
-                return { ...prev, [groupName]: currentGroupSelections.filter(o => o.name !== option.name) };
-            } else {
-                return { ...prev, [groupName]: [...currentGroupSelections, { name: option.name, price: option.price }] };
-            }
-        }
-    });
-  };
+
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-8 md:py-12">
@@ -262,13 +233,10 @@ const Menu = () => {
               <div
                 key={product._id}
                 onClick={() => {
-                  setSelectedProduct(product);
-                  setSelectedOptions({});
-                  setSelectedVariant(product.variants && product.variants.length > 0 ? product.variants[0] : null);
-                  setQty(1);
-                }}
-                className="bg-white/[0.02] backdrop-blur-3xl border border-white/5 rounded-[2.5rem] overflow-hidden hover:border-gold/40 group transition-all duration-700 transform hover:-translate-y-3 hover:shadow-[0_30px_60px_rgba(0,0,0,0.6)] relative cursor-pointer flex flex-col h-full"
-              >
+                    navigate(`/menu/${product._id}`);
+                  }}
+                  className="bg-white/[0.02] backdrop-blur-3xl border border-white/5 rounded-[2.5rem] overflow-hidden hover:border-gold/40 group transition-all duration-700 transform hover:-translate-y-3 hover:shadow-[0_30px_60px_rgba(0,0,0,0.6)] relative cursor-pointer flex flex-col h-full"
+                >
                 <div className="h-64 overflow-hidden relative shrink-0">
                   <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
                   <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-transparent to-transparent opacity-80"></div>
@@ -342,11 +310,8 @@ const Menu = () => {
                   <button
                     onClick={(e) => {
                       if (product.hasVariants && product.variants?.length > 0) {
-                        setSelectedProduct(product);
-                        setSelectedVariant(product.variants[0]);
-                        setSelectedOptions({});
-                        setQty(1);
                         e.stopPropagation();
+                        navigate(`/menu/${product._id}`);
                       } else {
                         addToCartHandler({ ...product, price: Math.round(discountedPrice) }, 1, e, []);
                       }
@@ -354,7 +319,7 @@ const Menu = () => {
                     className="mt-auto w-full flex items-center justify-between bg-white/5 hover:bg-gold/10 border border-white/5 group-hover:border-gold/30 hover:border-gold/50 px-5 py-3.5 rounded-2xl transition-all duration-300 group/btn"
                   >
                     <span className="text-sm font-black uppercase tracking-widest text-white/40 group-hover/btn:text-gold transition-colors">
-                      {product.hasVariants ? 'Customize' : 'Add to Cart'}
+                      {product.hasVariants ? 'Add to Cart' : 'Add to Cart'}
                     </span>
                     <ShoppingCart className="w-4 h-4 text-gold/40 group-hover/btn:text-gold group-hover/btn:scale-110 transition-all" />
                   </button>
@@ -377,226 +342,7 @@ const Menu = () => {
         </div>
       )}
 
-      {/* Modal - Simplified view for details */}
-      <AnimatePresence>
-        {selectedProduct && (() => {
-          const deal = getDealForProduct(selectedProduct._id, selectedProduct.category);
-          let basePrice = selectedProduct.price;
-          if (deal) {
-            if (deal.discountPercentage > 0) {
-              basePrice = selectedProduct.price - (selectedProduct.price * (deal.discountPercentage / 100));
-            } else if (deal.discountAmount > 0) {
-              basePrice = selectedProduct.price - deal.discountAmount;
-            }
-            basePrice = Math.max(0, basePrice);
-          }
-
-          // Calculate current price dynamically
-          let optionsPrice = 0;
-          Object.values(selectedOptions).forEach(options => {
-              options.forEach(opt => {
-                  optionsPrice += opt.price;
-              });
-          });
-          const currentPrice = (selectedVariant ? selectedVariant.price : basePrice) + optionsPrice;
-
-          return (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-charcoal/80 backdrop-blur-xl">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-charcoal border border-white/10 rounded-[3rem] overflow-hidden max-w-4xl w-full shadow-[0_50px_100px_rgba(0,0,0,0.8)] flex flex-col md:flex-row relative max-h-[90vh]"
-            >
-              <button
-                onClick={() => setSelectedProduct(null)}
-                className="absolute top-8 right-8 z-10 p-3 bg-charcoal/60 hover:bg-gold text-white hover:text-charcoal rounded-2xl transition-all backdrop-blur-xl border border-white/10"
-              >
-                <X className="w-6 h-6" />
-              </button>
-
-              <div className="md:w-1/2 h-64 md:h-auto overflow-hidden">
-                <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-full object-cover" />
-              </div>
-
-              <div className="md:w-1/2 p-8 md:p-10 flex flex-col overflow-y-auto no-scrollbar">
-                <div className="mb-8 shrink-0">
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="text-gold font-black text-xs uppercase tracking-widest">{selectedProduct.category}</span>
-                    <div className="w-1 h-1 rounded-full bg-white/20"></div>
-                  </div>
-                  <h2 className="text-3xl font-serif font-black text-white mb-4 leading-tight">
-                    {selectedProduct.name}
-                    {deal && (
-                      <span className="ml-4 inline-block align-middle bg-crimson text-white px-3 py-1.5 rounded-full text-sm font-black uppercase tracking-widest shadow-lg border border-crimson/50 whitespace-nowrap">
-                        {deal.discountPercentage > 0 
-                          ? `${deal.discountPercentage}% OFF`
-                          : `Rs. ${deal.discountAmount} OFF`
-                        }
-                      </span>
-                    )}
-                  </h2>
-                  <p className="text-gray-400 text-base leading-relaxed mb-6 font-medium">"{selectedProduct.description}"</p>
-                  <div className="flex items-center gap-4 mb-4">
-                    {deal && (
-                      <span className="text-gray-500 font-bold text-2xl line-through">Rs. {selectedProduct.price}</span>
-                    )}
-                    <span className="text-4xl font-black text-gold tracking-tighter">Rs. {Math.round(currentPrice)}</span>
-                  </div>
-                </div>
-
-                <div className="space-y-8 flex-grow">
-                  {/* Standardized Variants */}
-                  {selectedProduct.hasVariants && selectedProduct.variants?.length > 0 && (
-                    <div className="space-y-4">
-                      <label className="text-xs font-black uppercase tracking-widest text-gold/60 flex justify-between">
-                        Select Variation
-                        <span className="text-crimson">* Required</span>
-                      </label>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {selectedProduct.variants.map((variant, vIdx) => {
-                          const isSelected = selectedVariant?.name === variant.name;
-                          
-                          return (
-                            <button
-                                key={vIdx}
-                                onClick={() => setSelectedVariant(variant)}
-                                className={`flex flex-col items-start p-4 rounded-2xl border transition-all text-left ${
-                                isSelected
-                                    ? 'bg-gold/20 border-gold shadow-[0_0_15px_rgba(212,175,55,0.2)]'
-                                    : 'bg-white/5 border-white/10 hover:border-gold/30'
-                                }`}
-                            >
-                                <div className="flex items-center gap-3 w-full">
-                                    <div className={`w-5 h-5 flex items-center justify-center rounded-full border shrink-0 ${isSelected ? 'border-gold bg-gold text-charcoal' : 'border-white/20'}`}>
-                                        {isSelected && <div className="w-2.5 h-2.5 bg-charcoal rounded-full" />}
-                                    </div>
-                                    <div className="flex-1">
-                                        <span className={`block text-lg font-black uppercase tracking-widest mb-1 ${isSelected ? 'text-gold' : 'text-gray-300'}`}>
-                                            {variant.name}
-                                        </span>
-                                        <span className="text-sm font-bold text-white/70">
-                                            Rs. {variant.price}
-                                        </span>
-                                    </div>
-                                </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Legacy Variation Groups (if any) */}
-                  {selectedProduct.hasVariants && selectedProduct.variationGroups?.length > 0 && selectedProduct.variationGroups.map((group, gIdx) => (
-                    <div key={gIdx} className="space-y-4">
-                      <label className="text-xs font-black uppercase tracking-widest text-gold/60 flex justify-between">
-                        {group.name}
-                        {group.required && <span className="text-crimson">* Required</span>}
-                      </label>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {group.options.map((option, oIdx) => {
-                          const isSelected = selectedOptions[group.name]?.some(o => o.name === option.name);
-                          
-                          return (
-                            <button
-                                key={oIdx}
-                                onClick={() => handleOptionToggle(group, option)}
-                                className={`flex flex-col items-start p-4 rounded-2xl border transition-all text-left ${
-                                isSelected
-                                    ? 'bg-gold/20 border-gold shadow-[0_0_15px_rgba(212,175,55,0.2)]'
-                                    : 'bg-white/5 border-white/10 hover:border-gold/30'
-                                }`}
-                            >
-                                <div className="flex items-center gap-3 w-full">
-                                    <div className={`w-5 h-5 flex items-center justify-center rounded-full border shrink-0 ${group.type === 'multi' ? 'rounded-md' : 'rounded-full'} ${isSelected ? 'border-gold bg-gold text-charcoal' : 'border-white/20'}`}>
-                                        {isSelected && (group.type === 'multi' ? '✓' : <div className="w-2.5 h-2.5 bg-charcoal rounded-full" />)}
-                                    </div>
-                                    <div className="flex-1">
-                                        <span className={`block text-lg font-black uppercase tracking-widest mb-1 ${isSelected ? 'text-gold' : 'text-gray-300'}`}>
-                                            {option.name}
-                                        </span>
-                                        <span className="text-sm font-bold text-white/70">
-                                            {option.price > 0 ? `+Rs. ${option.price}` : 'Free'}
-                                        </span>
-                                    </div>
-                                </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-
-                  <div className="flex items-center justify-between bg-white/5 p-4 rounded-3xl border border-white/10 mt-8 shrink-0">
-                    <span className="text-xs font-black uppercase tracking-widest text-gold/60">Portions</span>
-                    <div className="flex items-center gap-6">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setQty(Math.max(1, qty - 1)); }}
-                        className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white hover:bg-gold hover:text-charcoal transition-all"
-                      >
-                        <Minus className="w-4 h-4" />
-                      </button>
-                      <span className="text-xl font-bold text-white w-4 text-center">{qty}</span>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setQty(Math.min(selectedProduct.countInStock || 20, qty + 1)); }}
-                        className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white hover:bg-gold hover:text-charcoal transition-all"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={(e) => {
-                      // Validation
-                      let isValid = true;
-                      
-                      // Check variants
-                      if (selectedProduct.hasVariants && selectedProduct.variants?.length > 0 && !selectedVariant) {
-                          toast.error(`Please select a variation`);
-                          isValid = false;
-                      }
-
-                      // Check variation groups
-                      if (isValid && selectedProduct.hasVariants && selectedProduct.variationGroups) {
-                          for (const group of selectedProduct.variationGroups) {
-                              if (group.required && (!selectedOptions[group.name] || selectedOptions[group.name].length === 0)) {
-                                  toast.error(`Please select an option for ${group.name}`);
-                                  isValid = false;
-                                  break;
-                              }
-                          }
-                      }
-                      
-                      if (!isValid) return;
-
-                      // Flatten selected options for Cart
-                      const finalOptions = [];
-                      Object.entries(selectedOptions).forEach(([groupName, options]) => {
-                          options.forEach(opt => {
-                              finalOptions.push({ groupName, optionName: opt.name, price: opt.price });
-                          });
-                      });
-
-                      addToCartHandler({ 
-                        ...selectedProduct, 
-                        price: selectedVariant ? selectedVariant.price : Math.round(basePrice),
-                        variantName: selectedVariant?.name
-                      }, qty, e, finalOptions);
-                    }}
-                    className="w-full bg-gold text-charcoal font-black py-5 rounded-[2rem] flex items-center justify-center gap-4 text-xl shadow-[0_20px_40px_rgba(212,175,55,0.3)] hover:scale-[1.02] active:scale-95 transition-all group uppercase tracking-widest shrink-0 mt-4"
-                  >
-                    <ShoppingCart className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                    Add to Cart
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-          );
-        })()}
-      </AnimatePresence>
+      {/* Modal - Simplified view for details removed in favor of full page */}
     </div>
   );
 };

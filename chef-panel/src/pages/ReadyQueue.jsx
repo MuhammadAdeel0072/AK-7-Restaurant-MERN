@@ -93,7 +93,7 @@ const ReadyQueue = () => {
                             <OrderCard
                                 key={order._id}
                                 order={order}
-                                actionText="Dispatch"
+                                actionText="Ready for Dispatch"
                                 onMainAction={() => handleDispatch(order._id)}
                             >
                                 <div className="space-y-2 mt-2">

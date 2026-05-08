@@ -2,7 +2,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 
 const apiClient = axios.create({
-  baseURL: 'http://127.0.0.1:5000/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -30,8 +30,8 @@ apiClient.interceptors.response.use(
       console.warn('Unauthorized — session may have expired');
       // Potential redirect to login could happen here if we had access to history
     } else if (error.response?.status >= 500) {
-      const errorDetail = error.response?.data?.message || 'Server-side protocol failure';
-      toast.error(`System Protocol Error: ${errorDetail}`);
+      const errorDetail = error.response?.data?.message || 'Server error';
+      toast.error(`System Error: ${errorDetail}`);
     }
     return Promise.reject(error);
   }

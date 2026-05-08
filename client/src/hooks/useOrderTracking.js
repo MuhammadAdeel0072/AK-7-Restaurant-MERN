@@ -45,20 +45,47 @@ export const useOrderTracking = (orderId) => {
         socket.emit('join', orderId);
 
         const handleStatusUpdate = (data) => {
-            if (data.orderId === orderId) {
-                setOrder(prev => ({ ...prev, status: data.status, estimatedDeliveryTime: data.estimatedDeliveryTime || prev.estimatedDeliveryTime }));
-                toast.success('Order Status Updated!', { id: 'status-toast' });
+            if (data.orderId === orderId || data._id === orderId) {
+                const newStatus = data.status || data.deliveryStatus;
+                setOrder(prev => ({ ...prev, status: newStatus, estimatedDeliveryTime: data.estimatedDeliveryTime || prev.estimatedDeliveryTime }));
+                toast.success(`Order Status: ${newStatus.replace(/_/g, ' ')}!`, { id: 'status-toast' });
             }
         };
 
-        const handleETAUpdate = (data) => {
+        const handleLocationUpdate = (data) => {
             if (data.orderId === orderId) {
-                setOrder(prev => ({ ...prev, estimatedDeliveryTime: data.estimatedDeliveryTime }));
+                setOrder(prev => ({ 
+                    ...prev, 
+                    riderLocation: { lat: data.lat, lng: data.lng, updatedAt: data.updatedAt } 
+                }));
+            }
+        };
+
+        const handleRiderAssigned = (data) => {
+            if (data._id === orderId || data.orderId === orderId) {
+                setOrder(prev => ({
+                    ...prev,
+                    status: 'ASSIGNED',
+                    rider: data.rider ? {
+                        name: data.riderName || (data.rider.firstName + ' ' + data.rider.lastName),
+                        phone: data.riderPhone || data.rider.phoneNumber
+                    } : prev.rider
+                }));
+                toast.success('Rider assigned to your order! 🛵');
             }
         };
 
         socket.on('orderStatusUpdated', handleStatusUpdate);
-        socket.on('etaUpdated', handleETAUpdate);
+        socket.on('orderUpdate', handleStatusUpdate);
+        socket.on('riderAssigned', handleRiderAssigned);
+        socket.on('orderOutForDelivery', handleStatusUpdate);
+        socket.on('orderDelivered', handleStatusUpdate);
+        socket.on('riderLocationUpdated', handleLocationUpdate);
+        socket.on('etaUpdated', (data) => {
+            if (data.orderId === orderId) {
+                setOrder(prev => ({ ...prev, estimatedDeliveryTime: data.estimatedDeliveryTime }));
+            }
+        });
 
         // Polling fallback check
         const checkConnectivity = setInterval(() => {
@@ -71,7 +98,12 @@ export const useOrderTracking = (orderId) => {
 
         return () => {
             socket.off('orderStatusUpdated', handleStatusUpdate);
-            socket.off('etaUpdated', handleETAUpdate);
+            socket.off('orderUpdate', handleStatusUpdate);
+            socket.off('riderAssigned', handleRiderAssigned);
+            socket.off('orderOutForDelivery', handleStatusUpdate);
+            socket.off('orderDelivered', handleStatusUpdate);
+            socket.off('riderLocationUpdated', handleLocationUpdate);
+            socket.off('etaUpdated');
             clearInterval(checkConnectivity);
         };
     }, [socket, orderId]);
@@ -80,7 +112,7 @@ export const useOrderTracking = (orderId) => {
     useEffect(() => {
         let interval;
         if (isPolling && orderId) {
-            console.log('Switching to Polling Fallback Protocol...');
+            console.log('Switching to Polling Fallback...');
             interval = setInterval(fetchOrder, 15000); // 15s polling
         }
         return () => clearInterval(interval);

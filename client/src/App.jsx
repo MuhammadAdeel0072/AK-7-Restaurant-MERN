@@ -18,7 +18,7 @@ import SignIn from './pages/SignIn';
 import TrackOrderPage from './pages/TrackOrderPage';
 import Help from './pages/Help';
 import Reservations from './pages/Reservations';
-import Settings from './pages/Settings';
+import Profile from './pages/Profile';
 import PlansPage from './pages/PlansPage';
 import PlanEditor from './pages/PlanEditor';
 import ProductDetail from './pages/ProductDetail';
@@ -73,9 +73,9 @@ function App() {
                     <TrackOrderPage />
                   </AuthGuard>
                 } />
-                <Route path="/settings" element={
+                <Route path="/profile" element={
                   <AuthGuard>
-                    <Settings />
+                    <Profile />
                   </AuthGuard>
                 } />
                 <Route path="/plans" element={

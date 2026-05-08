@@ -166,12 +166,18 @@ const claimOrder = asyncHandler(async (req, res) => {
     }
 
     order.rider = req.user._id;
+    order.riderName = `${req.user.firstName} ${req.user.lastName || ''}`;
+    order.riderPhone = req.user.phoneNumber || req.user.phone || "";
     order.status = 'ASSIGNED';
     order.assignedAt = Date.now();
     order.statusHistory.push({ status: 'ASSIGNED', timestamp: Date.now() });
 
     const updatedOrder = await order.save();
-    emitEvent(null, 'orderUpdate', updatedOrder);
+    
+    // Broadcast to relevant rooms
+    emitEvent(null, 'riderAssigned', updatedOrder);
+    emitEvent(order.user.toString(), 'riderAssigned', updatedOrder);
+    emitEvent('admin', 'orderUpdate', updatedOrder);
 
     res.json(updatedOrder);
 });
@@ -208,7 +214,11 @@ const pickupOrder = asyncHandler(async (req, res) => {
     order.statusHistory.push({ status: 'PICKED_UP', timestamp: Date.now() });
 
     const updatedOrder = await order.save();
-    emitEvent(null, 'orderUpdate', updatedOrder);
+    
+    emitEvent(null, 'orderOutForDelivery', updatedOrder);
+    emitEvent(order.user.toString(), 'orderOutForDelivery', updatedOrder);
+    emitEvent('admin', 'orderUpdate', updatedOrder);
+    
     res.json(updatedOrder);
 });
 
@@ -231,6 +241,13 @@ const confirmDelivery = asyncHandler(async (req, res) => {
     const order = await Order.findById(req.params.orderId);
     if (!order) throw new Error('Order not found');
 
+    const { cashCollected } = req.body;
+
+    if (order.paymentMethod === 'cod' && !cashCollected) {
+        res.status(400);
+        throw new Error('Cash collection confirmation required for COD');
+    }
+
     order.status = 'DELIVERED';
     order.deliveredAt = Date.now();
     order.statusHistory.push({ status: 'DELIVERED', timestamp: Date.now() });
@@ -238,11 +255,42 @@ const confirmDelivery = asyncHandler(async (req, res) => {
     if (order.paymentMethod === 'cod') {
         order.isPaid = true;
         order.paidAt = Date.now();
+        order.codCollected = true;
     }
 
     const updatedOrder = await order.save();
-    emitEvent(null, 'orderUpdate', updatedOrder);
+    
+    emitEvent(null, 'orderDelivered', updatedOrder);
+    emitEvent(order.user.toString(), 'orderDelivered', updatedOrder);
+    emitEvent('admin', 'orderUpdate', updatedOrder);
+    
     res.json(updatedOrder);
+});
+
+// @desc    Update rider live location
+// @route   POST /api/rider/location
+// @access  Private/Rider
+const updateRiderLocation = asyncHandler(async (req, res) => {
+    const { lat, lng, orderId } = req.body;
+    
+    if (orderId) {
+        const order = await Order.findById(orderId);
+        if (order && order.rider?.toString() === req.user._id.toString()) {
+            order.riderLocation = {
+                lat,
+                lng,
+                updatedAt: Date.now()
+            };
+            await order.save();
+            
+            // Broadcast location to customer and admin
+            const payload = { orderId, lat, lng, updatedAt: Date.now() };
+            emitEvent(order.user.toString(), 'riderLocationUpdated', payload);
+            emitEvent('admin', 'riderLocationUpdated', payload);
+        }
+    }
+    
+    res.json({ success: true });
 });
 
 // @desc    Get rider performance stats
@@ -283,5 +331,6 @@ module.exports = {
     pickupOrder,
     arrivedAtDestination,
     confirmDelivery,
-    getRiderStats
+    getRiderStats,
+    updateRiderLocation
 };

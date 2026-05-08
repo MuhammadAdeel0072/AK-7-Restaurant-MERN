@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-    Clock, 
-    ChefHat, 
-    CheckCircle, 
-    User, 
+import {
+    Clock,
+    ChefHat,
+    CheckCircle,
+    User,
     ShoppingBag,
     UtensilsCrossed,
     Info,
@@ -72,16 +72,15 @@ const OrderCard = ({ order, onMainAction, actionText, isActionDisabled, isUpdati
                                 #{order.orderNumber || order._id.slice(-6).toUpperCase()}
                             </h3>
                             {order.priority !== 'normal' && (
-                                <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest ${
-                                    order.priority === 'vip' ? 'bg-gold text-charcoal shadow-[0_0_15px_rgba(212,175,55,0.4)]' : 'bg-crimson text-white'
-                                }`}>
+                                <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest ${order.priority === 'vip' ? 'bg-gold text-charcoal shadow-[0_0_15px_rgba(212,175,55,0.4)]' : 'bg-crimson text-white'
+                                    }`}>
                                     {order.priority}
                                 </span>
                             )}
                         </div>
                         <div className="flex items-center gap-4 mt-2">
                             <span className="flex items-center gap-1.5 text-[10px] font-bold text-soft-white/30 uppercase tracking-widest">
-                                <Clock className="w-3.5 h-3.5" /> 
+                                <Clock className="w-3.5 h-3.5" />
                                 {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </span>
                             <div className="w-1 h-1 rounded-full bg-white/20"></div>
@@ -117,27 +116,26 @@ const OrderCard = ({ order, onMainAction, actionText, isActionDisabled, isUpdati
                                 <div className="text-left">
                                     <p className="font-bold text-white text-sm tracking-tight">{item.name}</p>
                                     <div className="flex flex-wrap gap-2 mt-1">
-                                         <span className="text-gold font-black text-xs">x{item.qty}</span>
-                                         {item.variantName && (
-                                              <span className="text-[10px] text-gold/60 font-black uppercase tracking-widest">
-                                                   {item.variantName}
-                                              </span>
-                                         )}
-                                         {item.customizations?.map((c, ci) => (
-                                              <span key={ci} className="text-[8px] bg-white/5 text-soft-white/40 px-1.5 py-0.5 rounded border border-white/5">{typeof c === 'string' ? c : c.selection}</span>
-                                         ))}
+                                        <span className="text-gold font-black text-xs">x{item.qty}</span>
+                                        {item.variantName && (
+                                            <span className="text-[10px] text-gold/60 font-black uppercase tracking-widest">
+                                                {item.variantName}
+                                            </span>
+                                        )}
+                                        {item.customizations?.map((c, ci) => (
+                                            <span key={ci} className="text-[8px] bg-white/5 text-soft-white/40 px-1.5 py-0.5 rounded border border-white/5">{typeof c === 'string' ? c : c.selection}</span>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
-                            
-                            <button 
+
+                            <button
                                 onClick={() => handleItemToggle(item._id, item.status)}
                                 disabled={isUpdating}
-                                className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all border ${
-                                    item.status === 'ready' 
-                                        ? 'bg-green-500/20 text-green-500 border-green-500/20' 
+                                className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all border ${item.status === 'ready'
+                                        ? 'bg-green-500/20 text-green-500 border-green-500/20'
                                         : 'bg-white/5 text-soft-white/40 border-white/5 hover:border-gold/30 hover:text-gold'
-                                }`}
+                                    }`}
                             >
                                 {item.status === 'ready' ? 'Done' : 'Pending'}
                             </button>
@@ -153,16 +151,15 @@ const OrderCard = ({ order, onMainAction, actionText, isActionDisabled, isUpdati
 
                 <div className="flex items-center gap-4">
                     {onMainAction && (
-                        <button 
+                        <button
                             onClick={onMainAction}
                             disabled={isUpdating || isActionDisabled}
-                            className={`flex-1 relative font-black py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-lg group/btn  ${
-                                isActionDisabled 
-                                    ? 'bg-white/10 text-white/40 cursor-not-allowed border border-white/5' 
+                            className={`flex-1 relative font-black py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-lg group/btn  ${isActionDisabled
+                                    ? 'bg-white/10 text-white/40 cursor-not-allowed border border-white/5'
                                     : actionText === 'Start Cooking' ? 'bg-gold text-charcoal hover:bg-gold/90 active:scale-95'
-                                    : actionText === 'Mark as Ready' ? 'bg-orange-500 text-white hover:bg-orange-600 active:scale-95'
-                                    : 'bg-green-500 text-white hover:bg-green-600 active:scale-95'
-                            }`}
+                                        : actionText === 'Mark as Ready' ? 'bg-orange-500 text-white hover:bg-orange-600 active:scale-95'
+                                            : 'bg-green-500 text-white hover:bg-green-600 active:scale-95'
+                                }`}
                         >
                             {isUpdating && <div className="absolute inset-0 bg-black/20 flex items-center justify-center rounded-2xl"><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div></div>}
                             <ChefHat className={`w-5 h-5 ${!isActionDisabled && 'group-hover/btn:rotate-12'} transition-transform`} />
@@ -171,7 +168,7 @@ const OrderCard = ({ order, onMainAction, actionText, isActionDisabled, isUpdati
                             </span>
                         </button>
                     )}
-                    
+
                     <button className="w-14 h-14 bg-white/5 border border-white/5 hover:border-gold/30 hover:bg-gold/10 text-gold flex items-center justify-center rounded-2xl transition-all shadow-lg active:scale-95">
                         <Info className="w-5 h-5" />
                     </button>

@@ -63,7 +63,6 @@ const Orders = () => {
         <p className="text-gold/60 font-medium tracking-widest uppercase text-xs">Active Orders - Track Your Status</p>
       </div>
 
-      <NextDeliveryBanner />
 
       {loading ? (
         <div className="space-y-6">

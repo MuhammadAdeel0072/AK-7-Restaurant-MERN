@@ -9,7 +9,8 @@ import {
     pickupOrder as apiPickupOrder,
     arrivedAtDestination as apiArrivedOrder,
     confirmDelivery as apiDeliveredOrder,
-    addToRoute as apiAddToRoute
+    addToRoute as apiAddToRoute,
+    updateLocation as apiUpdateLocation
 } from '../services/api';
 import socket, { joinRiders } from '../services/socket';
 import { useAuth } from '../hooks/useAuth';
@@ -80,6 +81,12 @@ export const RiderProvider = ({ children }) => {
     const [routeInfo, setRouteInfo] = useState({ sequence: [], totalDistance: 0 });
     
     const refreshTimer = useRef(null);
+    const myOrdersRef = useRef([]);
+
+    // Keep ref in sync with state for use in geolocation callback
+    useEffect(() => {
+        myOrdersRef.current = myOrders;
+    }, [myOrders]);
 
     const fetchData = useCallback(async () => {
         if (!user) return;
@@ -142,20 +149,47 @@ export const RiderProvider = ({ children }) => {
 
             const handleRefresh = () => fetchData();
 
-            socket.on('order:ready', (newOrder) => {
+            socket.on('order:ready', () => {
                 fetchData();
                 toast.success('New mission available nearby! 📦', {
                     duration: 6000,
                     style: { background: '#121212', color: '#D4AF37', border: '1px solid #D4AF37' }
                 });
             });
+
+            socket.on('orderDispatchReady', () => {
+                fetchData();
+                toast.success('Signal Received: New Dispatch Ready! 🛰️', {
+                    duration: 5000,
+                    style: { background: '#121212', color: '#D4AF37', border: '1px solid #D4AF37' }
+                });
+            });
             
             socket.on('orderUpdate', handleRefresh);
 
+            // --- Live Location Broadcasting ---
+            let watchId = null;
+            if (navigator.geolocation) {
+                watchId = navigator.geolocation.watchPosition((pos) => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    const locObj = { lat, lng };
+                    setLocation(locObj);
+
+                    // Use ref to read current orders without adding to deps
+                    const active = myOrdersRef.current.find(o => o.status === 'PICKED_UP' || o.status === 'ARRIVED');
+                    if (active) {
+                        apiUpdateLocation(active._id, lat, lng).catch(console.error);
+                    }
+                }, console.error, { enableHighAccuracy: true, distanceFilter: 10 });
+            }
+
             return () => {
                 socket.off('order:ready');
+                socket.off('orderDispatchReady');
                 socket.off('orderUpdate');
                 if (refreshTimer.current) clearInterval(refreshTimer.current);
+                if (watchId !== null) navigator.geolocation.clearWatch(watchId);
             };
         }
     }, [user, fetchData]);
@@ -184,8 +218,8 @@ export const RiderProvider = ({ children }) => {
         return res;
     };
 
-    const deliver = async (id) => {
-        const res = await apiDeliveredOrder(id);
+    const deliver = async (id, cashCollected = false) => {
+        const res = await apiDeliveredOrder(id, { cashCollected });
         await fetchData();
         return res;
     };

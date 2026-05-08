@@ -7,7 +7,7 @@ import { useSocket } from '../context/SocketContext';
 import OrderDetailModal from '../components/OrderDetailModal';
 import useReorder from '../hooks/useReorder';
 
-const OrderHistory = () => {
+const OrderHistory = ({ hideHeader = false }) => {
   const [orders, setOrders] = useState([]);
   const [groupedOrders, setGroupedOrders] = useState({});
   const [loading, setLoading] = useState(true);
@@ -47,7 +47,6 @@ const OrderHistory = () => {
       }
     });
 
-    // Remove empty standard groups
     Object.keys(groups).forEach(key => {
       if (groups[key].length === 0 && ['This Week', '1 Week Ago', '2 Weeks Ago', '3 Weeks Ago'].includes(key)) {
         delete groups[key];
@@ -63,12 +62,8 @@ const OrderHistory = () => {
         setLoading(true);
         const data = await getMyOrders();
         const allOrders = data.orders || data || [];
-        // Filter to show only delivered orders
         const deliveredOrders = allOrders.filter(order => order.status === 'DELIVERED');
-
-        // Sort orders by date descending
         deliveredOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
         setOrders(deliveredOrders);
         setGroupedOrders(groupOrdersByTime(deliveredOrders));
       } catch (err) {
@@ -103,11 +98,13 @@ const OrderHistory = () => {
   };
 
   return (
-    <div className="container mx-auto px-6 py-12 max-w-6xl">
-      <div className="mb-12">
-        <h1 className="text-5xl font-serif font-bold text-white mb-2">Order History</h1>
-        <p className="text-gold/60 font-medium tracking-widest uppercase text-xs">Your Completed Orders</p>
-      </div>
+    <div className={`container mx-auto ${hideHeader ? 'px-0 py-0' : 'px-6 py-12'} max-w-6xl`}>
+      {!hideHeader && (
+        <div className="mb-12">
+          <h1 className="text-5xl font-serif font-bold text-white mb-2">Order History</h1>
+          <p className="text-gold/60 font-medium tracking-widest uppercase text-xs">Your Completed Orders</p>
+        </div>
+      )}
 
       {loading ? (
         <div className="space-y-6">
@@ -116,7 +113,7 @@ const OrderHistory = () => {
           ))}
         </div>
       ) : orders.length === 0 ? (
-        <div className="bg-white/[0.02] border border-white/5 p-20 rounded-[3rem] text-center backdrop-blur-xl">
+        <div className={`bg-white/[0.02] border border-white/5 ${hideHeader ? 'p-12' : 'p-20'} rounded-[3rem] text-center backdrop-blur-xl`}>
           <div className="w-20 h-20 bg-gold/10 rounded-full flex items-center justify-center mx-auto mb-6">
             <Package className="w-10 h-10 text-gold/40" />
           </div>
@@ -140,7 +137,6 @@ const OrderHistory = () => {
               <div className="grid grid-cols-1 gap-6">
                 {groupOrders.map((order) => (
                   <div key={order._id} className="bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 hover:border-gold/20 rounded-[2.5rem] p-6 flex flex-col sm:flex-row items-start sm:items-center gap-6 transition-all duration-300 group">
-                    {/* Item thumbnails */}
                     <div className="flex gap-2 shrink-0">
                       {order.orderItems.slice(0, 3).map((item, idx) => (
                         <div key={idx} className="w-14 h-14 rounded-2xl overflow-hidden border border-white/10 shrink-0">
@@ -154,7 +150,6 @@ const OrderHistory = () => {
                       )}
                     </div>
 
-                    {/* Info */}
                     <div className="flex-1 min-w-0 w-full">
                       <div className="flex flex-wrap items-center gap-3 mb-2">
                         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gold/50">Order Number</span>
@@ -178,9 +173,7 @@ const OrderHistory = () => {
                       </div>
                     </div>
 
-                    {/* Action Buttons */}
                     <div className="flex flex-shrink-0 gap-3">
-                      {/* Reorder Button */}
                       <button
                         onClick={() => handleReorder(order._id)}
                         disabled={reordering}
@@ -190,7 +183,6 @@ const OrderHistory = () => {
                         Reorder
                       </button>
 
-                      {/* View Details */}
                       <button
                         onClick={() => handleViewDetails(order)}
                         className="flex items-center gap-2 bg-white/5 hover:bg-gold hover:text-charcoal border border-white/10 hover:border-gold px-6 py-3.5 rounded-2xl font-bold text-sm transition-all group/btn"
@@ -206,7 +198,6 @@ const OrderHistory = () => {
         </div>
       )}
 
-      {/* Detail Modal */}
       <OrderDetailModal
         order={selectedOrder}
         isOpen={isModalOpen}
