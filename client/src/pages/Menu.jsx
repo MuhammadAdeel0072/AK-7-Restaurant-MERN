@@ -17,8 +17,8 @@ const Menu = () => {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  
-  
+
+
   const { dispatch } = useCart();
   const { user: profile, isSignedIn, updateProfile } = useAuth();
   const { siteUpdate } = useSocket();
@@ -41,13 +41,13 @@ const Menu = () => {
         setLoading(false);
       }
     };
-    
+
     const fetchCategories = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/categories`);
         if (response.ok) {
           const data = await response.json();
-          const categoryNames = Array.isArray(data) 
+          const categoryNames = Array.isArray(data)
             ? data.map(cat => typeof cat === 'string' ? cat : cat.name)
             : [];
           setCategories(categoryNames);
@@ -57,7 +57,7 @@ const Menu = () => {
         setCategories([]);
       }
     };
-    
+
     const fetchDeals = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/deals?isActive=true`);
@@ -69,7 +69,7 @@ const Menu = () => {
         console.error('Failed to fetch deals:', error);
       }
     };
-    
+
     fetchProducts();
     fetchCategories();
     fetchDeals();
@@ -90,7 +90,7 @@ const Menu = () => {
           const response = await fetch(`${API_BASE_URL}/categories`);
           if (response.ok) {
             const data = await response.json();
-            const categoryNames = Array.isArray(data) 
+            const categoryNames = Array.isArray(data)
               ? data.map(cat => typeof cat === 'string' ? cat : cat.name)
               : [];
             setCategories(categoryNames);
@@ -105,7 +105,7 @@ const Menu = () => {
 
   const addToCartHandler = (product, quantity = 1, e, finalOptions = []) => {
     if (e) e.stopPropagation();
-    
+
     // Calculate final price based on selected options
     const optionsPrice = finalOptions.reduce((acc, opt) => acc + opt.price, 0);
     const cartPrice = product.price + optionsPrice;
@@ -132,13 +132,13 @@ const Menu = () => {
       toast.error('Sign in to save favorites');
       return;
     }
-    
+
     try {
       const isFavorite = profile?.favorites?.includes(productId);
       const newFavorites = isFavorite
         ? profile.favorites.filter(id => id !== productId)
         : [...(profile.favorites || []), productId];
-        
+
       await updateProfile({ favorites: newFavorites });
       toast.success(isFavorite ? 'Removed from favorites' : 'Added to favorites', { icon: '❤️' });
     } catch (error) {
@@ -147,7 +147,7 @@ const Menu = () => {
   };
 
   const getDealForProduct = (productId, category) => {
-    return deals.find(deal => 
+    return deals.find(deal =>
       (deal.productId && (deal.productId._id === productId || deal.productId === productId)) ||
       (deal.category === category && !deal.productId)
     );
@@ -171,7 +171,7 @@ const Menu = () => {
         <div className="mb-12 text-center animate-in fade-in slide-in-from-top-4 duration-1000">
           <p className="text-gold font-black uppercase tracking-[0.4em] text-[10px] mb-2">Tailored Selection</p>
           <h1 className="text-4xl md:text-6xl font-serif font-black text-white tracking-tighter">Recommended <span className="text-gold">for you</span></h1>
-          <button 
+          <button
             onClick={() => navigate('/menu')}
             className="mt-4 text-[10px] font-black uppercase tracking-widest text-white/30 hover:text-gold transition-colors underline underline-offset-8"
           >
@@ -197,11 +197,10 @@ const Menu = () => {
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-8 py-2.5 md:py-3 rounded-2xl transition-all font-black text-[10px] md:text-xs uppercase tracking-widest whitespace-nowrap ${
-                  activeCategory === cat
+                className={`px-8 py-2.5 md:py-3 rounded-2xl transition-all font-black text-[10px] md:text-xs uppercase tracking-widest whitespace-nowrap ${activeCategory === cat
                     ? 'bg-gold text-charcoal shadow-[0_0_20px_rgba(212,175,55,0.4)] scale-105 border-transparent'
                     : 'bg-white/5 text-gray-400 hover:text-gold border border-white/5 hover:border-gold/30'
-                }`}
+                  }`}
               >
                 {cat}
               </button>
@@ -233,19 +232,18 @@ const Menu = () => {
               <div
                 key={product._id}
                 onClick={() => {
-                    navigate(`/menu/${product._id}`);
-                  }}
-                  className="bg-white/[0.02] backdrop-blur-3xl border border-white/5 rounded-[2.5rem] overflow-hidden hover:border-gold/40 group transition-all duration-700 transform hover:-translate-y-3 hover:shadow-[0_30px_60px_rgba(0,0,0,0.6)] relative cursor-pointer flex flex-col h-full"
-                >
+                  navigate(`/menu/${product._id}`);
+                }}
+                className="bg-white/[0.02] backdrop-blur-3xl border border-white/5 rounded-[2.5rem] overflow-hidden hover:border-gold/40 group transition-all duration-700 transform hover:-translate-y-3 hover:shadow-[0_30px_60px_rgba(0,0,0,0.6)] relative cursor-pointer flex flex-col h-full"
+              >
                 <div className="h-64 overflow-hidden relative shrink-0">
                   <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
                   <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-transparent to-transparent opacity-80"></div>
 
                   <button
                     onClick={(e) => toggleFavoriteHandler(product._id, e)}
-                    className={`absolute top-4 left-4 w-10 h-10 flex items-center justify-center rounded-2xl backdrop-blur-xl transition-all duration-300 ${
-                      isFav ? 'bg-white/10 border border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.3)]' : 'bg-charcoal/60 text-white hover:text-red-400 border border-white/10'
-                    }`}
+                    className={`absolute top-4 left-4 w-10 h-10 flex items-center justify-center rounded-2xl backdrop-blur-xl transition-all duration-300 ${isFav ? 'bg-white/10 border border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.3)]' : 'bg-charcoal/60 text-white hover:text-red-400 border border-white/10'
+                      }`}
                   >
                     {isFav ? (
                       <span className="text-lg leading-none drop-shadow-md transform hover:scale-110 transition-transform">❤️</span>
@@ -257,7 +255,7 @@ const Menu = () => {
                   <div className="absolute top-4 right-4 flex flex-col gap-2">
                     {deal && (
                       <div className="bg-crimson text-white px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-lg border border-crimson/50 whitespace-nowrap">
-                        {deal.discountPercentage > 0 
+                        {deal.discountPercentage > 0
                           ? `${deal.discountPercentage}% OFF`
                           : `Rs. ${deal.discountAmount} OFF`
                         }
@@ -266,11 +264,6 @@ const Menu = () => {
                     {product.isBestSeller && (
                       <div className="bg-crimson text-white px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest shadow-lg border border-white/10">
                         Popular
-                      </div>
-                    )}
-                    {product.isSpecial && (
-                      <div className="bg-gold text-charcoal px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest shadow-lg">
-                        Chef Special
                       </div>
                     )}
                   </div>
@@ -348,14 +341,14 @@ const Menu = () => {
 };
 
 const SkeletonCard = () => (
-    <div className="bg-white/[0.03] border border-white/5 rounded-[2rem] overflow-hidden">
-        <div className="h-64 bg-white/[0.05]" />
-        <div className="p-6 space-y-4">
-            <div className="h-5 bg-white/[0.05] rounded-lg w-1/2" />
-            <div className="h-4 bg-white/[0.05] rounded-lg w-full" />
-            <div className="h-12 bg-white/[0.05] rounded-2xl w-full mt-4" />
-        </div>
+  <div className="bg-white/[0.03] border border-white/5 rounded-[2rem] overflow-hidden">
+    <div className="h-64 bg-white/[0.05]" />
+    <div className="p-6 space-y-4">
+      <div className="h-5 bg-white/[0.05] rounded-lg w-1/2" />
+      <div className="h-4 bg-white/[0.05] rounded-lg w-full" />
+      <div className="h-12 bg-white/[0.05] rounded-2xl w-full mt-4" />
     </div>
+  </div>
 );
 
 export default Menu;

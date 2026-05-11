@@ -7,7 +7,7 @@ const { emitEvent } = require('../services/socketService');
 // @access  Private/Chef
 const getActiveOrders = asyncHandler(async (req, res) => {
   const orders = await Order.find({
-    status: { $in: ['PENDING', 'RECEIVED', 'PLACED', 'PREPARING', 'READY_FOR_DELIVERY', 'confirmed', 'preparing', 'placed', 'ready', 'CONFIRMED', 'PREPARING', 'READY'] }
+    status: { $in: ['PENDING', 'RECEIVED', 'PREPARING', 'READY_FOR_DELIVERY', 'COOKED', 'PACKED'] }
   })
   .populate('user', 'firstName lastName email')
   .sort({ priority: 1, createdAt: 1 }); // Urgent and VIP first, then FIFO
@@ -115,13 +115,13 @@ const updateItemStatus = asyncHandler(async (req, res) => {
     order.statusHistory.push({ status: 'preparing', timestamp: Date.now() });
   }
 
-  // Auto-update order to 'ready' if all items are 'ready'
+  // Auto-update order to 'READY_FOR_DELIVERY' if all items are 'ready'
   const allReady = order.orderItems.every(i => i.status === 'ready');
-  if (allReady && order.status !== 'ready') {
-    order.status = 'ready';
+  if (allReady && order.status !== 'READY_FOR_DELIVERY') {
+    order.status = 'READY_FOR_DELIVERY';
     order.preparationEndTime = Date.now();
     order.readyAt = Date.now();
-    order.statusHistory.push({ status: 'ready', timestamp: Date.now() });
+    order.statusHistory.push({ status: 'READY_FOR_DELIVERY', timestamp: Date.now() });
   }
 
   const updatedOrder = await order.save();

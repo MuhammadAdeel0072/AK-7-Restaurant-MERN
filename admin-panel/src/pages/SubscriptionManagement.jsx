@@ -191,14 +191,14 @@ const SubscriptionManagement = () => {
 
       {/* Search & Actions */}
       <div className="flex flex-col md:flex-row gap-6">
-        <div className="flex-1 relative group">
-          <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-soft-white/20 group-focus-within:text-gold transition-colors" />
+        <div className="flex-1 relative group max-w-md">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gold opacity-70 group-focus-within:opacity-100 transition-opacity" />
           <input 
             type="text" 
             placeholder="Find by customer, phone or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-white/5 border border-white/5 rounded-2xl py-5 pl-16 pr-6 text-sm text-soft-white placeholder:text-soft-white/20 focus:outline-none focus:border-gold/50 focus:bg-white/[0.07] transition-all font-medium"
+            className="w-full bg-white/5 border border-white/5 rounded-2xl py-3 pl-12 pr-6 text-sm text-soft-white placeholder:text-soft-white/20 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition-all"
           />
         </div>
         <button 

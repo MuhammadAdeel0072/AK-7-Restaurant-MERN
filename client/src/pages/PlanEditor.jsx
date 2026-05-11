@@ -357,7 +357,7 @@ const PlanEditor = () => {
             <button
               onClick={handleSave}
               disabled={isSubmitting || selectedDays.length === 0}
-              className="bg-gold hover:bg-yellow-400 text-charcoal px-10 py-5 rounded-2xl font-black text-xs uppercase tracking-[0.3em] flex items-center gap-3 transition-all shadow-[0_20px_40px_rgba(212,175,55,0.2)] disabled:opacity-30 disabled:grayscale active:scale-95"
+              className="bg-gold hover:bg-yellow-400 text-charcoal px-8 py-3.5 rounded-2xl font-black text-sm uppercase tracking-[0.3em] flex items-center gap-3 transition-all shadow-[0_20px_40px_rgba(212,175,55,0.2)] disabled:opacity-30 disabled:grayscale active:scale-95"
             >
               {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
               {id ? 'UPDATE' : 'START PLAN'}

@@ -348,9 +348,9 @@ const dispatchOrder = asyncHandler(async (req, res) => {
   const { chefFeedback } = req.body;
   const order = await Order.findById(req.params.id);
   if (order) {
-    // If chef manually dispatches, it usually means ready for rider pickup
-    order.status = 'READY_FOR_DELIVERY';
-    order.statusHistory.push({ status: 'READY_FOR_DELIVERY', timestamp: Date.now() });
+    // If chef manually dispatches, it means the order is moving out of the kitchen
+    order.status = 'DISPATCHED';
+    order.statusHistory.push({ status: 'DISPATCHED', timestamp: Date.now() });
     order.dispatchReadyAt = Date.now();
     
     if (chefFeedback) {

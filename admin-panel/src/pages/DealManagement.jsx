@@ -12,7 +12,7 @@ const DealManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDeal, setEditingDeal] = useState(null);
-  
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -30,11 +30,11 @@ const DealManagement = () => {
     fetchDeals();
     fetchProducts();
     fetchCategories();
-    
+
     socket.on('dealCreated', fetchDeals);
     socket.on('dealUpdated', fetchDeals);
     socket.on('dealDeleted', fetchDeals);
-    
+
     return () => {
       socket.off('dealCreated');
       socket.off('dealUpdated');
@@ -133,7 +133,7 @@ const DealManagement = () => {
       } else {
         await api.post('/deals', payload);
       }
-      
+
       toast.dismiss(loadingToast);
       toast.success(editingDeal ? 'Deal updated successfully ✅' : 'Deal created successfully 🎉');
       socket.emit('adminAction', { type: 'dealUpdate' });
@@ -163,7 +163,7 @@ const DealManagement = () => {
     }
   };
 
-  const filteredDeals = deals.filter(deal => 
+  const filteredDeals = deals.filter(deal =>
     deal.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (deal.productId?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     (deal.category || '').toLowerCase().includes(searchTerm.toLowerCase())
@@ -176,7 +176,7 @@ const DealManagement = () => {
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="space-y-8"
@@ -186,7 +186,7 @@ const DealManagement = () => {
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-black text-soft-white tracking-tighter">Deal <span className="text-gold">Management</span></h1>
           <p className="text-soft-white/50 mt-1 sm:mt-2 uppercase text-[7px] sm:text-[9px] md:text-[10px] font-bold tracking-[0.2em]">CREATE PROMOTIONS & SPECIAL OFFERS</p>
         </div>
-        <button 
+        <button
           onClick={() => handleOpenModal()}
           className="btn-gold flex items-center justify-center space-x-2 py-3 px-6 rounded-2xl w-full sm:w-auto"
         >
@@ -252,13 +252,13 @@ const DealManagement = () => {
                     </td>
                     <td className="px-4 sm:px-8 py-4 sm:py-6 text-right">
                       <div className="flex justify-end gap-2 sm:gap-4">
-                        <button 
+                        <button
                           onClick={() => handleOpenModal(deal)}
                           className="p-2 sm:p-2.5 text-soft-white/40 hover:text-gold hover:bg-gold/10 rounded-xl transition-all"
                         >
                           <Edit className="w-4 h-4 sm:w-5 sm:h-5" />
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleDelete(deal._id)}
                           className="p-2 sm:p-2.5 text-soft-white/40 hover:text-crimson hover:bg-crimson/10 rounded-xl transition-all"
                         >
@@ -277,15 +277,15 @@ const DealManagement = () => {
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 lg:p-10 overflow-hidden">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={handleCloseModal}
               className="absolute inset-0 bg-charcoal/80 backdrop-blur-md"
             ></motion.div>
-            
-            <motion.div 
+
+            <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 50 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 50 }}
@@ -299,38 +299,38 @@ const DealManagement = () => {
                   <X className="w-5 h-5 md:w-6 md:h-6" />
                 </button>
               </div>
-              
+
               <form onSubmit={handleSubmit} className="p-8 lg:p-12 space-y-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div className="space-y-4 md:col-span-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-gold opacity-70">Deal Title</label>
-                    <input 
+                    <input
                       required
                       placeholder="e.g., Summer Feast Sale"
-                      className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-soft-white focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all text-xl" 
+                      className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-soft-white focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all text-xl"
                       value={formData.title}
-                      onChange={(e) => setFormData({...formData, title: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     />
                   </div>
 
                   <div className="space-y-4 md:col-span-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-gold opacity-70">Description</label>
-                    <textarea 
+                    <textarea
                       placeholder="Describe this amazing deal..."
                       rows="3"
-                      className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-soft-white focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all resize-none" 
+                      className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-soft-white focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all resize-none"
                       value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     />
                   </div>
 
                   <div className="space-y-4">
                     <label className="text-xs font-bold uppercase tracking-widest text-gold opacity-70">Apply To (Product or Category)</label>
                     <div className="space-y-3">
-                      <select 
+                      <select
                         className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-soft-white focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all [&>option]:bg-black [&>option]:text-white"
                         value={formData.productId}
-                        onChange={(e) => setFormData({...formData, productId: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, productId: e.target.value })}
                       >
                         <option value="">Select Product (Optional)</option>
                         {products.map(product => (
@@ -342,10 +342,10 @@ const DealManagement = () => {
 
                   <div className="space-y-4">
                     <label className="text-xs font-bold uppercase tracking-widest text-gold opacity-70">Or Category</label>
-                    <select 
+                    <select
                       className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-soft-white focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all [&>option]:bg-black [&>option]:text-white"
                       value={formData.category}
-                      onChange={(e) => setFormData({...formData, category: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     >
                       <option value="">Select Category (Optional)</option>
                       {categories.map(cat => (
@@ -356,69 +356,69 @@ const DealManagement = () => {
 
                   <div className="space-y-4">
                     <label className="text-xs font-bold uppercase tracking-widest text-gold opacity-70">Discount %</label>
-                    <input 
+                    <input
                       type="number"
                       min="0"
                       max="100"
                       placeholder="0"
-                      className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 font-bold text-gold focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all" 
+                      className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 font-bold text-gold focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all"
                       value={formData.discountPercentage}
-                      onChange={(e) => setFormData({...formData, discountPercentage: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, discountPercentage: e.target.value })}
                     />
                   </div>
 
                   <div className="space-y-4">
                     <label className="text-xs font-bold uppercase tracking-widest text-gold opacity-70">Or Fixed Amount (Rs.)</label>
-                    <input 
+                    <input
                       type="number"
                       min="0"
                       placeholder="0"
-                      className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 font-bold text-gold focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all" 
+                      className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 font-bold text-gold focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all"
                       value={formData.discountAmount}
-                      onChange={(e) => setFormData({...formData, discountAmount: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, discountAmount: e.target.value })}
                     />
                   </div>
 
                   <div className="space-y-4">
                     <label className="text-xs font-bold uppercase tracking-widest text-gold opacity-70">Start Date</label>
-                    <input 
+                    <input
                       type="date"
-                      className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-soft-white focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all" 
+                      className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-soft-white focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all"
                       value={formData.startDate}
-                      onChange={(e) => setFormData({...formData, startDate: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
                     />
                   </div>
 
                   <div className="space-y-4">
                     <label className="text-xs font-bold uppercase tracking-widest text-gold opacity-70">End Date</label>
-                    <input 
+                    <input
                       type="date"
-                      className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-soft-white focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all" 
+                      className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-soft-white focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all"
                       value={formData.endDate}
-                      onChange={(e) => setFormData({...formData, endDate: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
                     />
                   </div>
 
                   <div className="space-y-6 glass p-6 rounded-2xl border border-white/5 md:col-span-2">
                     <label className="flex items-center space-x-4 cursor-pointer group">
                       <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${formData.isActive ? 'bg-gold border-gold' : 'border-white/20'}`}>
-                         {formData.isActive && <div className="w-2 h-2 bg-charcoal rounded-full"></div>}
+                        {formData.isActive && <div className="w-2 h-2 bg-charcoal rounded-full"></div>}
                       </div>
-                      <input type="checkbox" className="hidden" checked={formData.isActive} onChange={(e) => setFormData({...formData, isActive: e.target.checked})}/>
+                      <input type="checkbox" className="hidden" checked={formData.isActive} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} />
                       <span className="text-soft-white/70 group-hover:text-soft-white transition-colors">Activate Deal Now</span>
                     </label>
                   </div>
                 </div>
 
                 <div className="pt-10 flex flex-col-reverse sm:flex-row justify-end gap-4 md:gap-6 sticky bottom-0 bg-charcoal p-5 md:p-8 border-t border-white/5">
-                  <button 
+                  <button
                     type="button"
                     onClick={handleCloseModal}
                     className="flex-1 sm:flex-none px-8 py-3 text-soft-white/50 hover:text-soft-white transition-colors font-bold uppercase tracking-widest text-xs md:text-sm"
                   >
                     Cancel
                   </button>
-                  <button 
+                  <button
                     type="submit"
                     className="flex-1 sm:flex-none btn-gold px-12 py-3 text-sm md:text-lg flex items-center justify-center gap-3 rounded-2xl"
                   >

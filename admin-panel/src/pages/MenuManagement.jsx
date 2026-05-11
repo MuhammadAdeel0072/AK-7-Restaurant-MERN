@@ -15,7 +15,7 @@ const MenuManagement = () => {
   const [newCategoryName, setNewCategoryName] = useState('');
   const [editingCategoryId, setEditingCategoryId] = useState(null);
   const [editingCategoryName, setEditingCategoryName] = useState('');
-  
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -38,10 +38,10 @@ const MenuManagement = () => {
   useEffect(() => {
     fetchItems();
     fetchCategories();
-    
+
     // Listen for real-time updates from other admin sessions or system
     socket.on('menuUpdated', fetchItems);
-    
+
     // Listen for admin actions (in case multiple admins are working)
     socket.on('adminAction', (data) => {
       if (data?.type?.includes('category')) {
@@ -51,7 +51,7 @@ const MenuManagement = () => {
         fetchItems();
       }
     });
-    
+
     return () => {
       socket.off('menuUpdated');
       socket.off('adminAction');
@@ -87,7 +87,7 @@ const MenuManagement = () => {
       toast.error('Category name cannot be empty âŒ');
       return;
     }
-    
+
     if (categories.includes(newCategoryName)) {
       toast.error('Category already exists âŒ');
       return;
@@ -97,15 +97,15 @@ const MenuManagement = () => {
     try {
       // Save category to backend
       await api.post('/categories', { name: newCategoryName });
-      
+
       // Update local state
       setCategories([...categories, newCategoryName]);
       const categoryName = newCategoryName;
       setNewCategoryName('');
-      
+
       // Broadcast socket event to all clients
       socket.emit('adminAction', { type: 'categoryAdded', category: categoryName });
-      
+
       toast.dismiss(loadingToast);
       toast.success(`${categoryName} category added successfully âœ…`);
     } catch (error) {
@@ -149,7 +149,7 @@ const MenuManagement = () => {
 
       // Broadcast socket event
       socket.emit('adminAction', { type: 'categoryUpdated', oldCategory: oldName, newCategory: editingCategoryName });
-      
+
       toast.dismiss(loadingToast);
       toast.success(`Category updated to "${editingCategoryName}" âœ…`);
       setEditingCategoryId(null);
@@ -175,14 +175,14 @@ const MenuManagement = () => {
       try {
         // Delete from backend
         await api.delete(`/categories/${categoryName}`);
-        
+
         // Update local state
         const updatedCategories = categories.filter((_, i) => i !== index);
         setCategories(updatedCategories);
-        
+
         // Broadcast socket event
         socket.emit('adminAction', { type: 'categoryDeleted', category: categoryName });
-        
+
         toast.dismiss(loadingToast);
         toast.success(`Category "${categoryName}" deleted successfully ðŸ—‘ï¸`);
         setEditingCategoryId(null);
@@ -246,7 +246,7 @@ const MenuManagement = () => {
     try {
       // Prepare data
       const dataToSubmit = { ...formData };
-      
+
       if (formData.hasVariants) {
         // Filter out empty variant entries and validate
         dataToSubmit.variants = formData.variants.filter(v => v.name.trim() && v.price);
@@ -305,13 +305,13 @@ const MenuManagement = () => {
     }
   };
 
-  const filteredItems = items.filter(item => 
+  const filteredItems = items.filter(item =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="space-y-8"
@@ -322,14 +322,14 @@ const MenuManagement = () => {
           <p className="text-soft-white/50 mt-1 sm:mt-2 uppercase text-[7px] sm:text-[9px] md:text-[10px] font-bold tracking-[0.2em]">DINEXIS MENU MANAGEMENT</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-          <button 
+          <button
             onClick={() => setIsCategoryModalOpen(true)}
             className="btn-gold flex items-center justify-center space-x-2 py-3 px-6 rounded-2xl w-full sm:w-auto"
           >
             <Plus className="w-5 h-5" />
             <span className="text-sm font-bold uppercase tracking-widest">Add Category</span>
           </button>
-          <button 
+          <button
             onClick={() => handleOpenModal()}
             className="btn-gold flex items-center justify-center space-x-2 py-3 px-6 rounded-2xl w-full sm:w-auto"
           >
@@ -357,11 +357,10 @@ const MenuManagement = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-white/5 border-b border-white/10">
-                <th className="text-left py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Item Name</th>
-                <th className="text-left py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Category</th>
-                <th className="text-center py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Price</th>
-                <th className="text-center py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">In Stock</th>
-                <th className="text-right py-6 px-4 sm:px-6 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Action</th>
+                <th className="text-left py-6 px-4 sm:px-8 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Item Name</th>
+                <th className="text-left py-6 px-4 sm:px-8 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Category</th>
+                <th className="text-center py-6 px-4 sm:px-8 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Price</th>
+                <th className="text-right py-6 px-4 sm:px-8 text-[13px] font-black uppercase tracking-[0.15em] text-gold">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -375,7 +374,7 @@ const MenuManagement = () => {
                     <td className="px-4 sm:px-8 py-4 sm:py-6">
                       <div className="flex items-center space-x-3 sm:space-x-5">
                         <div className="relative group/img">
-                          <img src={item.image} alt={item.name} className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl object-cover glass-gold p-1 flex-shrink-0" onerror="this.src='https://placehold.co/100x100?text=Food'"/>
+                          <img src={item.image} alt={item.name} className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl object-cover glass-gold p-1 flex-shrink-0" onerror="this.src='https://placehold.co/100x100?text=Food'" />
                           <div className="absolute inset-0 bg-gold/10 opacity-0 group-hover/img:opacity-100 transition-opacity rounded-xl sm:rounded-2xl"></div>
                         </div>
                         <div>
@@ -404,20 +403,16 @@ const MenuManagement = () => {
                         )}
                       </div>
                     </td>
-                    <td className="px-4 sm:px-8 py-4 sm:py-6 text-center">
-                      <span className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold ${item.countInStock < 5 ? 'bg-crimson/10 text-crimson border border-crimson/10' : 'bg-white/5 text-soft-white/60'}`}>
-                        {item.countInStock}
-                      </span>
-                    </td>
+
                     <td className="px-4 sm:px-8 py-4 sm:py-6 text-right">
                       <div className="flex justify-end gap-2 sm:gap-4">
-                        <button 
+                        <button
                           onClick={() => handleOpenModal(item)}
                           className="p-2 sm:p-2.5 text-soft-white/40 hover:text-gold hover:bg-gold/10 rounded-xl transition-all"
                         >
                           <Edit className="w-4 h-4 sm:w-5 sm:h-5" />
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleDelete(item._id)}
                           className="p-2 sm:p-2.5 text-soft-white/40 hover:text-crimson hover:bg-crimson/10 rounded-xl transition-all"
                         >
@@ -436,15 +431,15 @@ const MenuManagement = () => {
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 lg:p-10 overflow-hidden">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={handleCloseModal}
               className="absolute inset-0 bg-charcoal/80 backdrop-blur-md"
             ></motion.div>
-            
-            <motion.div 
+
+            <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 50 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 50 }}
@@ -458,26 +453,26 @@ const MenuManagement = () => {
                   <X className="w-5 h-5 md:w-6 md:h-6" />
                 </button>
               </div>
-              
+
               <form onSubmit={handleSubmit} className="p-8 lg:p-12 space-y-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div className="space-y-4 md:col-span-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-gold opacity-70">Item Name</label>
-                    <input 
+                    <input
                       required
                       placeholder="e.g., Truffle-Infused Risotto"
-                      className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-soft-white focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all text-xl" 
+                      className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-soft-white focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all text-xl"
                       value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     />
                   </div>
 
                   <div className="space-y-4">
                     <label className="text-xs font-bold uppercase tracking-widest text-gold opacity-70">Category</label>
-                    <select 
+                    <select
                       className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-soft-white focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all [&>option]:bg-black [&>option]:text-white"
                       value={formData.category}
-                      onChange={(e) => setFormData({...formData, category: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     >
                       {categories.map(cat => (
                         <option key={cat} className="bg-charcoal" value={cat}>{cat}</option>
@@ -487,39 +482,39 @@ const MenuManagement = () => {
 
                   <div className="space-y-4">
                     <label className="text-xs font-bold uppercase tracking-widest text-gold opacity-70">Price (Rs.)</label>
-                    <input 
+                    <input
                       type="number"
                       required
                       placeholder="0.00"
-                      className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 font-bold text-gold focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all text-xl" 
+                      className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 font-bold text-gold focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all text-xl"
                       value={formData.price}
-                      onChange={(e) => setFormData({...formData, price: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     />
                   </div>
 
                   <div className="space-y-4 md:col-span-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-gold opacity-70">Description</label>
-                    <textarea 
+                    <textarea
                       required
                       placeholder="The artistic vision behind this dish..."
                       rows="4"
-                      className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-soft-white focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all resize-none" 
+                      className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-soft-white focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all resize-none"
                       value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     />
                   </div>
 
                   <div className="space-y-4 md:col-span-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-gold opacity-70">Visual Identity (Image URL)</label>
                     <div className="flex gap-4 items-center">
-                      <input 
+                      <input
                         placeholder="https://images.unsplash.com/..."
-                        className="flex-1 px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-soft-white text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all" 
+                        className="flex-1 px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-soft-white text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all"
                         value={formData.image}
-                        onChange={(e) => setFormData({...formData, image: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, image: e.target.value })}
                       />
                       <div className="w-16 h-16 rounded-2xl glass-gold p-1 flex items-center justify-center border border-white/10 overflow-hidden flex-shrink-0">
-                         {formData.image ? <img src={formData.image} className="object-cover w-full h-full rounded-xl" /> : <ImageIcon className="text-gold/30 w-8 h-8"/>}
+                        {formData.image ? <img src={formData.image} className="object-cover w-full h-full rounded-xl" /> : <ImageIcon className="text-gold/30 w-8 h-8" />}
                       </div>
                     </div>
                   </div>
@@ -529,16 +524,16 @@ const MenuManagement = () => {
                     <div className="flex flex-col gap-5">
                       <label className="flex items-center space-x-4 cursor-pointer group">
                         <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${formData.isVegetarian ? 'bg-gold border-gold' : 'border-white/20'}`}>
-                           {formData.isVegetarian && <div className="w-2 h-2 bg-charcoal rounded-full"></div>}
+                          {formData.isVegetarian && <div className="w-2 h-2 bg-charcoal rounded-full"></div>}
                         </div>
-                        <input type="checkbox" className="hidden" checked={formData.isVegetarian} onChange={(e) => setFormData({...formData, isVegetarian: e.target.checked})}/>
+                        <input type="checkbox" className="hidden" checked={formData.isVegetarian} onChange={(e) => setFormData({ ...formData, isVegetarian: e.target.checked })} />
                         <span className="text-soft-white/70 group-hover:text-soft-white transition-colors">Vegetarian Mastery</span>
                       </label>
                       <label className="flex items-center space-x-4 cursor-pointer group">
                         <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${formData.isSpecial ? 'bg-gold border-gold' : 'border-white/20'}`}>
-                           {formData.isSpecial && <div className="w-2 h-2 bg-charcoal rounded-full"></div>}
+                          {formData.isSpecial && <div className="w-2 h-2 bg-charcoal rounded-full"></div>}
                         </div>
-                        <input type="checkbox" className="hidden" checked={formData.isSpecial} onChange={(e) => setFormData({...formData, isSpecial: e.target.checked})}/>
+                        <input type="checkbox" className="hidden" checked={formData.isSpecial} onChange={(e) => setFormData({ ...formData, isSpecial: e.target.checked })} />
                         <span className="text-soft-white/70 group-hover:text-soft-white transition-colors">Midnight Special</span>
                       </label>
                     </div>
@@ -546,23 +541,14 @@ const MenuManagement = () => {
 
                   <div className="space-y-6 glass p-6 rounded-2xl border border-white/5">
                     <label className="text-xs font-bold uppercase tracking-widest text-gold opacity-70 block mb-4">Master Metrics</label>
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 gap-6">
                       <div className="space-y-2">
-                        <span className="text-[10px] uppercase font-bold text-soft-white/40 tracking-tighter">Inventory</span>
-                        <input 
-                          type="number"
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-gold font-bold focus:outline-none focus:border-gold/30" 
-                          value={formData.countInStock}
-                          onChange={(e) => setFormData({...formData, countInStock: e.target.value})}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <span className="text-[10px] uppercase font-bold text-soft-white/40 tracking-tighter">Spiciness</span>
-                        <input 
+                        <span className="text-[10px] uppercase font-bold text-soft-white/40 tracking-tighter">Spiciness Level (0-3)</span>
+                        <input
                           type="number" min="0" max="3"
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-crimson font-bold focus:outline-none focus:border-crimson/30" 
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-crimson font-bold focus:outline-none focus:border-crimson/30"
                           value={formData.spicyLevel}
-                          onChange={(e) => setFormData({...formData, spicyLevel: e.target.value})}
+                          onChange={(e) => setFormData({ ...formData, spicyLevel: e.target.value })}
                         />
                       </div>
                     </div>
@@ -576,7 +562,7 @@ const MenuManagement = () => {
                         <div className={`w-10 h-5 rounded-full transition-all relative ${formData.hasVariants ? 'bg-gold' : 'bg-white/10'}`}>
                           <div className={`absolute top-1 w-3 h-3 rounded-full bg-white transition-all ${formData.hasVariants ? 'left-6' : 'left-1'}`}></div>
                         </div>
-                        <input type="checkbox" className="hidden" checked={formData.hasVariants} onChange={(e) => setFormData({...formData, hasVariants: e.target.checked})}/>
+                        <input type="checkbox" className="hidden" checked={formData.hasVariants} onChange={(e) => setFormData({ ...formData, hasVariants: e.target.checked })} />
                         <span className="text-[10px] font-black uppercase tracking-widest text-soft-white/60 group-hover:text-gold">Enable Variations</span>
                       </label>
                     </div>
@@ -594,19 +580,19 @@ const MenuManagement = () => {
                           return (
                             <div key={idx} className={`grid grid-cols-[1fr_1fr_1fr_40px] gap-4 items-center bg-white/5 p-3 rounded-xl border transition-all ${isDuplicateName ? 'border-crimson/40' : 'border-white/5'}`}>
                               <div className="relative">
-                                <input 
+                                <input
                                   placeholder="e.g. Small"
                                   className="bg-transparent border-none text-soft-white focus:outline-none font-bold w-full"
                                   value={variant.name}
                                   onChange={(e) => {
                                     const newVariants = [...formData.variants];
                                     newVariants[idx].name = e.target.value;
-                                    setFormData({...formData, variants: newVariants});
+                                    setFormData({ ...formData, variants: newVariants });
                                   }}
                                 />
                                 {isDuplicateName && <span className="text-[8px] text-crimson font-bold absolute -bottom-4 left-0">Duplicate</span>}
                               </div>
-                              <input 
+                              <input
                                 type="number"
                                 placeholder="Price"
                                 className="bg-transparent border-none text-gold font-bold focus:outline-none w-full"
@@ -614,10 +600,10 @@ const MenuManagement = () => {
                                 onChange={(e) => {
                                   const newVariants = [...formData.variants];
                                   newVariants[idx].price = e.target.value;
-                                  setFormData({...formData, variants: newVariants});
+                                  setFormData({ ...formData, variants: newVariants });
                                 }}
                               />
-                              <input 
+                              <input
                                 type="number"
                                 placeholder="Min"
                                 className="bg-transparent border-none text-soft-white/60 focus:outline-none text-center w-full"
@@ -625,7 +611,7 @@ const MenuManagement = () => {
                                 onChange={(e) => {
                                   const newVariants = [...formData.variants];
                                   newVariants[idx].prepTime = e.target.value;
-                                  setFormData({...formData, variants: newVariants});
+                                  setFormData({ ...formData, variants: newVariants });
                                 }}
                               />
                               <button
@@ -636,7 +622,7 @@ const MenuManagement = () => {
                                     return;
                                   }
                                   const newVariants = formData.variants.filter((_, i) => i !== idx);
-                                  setFormData({...formData, variants: newVariants});
+                                  setFormData({ ...formData, variants: newVariants });
                                 }}
                                 className="p-1.5 text-soft-white/30 hover:text-crimson hover:bg-crimson/10 rounded-lg transition-all"
                                 title="Remove variant"
@@ -646,9 +632,9 @@ const MenuManagement = () => {
                             </div>
                           );
                         })}
-                        <button 
+                        <button
                           type="button"
-                          onClick={() => setFormData({...formData, variants: [...formData.variants, { name: '', price: '', prepTime: 15 }]})}
+                          onClick={() => setFormData({ ...formData, variants: [...formData.variants, { name: '', price: '', prepTime: 15 }] })}
                           className="text-[10px] font-black text-gold/60 hover:text-gold uppercase tracking-[0.2em] pt-2 transition-colors"
                         >
                           + Add Another Variant
@@ -662,14 +648,14 @@ const MenuManagement = () => {
                 </div>
 
                 <div className="pt-10 flex flex-col-reverse sm:flex-row justify-end gap-4 md:gap-6 sticky bottom-0 bg-charcoal p-5 md:p-8 border-t border-white/5">
-                  <button 
+                  <button
                     type="button"
                     onClick={handleCloseModal}
                     className="flex-1 sm:flex-none px-8 py-3 text-soft-white/50 hover:text-soft-white transition-colors font-bold uppercase tracking-widest text-xs md:text-sm"
                   >
                     Discard
                   </button>
-                  <button 
+                  <button
                     type="submit"
                     className="flex-1 sm:flex-none btn-gold px-12 py-3 text-sm md:text-lg flex items-center justify-center gap-3 rounded-2xl"
                   >
@@ -681,10 +667,10 @@ const MenuManagement = () => {
             </motion.div>
           </div>
         )}
-        
+
         {isCategoryModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 lg:p-10 overflow-hidden">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -694,8 +680,8 @@ const MenuManagement = () => {
               }}
               className="absolute inset-0 bg-charcoal/80 backdrop-blur-md"
             ></motion.div>
-            
-            <motion.div 
+
+            <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 50 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 50 }}
@@ -705,30 +691,30 @@ const MenuManagement = () => {
                 <h2 className="text-xl md:text-2xl font-serif font-bold text-gold tracking-tighter">
                   Manage Categories
                 </h2>
-                  <button 
+                <button
                   onClick={() => {
                     setIsCategoryModalOpen(false);
                     setEditingCategoryId(null);
-                  }} 
+                  }}
                   className="btn-close-gold"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              
+
               <div className="p-8 space-y-8">
                 {/* Add New Category Section */}
                 <div className="glass p-6 rounded-2xl border border-white/5">
                   <h3 className="text-sm font-bold uppercase tracking-widest text-gold opacity-70 mb-4">Add New Category</h3>
                   <form onSubmit={handleAddCategory} className="flex gap-4">
-                    <input 
+                    <input
                       required
                       placeholder="e.g., Appetizers, Desserts"
-                      className="flex-1 px-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-soft-white focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all" 
+                      className="flex-1 px-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-soft-white focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50 transition-all"
                       value={newCategoryName}
                       onChange={(e) => setNewCategoryName(e.target.value)}
                     />
-                    <button 
+                    <button
                       type="submit"
                       className="btn-gold px-8 py-3 text-sm flex items-center justify-center gap-2 rounded-2xl whitespace-nowrap"
                     >
@@ -743,11 +729,11 @@ const MenuManagement = () => {
                   <h3 className="text-sm font-bold uppercase tracking-widest text-gold opacity-70 mb-4">
                     All Categories ({categories.length})
                   </h3>
-                  
+
                   <div className="space-y-3">
                     <AnimatePresence mode="popLayout">
                       {categories.length === 0 ? (
-                        <motion.div 
+                        <motion.div
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
@@ -768,7 +754,7 @@ const MenuManagement = () => {
                             <div className="flex-1">
                               {editingCategoryId === index ? (
                                 <div className="flex items-center gap-3">
-                                  <input 
+                                  <input
                                     autoFocus
                                     type="text"
                                     value={editingCategoryName}
@@ -806,17 +792,17 @@ const MenuManagement = () => {
                                 </div>
                               )}
                             </div>
-                            
+
                             {editingCategoryId !== index && (
                               <div className="flex gap-2 ml-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button 
+                                <button
                                   onClick={() => handleEditCategory(index, category)}
                                   className="p-2 bg-gold/20 hover:bg-gold/30 text-gold rounded-lg transition-all"
                                   title="Edit category"
                                 >
                                   <Edit className="w-4 h-4" />
                                 </button>
-                                <button 
+                                <button
                                   onClick={() => handleDeleteCategory(index)}
                                   className="p-2 bg-crimson/20 hover:bg-crimson/30 text-crimson rounded-lg transition-all"
                                   title="Delete category"
@@ -834,7 +820,7 @@ const MenuManagement = () => {
 
                 {/* Footer Actions */}
                 <div className="flex justify-end pt-4 border-t border-white/5">
-                  <button 
+                  <button
                     onClick={() => {
                       setIsCategoryModalOpen(false);
                       setEditingCategoryId(null);

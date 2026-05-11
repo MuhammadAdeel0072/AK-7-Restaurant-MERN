@@ -161,7 +161,7 @@ const SubscriptionManager = () => {
                     </div>
                     <button
                         onClick={() => setShowAdd(true)}
-                        className="bg-gold text-charcoal px-8 py-4 rounded-2xl font-black text-xs tracking-widest flex items-center gap-3 hover:scale-105 transition-all shadow-lg shadow-gold/20"
+                        className="bg-gold text-charcoal px-8 py-3.5 rounded-2xl font-black text-sm tracking-widest flex items-center gap-3 hover:scale-105 transition-all shadow-lg shadow-gold/20"
                     >
                         <Plus className="w-4 h-4" /> NEW PLAN
                     </button>

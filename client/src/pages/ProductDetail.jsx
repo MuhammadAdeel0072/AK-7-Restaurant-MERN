@@ -13,7 +13,7 @@ const ProductDetail = () => {
     const navigate = useNavigate();
     const { dispatch } = useCart();
     const { user: profile, isSignedIn } = useAuth();
-    
+
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [deals, setDeals] = useState([]);
@@ -29,7 +29,7 @@ const ProductDetail = () => {
                 if (!prodRes.ok) throw new Error("Failed to load product");
                 const prodData = await prodRes.json();
                 setProduct(prodData);
-                
+
                 if (prodData.variants && prodData.variants.length > 0) {
                     setSelectedVariant(prodData.variants[0]);
                 }
@@ -52,7 +52,7 @@ const ProductDetail = () => {
 
     const deal = useMemo(() => {
         if (!product || !deals.length) return null;
-        return deals.find(d => 
+        return deals.find(d =>
             (d.productId && (d.productId._id === product._id || d.productId === product._id)) ||
             (d.category === product.category && !d.productId)
         );
@@ -61,8 +61,8 @@ const ProductDetail = () => {
     const calculateCurrentPrice = () => {
         if (!product) return 0;
         let basePrice = selectedVariant ? selectedVariant.price : product.price;
-        
-        if (deal && !selectedVariant) {
+
+        if (deal) {
             if (deal.discountPercentage > 0) {
                 basePrice = basePrice - (basePrice * (deal.discountPercentage / 100));
             } else if (deal.discountAmount > 0) {
@@ -180,14 +180,14 @@ const ProductDetail = () => {
 
                     {/* ── LEFT: Image ── */}
                     <div className="relative w-full md:w-[45%] h-64 sm:h-72 md:h-auto md:min-h-[420px] shrink-0 overflow-hidden">
-                        <img 
-                            src={product.image} 
-                            alt={product.name} 
+                        <img
+                            src={product.image}
+                            alt={product.name}
                             className="w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#121212]/30 hidden md:block" />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#121212]/60 via-transparent to-transparent md:hidden" />
-                        
+
                         {/* Badges */}
                         <div className="absolute top-4 left-4 flex flex-col gap-2">
                             {deal && (
@@ -230,8 +230,10 @@ const ProductDetail = () => {
 
                         {/* Price */}
                         <div className="flex items-baseline gap-3 mb-6">
-                            {deal && !selectedVariant && (
-                                <span className="text-gray-600 font-bold text-sm line-through">Rs. {product.price * qty}</span>
+                            {deal && (
+                                <span className="text-gray-600 font-bold text-sm line-through">
+                                    Rs. {(selectedVariant ? selectedVariant.price : product.price) * qty}
+                                </span>
                             )}
                             <span className="text-2xl sm:text-3xl font-black text-white tracking-tighter">
                                 Rs. {Math.round(calculateCurrentPrice())}
@@ -253,11 +255,10 @@ const ProductDetail = () => {
                                         <button
                                             key={idx}
                                             onClick={() => setSelectedVariant(v)}
-                                            className={`px-4 py-2.5 rounded-xl border transition-all text-[11px] font-black uppercase tracking-wider ${
-                                                selectedVariant?.name === v.name 
-                                                    ? 'bg-gold/10 border-gold/60 text-gold' 
+                                            className={`px-4 py-2.5 rounded-xl border transition-all text-[11px] font-black uppercase tracking-wider ${selectedVariant?.name === v.name
+                                                    ? 'bg-gold/10 border-gold/60 text-gold'
                                                     : 'bg-white/[0.02] border-white/[0.06] text-gray-500 hover:border-white/15 hover:text-white/60'
-                                            }`}
+                                                }`}
                                         >
                                             {v.name}
                                             <span className="ml-1.5 opacity-50 text-[10px]">Rs.{v.price}</span>
@@ -281,11 +282,10 @@ const ProductDetail = () => {
                                             <button
                                                 key={oIdx}
                                                 onClick={() => handleOptionToggle(group, opt)}
-                                                className={`px-3.5 py-2 rounded-xl border transition-all text-[11px] font-bold flex items-center gap-1.5 ${
-                                                    isSelected 
-                                                        ? 'bg-white/8 border-gold/40 text-white' 
+                                                className={`px-3.5 py-2 rounded-xl border transition-all text-[11px] font-bold flex items-center gap-1.5 ${isSelected
+                                                        ? 'bg-white/8 border-gold/40 text-white'
                                                         : 'bg-white/[0.01] border-white/[0.06] text-gray-600 hover:border-white/10 hover:text-gray-400'
-                                                }`}
+                                                    }`}
                                             >
                                                 {isSelected && <Check className="w-3 h-3 text-gold" />}
                                                 <span>{opt.name}</span>
@@ -304,19 +304,19 @@ const ProductDetail = () => {
 
                         {/* ── Quantity + Add to Cart ── */}
                         <div className="pt-5 border-t border-white/[0.05] space-y-4">
-                            
+
                             {/* Quantity */}
                             <div className="flex items-center justify-between">
                                 <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30">Qty</span>
                                 <div className="flex items-center gap-3 bg-white/[0.03] border border-white/[0.06] p-1 rounded-xl">
-                                    <button 
+                                    <button
                                         onClick={() => setQty(Math.max(1, qty - 1))}
                                         className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white hover:bg-crimson/20 hover:text-crimson transition-all"
                                     >
                                         <Minus className="w-3.5 h-3.5" />
                                     </button>
                                     <span className="text-base font-black text-white w-5 text-center">{qty}</span>
-                                    <button 
+                                    <button
                                         onClick={() => setQty(qty + 1)}
                                         className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white hover:bg-gold/20 hover:text-gold transition-all"
                                     >

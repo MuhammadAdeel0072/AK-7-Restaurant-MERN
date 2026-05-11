@@ -1,0 +1,118 @@
+.stop-marker {
+    width: 40px;
+    height: 40px;
+    position: relative;
+}
+
+.stop-marker .icon-body {
+    width: 24px;
+    height: 24px;
+    background: var(--marker-color);
+    border: 3px solid white;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+    color: white;
+    font-weight: 900;
+    font-size: 10px;
+}
+
+.stop-marker.restaurant .icon-body {
+    border-radius: 6px;
+}
+
+.inner-square {
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 1px;
+}
+
+.stop-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.marker-shadow {
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 50%;
+    filter: blur(2px);
+}
+
+.rider-marker-live {
+    width: 30px;
+    height: 30px;
+    position: relative;
+}
+
+.rider-dot {
+    width: 14px;
+    height: 14px;
+    background: #D4AF37;
+    border: 3px solid white;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+}
+
+.pulse-ring {
+    width: 30px;
+    height: 30px;
+    background: rgba(212, 175, 55, 0.4);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: rider-pulse 2s infinite;
+}
+
+@keyframes rider-pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 0;
+    }
+}
+
+.custom-popup .leaflet-popup-content-wrapper {
+    background: #181818 !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1.5rem;
+    padding: 4px;
+    backdrop-filter: blur(10px);
+}
+
+.custom-popup .leaflet-popup-tip {
+    background: #181818 !important;
+}
+
+/* Fix for custom markers being cut off */
+.custom-leaflet-icon, .rider-live-icon, .restaurant-icon, .custom-stop-icon {
+    background: transparent !important;
+    border: none !important;
+}

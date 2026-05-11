@@ -27,10 +27,10 @@ const ProductDetailModal = ({ product, isOpen, onClose }) => {
     const handleOptionToggle = (group, option) => {
         const groupName = group.name;
         const isSingle = group.type === 'single';
-        
+
         setSelectedOptions(prev => {
             const currentGroupSelections = prev[groupName] || [];
-            
+
             if (isSingle) {
                 return { ...prev, [groupName]: [{ name: option.name, price: option.price }] };
             } else {
@@ -46,6 +46,21 @@ const ProductDetailModal = ({ product, isOpen, onClose }) => {
 
     const calculateCurrentPrice = () => {
         let basePrice = selectedVariant ? selectedVariant.price : product.price;
+        
+        // Fetch applicable deal
+        const deal = deals.find(d => 
+            (d.productId && (d.productId._id === product._id || d.productId === product._id)) || 
+            (d.category === product.category && !d.productId)
+        );
+
+        if (deal) {
+            if (deal.discountPercentage > 0) {
+                basePrice = basePrice - (basePrice * (deal.discountPercentage / 100));
+            } else if (deal.discountAmount > 0) {
+                basePrice = basePrice - deal.discountAmount;
+            }
+        }
+
         let optionsPrice = 0;
         Object.values(selectedOptions).forEach(options => {
             options.forEach(opt => {
@@ -96,7 +111,7 @@ const ProductDetailModal = ({ product, isOpen, onClose }) => {
                     onClick={onClose}
                     className="absolute inset-0 bg-charcoal/80 backdrop-blur-md"
                 />
-                
+
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -104,7 +119,7 @@ const ProductDetailModal = ({ product, isOpen, onClose }) => {
                     className="relative w-full max-w-2xl bg-white/[0.03] border border-white/10 rounded-[2.5rem] overflow-hidden shadow-[0_50px_100px_rgba(0,0,0,0.8)] backdrop-blur-2xl flex flex-col md:flex-row"
                 >
                     {/* Close Button */}
-                    <button 
+                    <button
                         onClick={onClose}
                         className="absolute top-6 right-6 z-10 w-10 h-10 rounded-full bg-charcoal/40 text-white flex items-center justify-center hover:bg-white/10 transition-all border border-white/5"
                     >
@@ -116,10 +131,10 @@ const ProductDetailModal = ({ product, isOpen, onClose }) => {
                         <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-transparent to-transparent"></div>
                         <div className="absolute bottom-6 left-6 flex items-center gap-2">
-                             <div className={`w-3 h-3 border-2 rounded-sm flex items-center justify-center ${product.isVegetarian ? 'border-green-500' : 'border-red-500'}`}>
+                            <div className={`w-3 h-3 border-2 rounded-sm flex items-center justify-center ${product.isVegetarian ? 'border-green-500' : 'border-red-500'}`}>
                                 <div className={`w-1.5 h-1.5 rounded-full ${product.isVegetarian ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                             </div>
-                             <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">{product.preparationTime} MINS</span>
+                            </div>
+                            <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">{product.preparationTime} MINS</span>
                         </div>
                     </div>
 
@@ -181,7 +196,14 @@ const ProductDetailModal = ({ product, isOpen, onClose }) => {
                                 </div>
                                 <div className="text-right">
                                     <p className="text-[8px] font-black text-white/40 uppercase tracking-widest mb-1">Total Amount</p>
-                                    <p className="text-2xl font-black text-white tracking-tighter">Rs. {Math.round(calculateCurrentPrice())}</p>
+                                    <div className="flex items-center justify-end gap-2">
+                                        {deals.some(d => (d.productId?._id === product._id || d.productId === product._id) || (d.category === product.category && !d.productId)) && (
+                                            <span className="text-xs text-white/30 line-through font-bold">
+                                                Rs. {(selectedVariant ? selectedVariant.price : product.price) * qty}
+                                            </span>
+                                        )}
+                                        <p className="text-2xl font-black text-white tracking-tighter">Rs. {Math.round(calculateCurrentPrice())}</p>
+                                    </div>
                                 </div>
                             </div>
 

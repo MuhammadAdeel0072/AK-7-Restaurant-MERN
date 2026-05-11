@@ -112,7 +112,7 @@ const PlansPage = () => {
         
         <button
           onClick={() => navigate('/plans/new')}
-          className="bg-gold hover:bg-yellow-400 text-charcoal px-8 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all active:scale-95 shadow-lg"
+          className="bg-gold hover:bg-yellow-400 text-charcoal px-8 py-3.5 rounded-2xl font-bold text-sm uppercase tracking-widest flex items-center gap-2 transition-all active:scale-95 shadow-lg"
         >
           <Plus className="w-4 h-4" /> Start New Plan
         </button>

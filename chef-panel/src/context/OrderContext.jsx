@@ -97,13 +97,15 @@ export const OrderProvider = ({ children }) => {
         };
 
         socket.on("orderUpdated", handleOrderUpdated);
-        socket.on("orderUpdate", handleOrderUpdated); // Fallback to existing logic format
+        socket.on("orderUpdate", handleOrderUpdated);
+        socket.on("orderDispatchReady", handleOrderUpdated);
         socket.on("newOrder", handleNewOrder);
-        socket.on("NEW_ORDER", handleNewOrder); // Fallback to existing logic format
+        socket.on("NEW_ORDER", handleNewOrder);
 
         return () => {
             socket.off("orderUpdated", handleOrderUpdated);
             socket.off("orderUpdate", handleOrderUpdated);
+            socket.off("orderDispatchReady", handleOrderUpdated);
             socket.off("newOrder", handleNewOrder);
             socket.off("NEW_ORDER", handleNewOrder);
         };

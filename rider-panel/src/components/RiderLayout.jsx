@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { 
-    LayoutDashboard, 
-    Truck, 
-    User as UserIcon, 
-    LogOut, 
-    Clock, 
-    Menu as MenuIcon, 
-    X 
+import {
+    LayoutDashboard,
+    Truck,
+    User as UserIcon,
+    LogOut,
+    Clock,
+    Menu as MenuIcon,
+    X
 } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
 import { useRider } from '../hooks/useRider';
@@ -46,11 +46,11 @@ const RiderLayout = () => {
 
     return (
         <div className="flex min-h-screen bg-charcoal text-soft-white font-sans selection:bg-gold selection:text-charcoal relative">
-            
-            
+
+
             {/* Sidebar Overlay */}
             {isSidebarOpen && (
-                <div 
+                <div
                     className="lg:hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 transition-opacity"
                     onClick={() => setIsSidebarOpen(false)}
                 />
@@ -58,7 +58,7 @@ const RiderLayout = () => {
 
             {/* Premium Sidebar Navigation */}
             <aside className={`
-                fixed top-0 left-0 h-full w-72 bg-charcoal border-r border-white/5 z-50 transition-transform duration-500 ease-in-out lg:translate-x-0
+                fixed top-0 left-0 h-full w-72 glass border-r border-white/5 z-50 transition-transform duration-500 ease-in-out lg:translate-x-0
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
                 <div className="flex flex-col h-full p-8">
@@ -74,15 +74,14 @@ const RiderLayout = () => {
                                 to={item.path}
                                 onClick={() => setIsSidebarOpen(false)}
                                 className={({ isActive }) =>
-                                    `flex items-center space-x-4 px-6 py-5 rounded-xl transition-all duration-300 group ${
-                                        isActive 
-                                            ? 'bg-gold/10 text-gold border border-gold/20 shadow-[0_0_20px_rgba(212,175,55,0.1)]' 
-                                            : 'text-soft-white/60 hover:bg-white/5 hover:text-soft-white border border-transparent'
+                                    `flex items-center space-x-4 px-5 py-4 rounded-xl transition-all duration-300 group ${isActive
+                                        ? 'bg-gold/10 text-gold border border-gold/20 shadow-[0_0_20px_rgba(212,175,55,0.1)]'
+                                        : 'text-soft-white/60 hover:bg-white/5 hover:text-soft-white border border-transparent'
                                     }`
                                 }
                             >
-                                <item.icon className="w-6 h-6 transition-transform duration-300 group-hover:scale-110" />
-                                <span className="text-base font-black uppercase tracking-widest">{item.label}</span>
+                                <item.icon className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+                                <span className="text-sm font-bold tracking-wide uppercase tracking-[0.05em]">{item.label}</span>
                             </NavLink>
                         ))}
                     </nav>

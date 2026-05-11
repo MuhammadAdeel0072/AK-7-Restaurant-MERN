@@ -45,6 +45,18 @@ const init = (server) => {
       console.log('Rider joined delivery room');
     });
 
+    // Handle Live Rider Location Tracking
+    socket.on('updateRiderLocation', (data) => {
+      // data: { riderId, lat, lng, orderId, status }
+      console.log(`Rider ${data.riderId} location update:`, data.lat, data.lng);
+      
+      // Broadcast to Admin and other relevant listeners (Client panel can listen to this too)
+      io.emit('riderLocationSynced', data);
+      
+      // Also send to specific rooms if needed
+      io.to('admin').emit('riderLocationSynced', data);
+    });
+
     // Listen for admin actions and broadcast to all clients
     socket.on('adminAction', (data) => {
       console.log('Admin action received:', data);

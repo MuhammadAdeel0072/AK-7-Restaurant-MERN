@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { ArrowRight, Coffee, Utensils, Pizza, Cake, RotateCcw, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getUserOrderHistory } from '../services/orderService';
@@ -53,27 +54,51 @@ const Home = () => {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative h-[80vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')] bg-cover bg-center">
-          <div className="absolute inset-0 bg-black/60"></div>
+      <section className="relative h-[90vh] flex items-center justify-center overflow-hidden bg-black">
+        <motion.div 
+          initial={{ scale: 1.1, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          className="absolute inset-0"
+        >
+          <img 
+            src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80" 
+            alt="Hero Background" 
+            className="w-full h-full object-cover opacity-40"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black"></div>
+        </motion.div>
+        
+        <div className="relative z-10 text-center px-4 max-w-5xl">
+          <motion.div
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+          >
+            <span className="text-gold font-black uppercase tracking-[0.4em] text-[10px] mb-6 block">Midnight Gourmet</span>
+            <h1 className="text-5xl md:text-8xl font-serif font-black mb-8 text-white tracking-tighter leading-none">
+              Delicious Food, <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold via-white to-gold">Delivered Fast</span>
+            </h1>
+            <p className="text-lg md:text-xl text-white/50 mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
+              Order your favorite meals easily and enjoy a luxury dining experience right at your doorstep.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+              <Link to="/menu" className="group relative bg-gold text-charcoal px-8 py-3.5 rounded-2xl font-black text-sm uppercase tracking-widest overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-gold/20">
+                <span className="relative z-10 flex items-center gap-2">
+                  View Menu <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </span>
+                <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></div>
+              </Link>
+              <Link to="/cart" className="group px-8 py-3.5 rounded-2xl font-black text-sm uppercase tracking-widest text-white border border-white/10 hover:bg-white/5 transition-all">
+                Order Now
+              </Link>
+            </div>
+          </motion.div>
         </div>
         
-        <div className="relative z-10 text-center px-4 max-w-4xl">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white tracking-tight">
-            Exquisite Taste, <br />
-            <span className="text-gold">Premium Experience</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Order your favorite food easily and quickly.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/menu" className="btn-primary flex items-center justify-center gap-2 text-lg">
-              Menu <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link to="/cart" className="bg-white/10 backdrop-blur-md text-white px-6 py-3 rounded-md font-bold hover:bg-white/20 transition-all border border-white/20">
-              Order Now
-            </Link>
-          </div>
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-20">
+          <div className="w-px h-12 bg-white"></div>
         </div>
       </section>
 
@@ -84,7 +109,7 @@ const Home = () => {
             How are you <span className="text-gold">feeling today?</span>
           </h2>
           <p className="text-gray-500 text-sm md:text-base mb-12 uppercase tracking-[0.3em] font-black">Select your mood & we'll handle the rest</p>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
               { id: 'hungry', label: "I'm Very Hungry", emoji: "😋", color: "from-orange-500/20 to-crimson/20" },
@@ -92,7 +117,7 @@ const Home = () => {
               { id: 'quick', label: "Quick Snack", emoji: "🍕", color: "from-blue-500/20 to-indigo-500/20" },
               { id: 'premium', label: "Premium Dinner", emoji: "❤️", color: "from-gold/20 to-yellow-500/20" }
             ].map((mood) => (
-              <button 
+              <button
                 key={mood.id}
                 onClick={() => handleMoodClick(mood.id)}
                 className={`group relative overflow-hidden p-8 rounded-[2.5rem] border ${selectedMood === mood.id ? 'border-gold shadow-[0_0_20px_rgba(212,175,55,0.4)] scale-[1.02]' : 'border-white/5'} bg-gradient-to-br ${mood.color} transition-all duration-500 hover:scale-[1.02] hover:border-white/10 hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)] text-left w-full`}
@@ -111,12 +136,12 @@ const Home = () => {
                 <span className="w-1.5 h-8 bg-gold rounded-full"></span>
                 Recommended for you
               </h3>
-              
+
               {moodLoading && (
-                 <div className="flex flex-col items-center justify-center py-16 bg-white/[0.02] rounded-[2.5rem] border border-white/5">
-                   <Loader2 className="w-12 h-12 text-gold animate-spin mb-4" />
-                   <p className="text-gold/80 uppercase tracking-widest font-black text-sm animate-pulse">Loading recommendations...</p>
-                 </div>
+                <div className="flex flex-col items-center justify-center py-16 bg-white/[0.02] rounded-[2.5rem] border border-white/5">
+                  <Loader2 className="w-12 h-12 text-gold animate-spin mb-4" />
+                  <p className="text-gold/80 uppercase tracking-widest font-black text-sm animate-pulse">Loading recommendations...</p>
+                </div>
               )}
 
               {!moodLoading && selectedMood && moodProducts.length === 0 && (
@@ -136,9 +161,9 @@ const Home = () => {
                         <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-transparent to-transparent opacity-80"></div>
                         <div className="absolute top-3 right-3 bg-charcoal/80 backdrop-blur-xl px-3 py-1.5 rounded-xl text-gold font-black text-xs border border-white/10 shadow-lg">Rs. {item.price}</div>
                         <div className="absolute bottom-3 left-3 flex gap-1">
-                           {item.tags?.slice(0,2).map(tag => (
-                             <span key={tag} className="bg-gold/20 text-gold border border-gold/20 px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest backdrop-blur-md">{tag}</span>
-                           ))}
+                          {item.tags?.slice(0, 2).map(tag => (
+                            <span key={tag} className="bg-gold/20 text-gold border border-gold/20 px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest backdrop-blur-md">{tag}</span>
+                          ))}
                         </div>
                       </div>
                       <h4 className="text-white font-serif font-bold text-lg mb-2 group-hover:text-gold transition-colors leading-tight">{item.name}</h4>
@@ -154,34 +179,34 @@ const Home = () => {
           )}
         </div>
       </section>
-      
+
       {/* Subscription Banner */}
       <section className="relative py-12 px-6 overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="bg-gradient-to-r from-gold/20 via-charcoal to-crimson/20 border border-gold/30 rounded-[3rem] p-10 md:p-16 relative overflow-hidden group shadow-[0_30px_60px_rgba(0,0,0,0.4)]">
-             <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-gold/10 rounded-full blur-[100px] group-hover:bg-gold/20 transition-all duration-700"></div>
-             <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12">
-               <div className="lg:w-2/3 text-center lg:text-left">
-                  <span className="bg-gold text-charcoal px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] mb-6 inline-block">Exclusive Meal Plans</span>
-                  <h2 className="text-4xl md:text-5xl font-serif font-bold text-white mb-6">Set Your <span className="text-gold">Weekly Meal Plan</span> & Relax</h2>
-                  <p className="text-gray-400 text-lg md:text-xl font-medium mb-10 max-w-2xl leading-relaxed">Automate your favorites. Schedule your orders for any day of the week and we will deliver them precisely when you are hungry.</p>
-                  <Link to="/plans" className="inline-flex items-center gap-4 bg-gold text-charcoal px-10 py-5 rounded-[2rem] font-bold text-sm uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-gold/30 group/btn">
-                    Get Started <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-2 transition-transform" />
-                  </Link>
-               </div>
-               <div className="lg:w-1/3 flex justify-center">
-                  <div className="relative w-64 h-64">
-                    <div className="absolute inset-0 bg-gold/20 rounded-[3rem] rotate-12 group-hover:rotate-6 transition-transform duration-700"></div>
-                    <div className="absolute inset-0 bg-white/[0.05] border border-white/10 rounded-[3rem] backdrop-blur-xl flex flex-col items-center justify-center p-8 group-hover:-translate-y-4 transition-transform duration-700">
-                       <Pizza className="w-20 h-20 text-gold mb-4 group-hover:scale-110 transition-transform" />
-                       <div className="text-center">
-                          <p className="text-white font-black text-xl font-serif">Mondays</p>
-                          <p className="text-gold/60 font-black text-xs uppercase tracking-widest">at 8:00 PM</p>
-                       </div>
+            <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-gold/10 rounded-full blur-[100px] group-hover:bg-gold/20 transition-all duration-700"></div>
+            <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12">
+              <div className="lg:w-2/3 text-center lg:text-left">
+                <span className="bg-gold text-charcoal px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] mb-6 inline-block">Exclusive Meal Plans</span>
+                <h2 className="text-4xl md:text-5xl font-serif font-bold text-white mb-6">Set Your <span className="text-gold">Weekly Meal Plan</span> & Relax</h2>
+                <p className="text-gray-400 text-lg md:text-xl font-medium mb-10 max-w-2xl leading-relaxed">Automate your favorites. Schedule your orders for any day of the week and we will deliver them precisely when you are hungry.</p>
+                <Link to="/plans" className="inline-flex items-center gap-4 bg-gold text-charcoal px-10 py-5 rounded-[2rem] font-bold text-sm uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-gold/30 group/btn">
+                  Get Started <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-2 transition-transform" />
+                </Link>
+              </div>
+              <div className="lg:w-1/3 flex justify-center">
+                <div className="relative w-64 h-64">
+                  <div className="absolute inset-0 bg-gold/20 rounded-[3rem] rotate-12 group-hover:rotate-6 transition-transform duration-700"></div>
+                  <div className="absolute inset-0 bg-white/[0.05] border border-white/10 rounded-[3rem] backdrop-blur-xl flex flex-col items-center justify-center p-8 group-hover:-translate-y-4 transition-transform duration-700">
+                    <Pizza className="w-20 h-20 text-gold mb-4 group-hover:scale-110 transition-transform" />
+                    <div className="text-center">
+                      <p className="text-white font-black text-xl font-serif">Mondays</p>
+                      <p className="text-gold/60 font-black text-xs uppercase tracking-widest">at 8:00 PM</p>
                     </div>
                   </div>
-               </div>
-             </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -267,32 +292,8 @@ const Home = () => {
           </div>
         </section>
       )}
-
-      {/* Categories */}
-      <section className="py-20 bg-charcoal px-6">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-5xl font-bold text-center mb-16 underline decoration-gold underline-offset-8">
-            Our Categories
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <CategoryCard icon={<Coffee className="w-10 h-10" />} title="Drinks" color="bg-gold" />
-            <CategoryCard icon={<Utensils className="w-10 h-10" />} title="Food" color="bg-crimson" />
-            <CategoryCard icon={<Pizza className="w-10 h-10" />} title="Dishes" color="bg-gold" />
-            <CategoryCard icon={<Cake className="w-10 h-10" />} title="Sweets" color="bg-crimson" />
-          </div>
-        </div>
-      </section>
     </div>
   );
 };
-
-const CategoryCard = ({ icon, title, color }) => (
-  <div className="flex flex-col items-center p-8 rounded-xl bg-white/5 border border-white/10 hover:border-gold group cursor-pointer transition-all">
-    <div className={`${color} p-4 rounded-full mb-4 group-hover:scale-110 transition-transform text-charcoal shadow-lg shadow-gold/20`}>
-      {icon}
-    </div>
-    <h3 className="text-xl font-bold group-hover:text-gold transition-colors">{title}</h3>
-  </div>
-);
 
 export default Home;

@@ -35,17 +35,18 @@ const Orders = () => {
     const [actionLoading, setActionLoading] = useState(false);
     const [tab, setTab] = useState('new'); // 'new' | 'active' | 'history'
     const [viewMode, setViewMode] = useState('list'); // 'list' | 'map'
+    const [collectedOrders, setCollectedOrders] = useState(new Set());
 
     const handleAction = async (orderId, type) => {
-        let payload = {};
-        
-        if (type === 'deliver') {
+        // Step 1: COD Cash Collection (local only, no API call)
+        if (type === 'collect') {
+            setCollectedOrders(prev => new Set([...prev, orderId]));
             const order = myOrders.find(o => o._id === orderId);
-            if (order && order.paymentMethod === 'cod') {
-                const confirmed = window.confirm(`CASH COLLECTION VERIFICATION:\n\nHave you collected Rs. ${order.totalPrice} from the customer?`);
-                if (!confirmed) return;
-                payload.cashCollected = true;
-            }
+            toast.success(`Rs. ${order?.totalPrice || 0} collected successfully! ✅`, {
+                duration: 3000,
+                style: { background: '#121212', color: '#D4AF37', border: '1px solid #D4AF37' }
+            });
+            return;
         }
 
         setActionLoading(true);
@@ -56,10 +57,27 @@ const Orders = () => {
                 case 'accept': await accept(orderId); break;
                 case 'pickup': await pickup(orderId); break;
                 case 'arrive': await arrive(orderId); break;
-                case 'deliver': await deliver(orderId, payload.cashCollected); break;
+                case 'deliver': {
+                    const isCOD = collectedOrders.has(orderId);
+                    await deliver(orderId, isCOD);
+                    // Clean up collected set
+                    setCollectedOrders(prev => {
+                        const next = new Set(prev);
+                        next.delete(orderId);
+                        return next;
+                    });
+                    break;
+                }
                 default: throw new Error("Invalid action");
             }
-            toast.success(`Mission updated! ✅`);
+            if (type === 'deliver') {
+                toast.success('Successfully Delivered! 🎉', {
+                    duration: 5000,
+                    style: { background: '#121212', color: '#22c55e', border: '1px solid #22c55e' }
+                });
+            } else {
+                toast.success(`Action updated! ✅`);
+            }
             if (['claim', 'batch', 'accept', 'pickup'].includes(type)) setTab('active');
         } catch (error) {
             toast.error(error.response?.data?.message || `Operation failed ❌`);
@@ -95,14 +113,18 @@ const Orders = () => {
     );
 
     return (
-        <div className="space-y-8 pb-24 max-w-4xl mx-auto px-4 pt-6">
-            <header className="flex flex-col gap-6">
-                <div>
-                    <h1 className="text-4xl font-serif font-black tracking-tight text-white mb-1 uppercase">
-                        Mission <span className="text-gold">Terminal</span>
+        <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="space-y-6 md:space-y-10 pb-24 max-w-7xl mx-auto px-4 pt-6"
+        >
+            <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <header>
+                    <h1 className="text-3xl md:text-4xl font-serif font-black text-soft-white tracking-tighter">
+                        Deliveries
                     </h1>
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20">Operational Route Logistics</p>
-                </div>
+                    <p className="text-soft-white/50 mt-1 sm:mt-2 uppercase text-[8px] md:text-[10px] font-bold tracking-[0.2em]">Operational Route Logistics</p>
+                </header>
 
                 <div className="flex bg-white/5 p-1.5 rounded-2xl border border-white/5 shadow-2xl">
                     {[
@@ -113,8 +135,8 @@ const Orders = () => {
                         <button
                             key={t.id}
                             onClick={() => setTab(t.id)}
-                            className={`flex-1 flex items-center justify-center gap-3 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-500 ${
-                                tab === t.id ? 'bg-gold text-charcoal shadow-xl shadow-gold/20' : 'text-white/30 hover:text-white hover:bg-white/5'
+                            className={`px-4 md:px-5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
+                                tab === t.id ? 'bg-gold text-charcoal shadow-lg' : 'text-soft-white/40 hover:text-soft-white'
                             }`}
                         >
                             <t.icon className="w-4 h-4" />
@@ -134,11 +156,11 @@ const Orders = () => {
                         className="space-y-6"
                     >
                         <div className="flex items-center justify-between">
-                            <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-gold flex items-center gap-2">
-                                <Zap className="w-4 h-4" /> Available Signals
+                            <h2 className="text-[10px] font-bold uppercase tracking-[0.3em] text-gold flex items-center gap-2">
+                                <Zap className="w-4 h-4" /> Available Orders
                             </h2>
-                            <span className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[9px] font-black text-white/40 uppercase tracking-widest">
-                                {availableOrders.length} Potential Missions
+                            <span className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[9px] font-bold text-soft-white/60 uppercase tracking-widest">
+                                {availableOrders.length} Ready Orders
                             </span>
                         </div>
 
@@ -146,8 +168,8 @@ const Orders = () => {
                             {availableOrders.length === 0 ? (
                                 <div className="py-24 glass rounded-[2.5rem] border border-dashed border-white/10 flex flex-col items-center justify-center text-center px-6">
                                     <ShoppingBag className="w-16 h-16 text-white/5 mb-6" />
-                                    <h3 className="text-xl font-serif text-white/20 uppercase tracking-widest">No Signals Detected</h3>
-                                    <p className="text-[10px] font-bold text-white/10 uppercase tracking-widest mt-4">Deep scan in progress...</p>
+                                    <h3 className="text-xl font-serif text-white/20 uppercase tracking-widest">No Ready Orders</h3>
+                                    <p className="text-[10px] font-bold text-white/10 uppercase tracking-widest mt-4">Waiting for chef to dispatch...</p>
                                 </div>
                             ) : (
                                 availableOrders.map((order) => (
@@ -173,63 +195,73 @@ const Orders = () => {
                         className="space-y-6"
                     >
                         {activeOrders.length > 0 && (
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                                <div className="glass p-6 rounded-2xl border border-gold/20 bg-gold/5 flex flex-col items-center text-center">
-                                    <p className="text-[9px] font-black text-gold uppercase tracking-widest mb-2">Total Route</p>
-                                    <h4 className="text-3xl font-serif font-black text-white leading-none">{routeInfo.totalDistance} <span className="text-sm font-sans text-gold/40">KM</span></h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                <div className="glass p-6 rounded-2xl border border-white/5 bg-gold/5 flex flex-col items-center text-center hover:border-gold/30 transition-all">
+                                    <p className="text-[10px] font-bold text-gold uppercase tracking-widest mb-2">Total Route</p>
+                                    <h4 className="text-3xl font-serif font-bold text-soft-white leading-none">{routeInfo.totalDistance} <span className="text-sm font-sans text-gold/40">KM</span></h4>
                                 </div>
-                                <div className="glass p-6 rounded-2xl border border-white/5 flex flex-col items-center text-center">
-                                    <p className="text-[9px] font-black text-white/40 uppercase tracking-widest mb-2">Stops Remaining</p>
-                                    <h4 className="text-3xl font-serif font-black text-white leading-none">{activeOrders.length} <span className="text-sm font-sans text-white/20">STOPS</span></h4>
+                                <div className="glass p-6 rounded-2xl border border-white/5 flex flex-col items-center text-center hover:border-gold/30 transition-all">
+                                    <p className="text-[10px] font-bold text-soft-white/40 uppercase tracking-widest mb-2">Stops Remaining</p>
+                                    <h4 className="text-3xl font-serif font-bold text-soft-white leading-none">{activeOrders.length} <span className="text-sm font-sans text-soft-white/20">STOPS</span></h4>
                                 </div>
-                                <button 
-                                    onClick={handleNavigateAll}
-                                    className="btn-gold h-full flex flex-col items-center justify-center gap-2 rounded-2xl group"
-                                >
-                                    <Compass className="w-6 h-6 group-hover:rotate-45 transition-transform" />
-                                    <span>Navigate All</span>
-                                </button>
                             </div>
                         )}
 
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-gold flex items-center gap-2">
-                                <RouteIcon className="w-4 h-4" /> Optimized Deployment
-                            </h2>
-                            <div className="flex bg-white/5 p-1.5 rounded-xl border border-white/10">
-                                <button 
-                                    onClick={() => setViewMode('list')}
-                                    className={`p-2.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-gold text-charcoal shadow-lg' : 'text-white/20 hover:text-white'}`}
-                                >
-                                    <LayoutList className="w-4 h-4" />
-                                </button>
-                                <button 
-                                    onClick={() => setViewMode('map')}
-                                    className={`p-2.5 rounded-lg transition-all ml-1 ${viewMode === 'map' ? 'bg-gold text-charcoal shadow-lg' : 'text-white/20 hover:text-white'}`}
-                                >
-                                    <MapIcon className="w-4 h-4" />
-                                </button>
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-4">
+                            <div className="flex items-center gap-4">
+                                <h2 className="text-[10px] font-bold uppercase tracking-[0.3em] text-gold flex items-center gap-2">
+                                    <RouteIcon className="w-4 h-4" /> Optimized Deployment
+                                </h2>
+                            </div>
+                            
+                            <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                                {activeOrders.length > 0 && (
+                                    <button 
+                                        onClick={handleNavigateAll}
+                                        className="btn-gold px-4 py-2 flex items-center gap-2 rounded-lg text-[10px] shadow-none"
+                                    >
+                                        <Compass className="w-3.5 h-3.5" />
+                                        <span className="uppercase tracking-widest">Navigate</span>
+                                    </button>
+                                )}
+                                
+                                <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
+                                    <button 
+                                        onClick={() => setViewMode('list')}
+                                        className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-gold text-charcoal shadow-lg' : 'text-soft-white/20 hover:text-soft-white'}`}
+                                    >
+                                        <LayoutList className="w-4 h-4" />
+                                    </button>
+                                    <button 
+                                        onClick={() => setViewMode('map')}
+                                        className={`p-2 rounded-lg transition-all ml-1 ${viewMode === 'map' ? 'bg-gold text-charcoal shadow-lg' : 'text-soft-white/20 hover:text-soft-white'}`}
+                                    >
+                                        <MapIcon className="w-4 h-4" />
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
                         {activeOrders.length === 0 ? (
                             <div className="py-24 glass rounded-[2.5rem] border border-dashed border-white/10 flex flex-col items-center justify-center text-center px-6">
                                 <Navigation className="w-16 h-16 text-white/5 mb-6" />
-                                <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">No active deployments found</p>
+                                <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">No active deliveries found</p>
                             </div>
                         ) : (
                             <div className="space-y-8">
                                 {viewMode === 'map' && (
-                                    <div className="h-[450px] rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl relative">
-                                        <DeliveryMap riderLoc={location} activeOrders={activeOrders} />
-                                        <div className="absolute top-6 left-6 z-[1000]">
-                                            <div className="glass p-4 rounded-2xl border border-gold/20 flex items-center gap-4">
-                                                <div className="w-10 h-10 rounded-xl bg-gold text-charcoal flex items-center justify-center font-black text-sm">
+                                    <div className="h-[250px] md:h-[300px] glass rounded-2xl overflow-hidden border border-white/5 shadow-lg relative p-1">
+                                        <div className="w-full h-full rounded-xl overflow-hidden relative">
+                                            <DeliveryMap riderLoc={location} activeOrders={activeOrders} />
+                                        </div>
+                                        <div className="absolute top-4 left-4 z-[1000] pointer-events-none">
+                                            <div className="glass p-3 rounded-xl border border-gold/20 flex items-center gap-3 backdrop-blur-xl">
+                                                <div className="w-8 h-8 rounded-lg bg-gold text-charcoal flex items-center justify-center font-bold text-xs">
                                                     {activeOrders.length}
                                                 </div>
                                                 <div>
-                                                    <p className="text-[9px] font-black text-gold uppercase tracking-widest">Live Route</p>
-                                                    <p className="text-xs font-bold text-white uppercase">{routeInfo.totalDistance} KM Total</p>
+                                                    <p className="text-[9px] font-bold text-gold uppercase tracking-widest">Live Route</p>
+                                                    <p className="text-[10px] font-bold text-soft-white uppercase mt-0.5">{routeInfo.totalDistance} KM Total</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -252,7 +284,7 @@ const Orders = () => {
                                             </div>
 
                                             {idx === 0 && (
-                                                <div className="absolute -top-4 left-14 bg-near/20 text-near text-[7px] font-black px-2 py-0.5 rounded border border-near/30 uppercase tracking-[0.2em] animate-pulse">
+                                                <div className="absolute -top-4 left-14 bg-green-500/20 text-green-500 text-[7px] font-bold px-2 py-0.5 rounded border border-green-500/30 uppercase tracking-[0.2em] animate-pulse">
                                                     Current Priority
                                                 </div>
                                             )}
@@ -279,10 +311,10 @@ const Orders = () => {
                         className="space-y-6"
                     >
                         <div className="flex items-center justify-between">
-                            <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 flex items-center gap-2">
-                                <CheckCircle2 className="w-4 h-4" /> Mission Logs
+                            <h2 className="text-[10px] font-bold uppercase tracking-[0.3em] text-soft-white/40 flex items-center gap-2">
+                                <CheckCircle2 className="w-4 h-4" /> Delivery Logs
                             </h2>
-                            <span className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[9px] font-black text-white/40 uppercase tracking-widest">
+                            <span className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[9px] font-bold text-soft-white/60 uppercase tracking-widest">
                                 {completedOrders.length} Successful
                             </span>
                         </div>
@@ -290,28 +322,28 @@ const Orders = () => {
                             {completedOrders.length === 0 ? (
                                 <div className="py-24 glass rounded-[2.5rem] border border-dashed border-white/10 flex flex-col items-center justify-center text-center px-6">
                                     <CheckCircle2 className="w-16 h-16 text-white/5 mb-6" />
-                                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">No mission history found</p>
+                                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">No delivery history found</p>
                                 </div>
                             ) : (
                                 completedOrders.map((order) => (
                                     <div key={order._id} className="glass p-6 rounded-[2rem] border border-white/5 flex flex-col gap-6 group hover:bg-white/[0.04] transition-all duration-500">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-5">
-                                                <div className="w-14 h-14 rounded-2xl bg-near/5 flex items-center justify-center border border-near/10">
-                                                    <CheckCircle2 className="w-7 h-7 text-near" />
+                                                <div className="w-14 h-14 rounded-2xl bg-green-500/5 flex items-center justify-center border border-green-500/10">
+                                                    <CheckCircle2 className="w-7 h-7 text-green-500" />
                                                 </div>
                                                 <div>
-                                                    <h4 className="text-xl font-bold text-white uppercase tracking-tight">
+                                                    <h4 className="text-xl font-bold text-soft-white uppercase tracking-tight">
                                                         {order.user?.firstName} {order.user?.lastName}
                                                     </h4>
-                                                    <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mt-1">
+                                                    <p className="text-[10px] font-bold text-soft-white/40 uppercase tracking-[0.2em] mt-1">
                                                         ID: {order.orderNumber || order._id.slice(-6).toUpperCase()}
                                                     </p>
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <p className="text-2xl font-serif font-black text-gold">Rs. {order.totalPrice}</p>
-                                                <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mt-2">
+                                                <p className="text-2xl font-serif font-bold text-gold">Rs. {order.totalPrice}</p>
+                                                <p className="text-[9px] font-bold text-soft-white/40 uppercase tracking-widest mt-2">
                                                     {new Date(order.deliveredAt).toLocaleDateString()}
                                                 </p>
                                             </div>
@@ -328,7 +360,7 @@ const Orders = () => {
                                             </div>
                                             <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/5">
                                                 <Zap size={12} className="text-gold" />
-                                                <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Protocol Success</span>
+                                                <span className="text-[10px] font-bold text-soft-white/40 uppercase tracking-widest">Delivery Complete</span>
                                             </div>
                                         </div>
                                     </div>
@@ -338,7 +370,7 @@ const Orders = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </div>
+        </motion.div>
     );
 };
 

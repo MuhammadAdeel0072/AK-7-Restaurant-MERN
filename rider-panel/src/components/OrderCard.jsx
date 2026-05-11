@@ -1,7 +1,7 @@
 import React from 'react';
-import { 
-    User, 
-    MapPin, 
+import {
+    User,
+    MapPin,
     Navigation,
     ChevronRight,
     CheckCircle2,
@@ -9,36 +9,47 @@ import {
     PackageCheck,
     Zap,
     Phone,
-    CreditCard,
     Banknote
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const OrderCard = ({ 
-    order, 
-    onAction, 
-    actionLoading, 
-    isNearby 
+const OrderCard = ({
+    order,
+    onAction,
+    actionLoading,
+    isNearby,
+    cashCollected
 }) => {
     if (!order || !order._id) return null;
 
     const getDistanceLabel = (dist) => {
         const d = parseFloat(dist);
-        if (isNaN(d)) return { label: 'Nearby', color: 'bg-near' };
-        if (d < 2) return { label: 'Near', color: 'bg-near' };
-        if (d < 5) return { label: 'Medium', color: 'bg-medium' };
-        return { label: 'Far', color: 'bg-far' };
+        if (isNaN(d)) return { label: 'Nearby', color: 'bg-green-500/10 text-green-500 border-green-500/20' };
+        if (d < 2) return { label: 'Near', color: 'bg-green-500/10 text-green-500 border-green-500/20' };
+        if (d < 5) return { label: 'Medium', color: 'bg-gold/10 text-gold border-gold/20' };
+        return { label: 'Far', color: 'bg-crimson/10 text-crimson border-crimson/20' };
     };
 
     const distInfo = getDistanceLabel(order.distance);
 
+    const getStatusBadge = () => {
+        const s = order.status;
+        if (['READY_FOR_DELIVERY', 'DISPATCHED'].includes(s)) return { label: 'Dispatch Ready', style: 'bg-gold/10 text-gold border-gold/20' };
+        if (s === 'ASSIGNED') return { label: 'Assigned', style: 'bg-blue-400/10 text-blue-400 border-blue-400/20' };
+        if (s === 'ACCEPTED') return { label: 'Accepted', style: 'bg-indigo-400/10 text-indigo-400 border-indigo-400/20' };
+        if (s === 'PICKED_UP') return { label: 'Out for Delivery', style: 'bg-orange-400/10 text-orange-400 border-orange-400/20' };
+        if (s === 'ARRIVED') return { label: 'Arrived', style: 'bg-purple-400/10 text-purple-400 border-purple-400/20' };
+        if (s === 'DELIVERED') return { label: 'Delivered', style: 'bg-green-500/10 text-green-500 border-green-500/20' };
+        return { label: s, style: 'bg-white/5 text-white/40 border-white/10' };
+    };
+
     const getMainAction = () => {
         switch (order.status) {
             case 'READY_FOR_DELIVERY':
+            case 'DISPATCHED':
                 return {
                     label: isNearby ? 'Accept Nearby Order' : 'Accept Order',
                     icon: <PackageCheck className="w-4 h-4" />,
-                    class: 'btn-primary-large',
                     type: isNearby ? 'batch' : 'claim'
                 };
             case 'ASSIGNED':
@@ -46,146 +57,175 @@ const OrderCard = ({
                 return {
                     label: 'Start Delivery',
                     icon: <Truck className="w-4 h-4" />,
-                    class: 'btn-primary-large',
                     type: 'pickup'
                 };
             case 'PICKED_UP':
                 return {
                     label: 'I Have Arrived',
                     icon: <Navigation className="w-4 h-4" />,
-                    class: 'btn-primary-large',
                     type: 'arrive'
                 };
-            case 'ARRIVED':
+            case 'ARRIVED': {
+                const isCOD = order.paymentMethod === 'cod' || order.paymentMethod === 'COD';
+                if (isCOD && !cashCollected) {
+                    return {
+                        label: `Collect Rs. ${order.totalPrice}`,
+                        icon: <Banknote className="w-4 h-4" />,
+                        type: 'collect'
+                    };
+                }
                 return {
-                    label: order.paymentMethod === 'cod' ? `Collect Rs. ${order.totalPrice} & Deliver` : 'Mark Delivered',
+                    label: 'Mark Delivered',
                     icon: <CheckCircle2 className="w-4 h-4" />,
-                    class: 'btn-success-large',
                     type: 'deliver'
                 };
+            }
             default:
                 return null;
         }
     };
 
     const action = getMainAction();
+    const statusBadge = getStatusBadge();
 
     return (
-        <motion.div 
+        <motion.div
             layout
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="card-minimal p-6 flex flex-col gap-6 relative overflow-hidden"
+            className="glass rounded-2xl border border-white/5 p-4 md:p-5 flex flex-col gap-4 relative overflow-hidden hover:border-gold/30 transition-all duration-500 group"
         >
-            {/* Status Badge */}
-            <div className="absolute top-0 right-0">
-                <div className={`${distInfo.color} text-charcoal px-4 py-1.5 rounded-bl-2xl text-[8px] font-black uppercase tracking-[0.2em] shadow-lg`}>
-                    {distInfo.label} • {order.distance || '0'} KM
-                </div>
+            {/* Top Bar — Badges */}
+            <div className="flex flex-wrap items-center gap-2">
+                <span className={`px-2.5 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest border ${statusBadge.style}`}>
+                    {statusBadge.label}
+                </span>
+                <span className={`px-2.5 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest border ${distInfo.color}`}>
+                    {order.distance || '0'} KM
+                </span>
+                <span className={`px-2.5 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest border border-white/10 bg-white/5 text-soft-white/60 ml-auto`}>
+                    {order.paymentMethod === 'cod' ? 'COD' : 'Prepaid'}
+                </span>
             </div>
 
-            {/* Simple Header */}
-            <div className="flex justify-between items-start pt-2">
-                <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5">
-                        <User className="w-7 h-7 text-gold" />
+            {/* Middle Section — Info Grid */}
+            <div className="flex flex-col gap-4 pt-1">
+                <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center border border-gold/20 shrink-0">
+                            <User className="w-5 h-5 text-gold" />
+                        </div>
+                        <div>
+                            <h3 className="text-lg sm:text-xl font-bold text-soft-white tracking-tight leading-none">
+                                {order.user?.firstName} {order.user?.lastName}
+                            </h3>
+                        </div>
                     </div>
-                    <div>
-                        <h3 className="text-xl font-bold text-white tracking-tight leading-none mb-1">
-                            {order.user?.firstName} {order.user?.lastName}
-                        </h3>
-                        <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">MISSION ID: {order.orderNumber || order._id.slice(-6).toUpperCase()}</p>
-                    </div>
-                </div>
-            </div>
-
-            {/* Details Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Address */}
-                <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
-                    <div className="w-10 h-10 rounded-xl bg-near/10 flex items-center justify-center border border-near/20 shrink-0">
-                        <MapPin className="w-5 h-5 text-near" />
-                    </div>
-                    <div className="flex-1">
-                        <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">Destination</p>
-                        <p className="text-sm font-medium text-white/80 leading-snug">
-                            {order.shippingAddress?.address}
-                        </p>
-                        <p className="text-[10px] font-bold text-near mt-1 uppercase tracking-wider">{order.shippingAddress?.area}</p>
+                    <div className="text-right mt-1 sm:mt-0">
+                        <p className="text-xl font-bold text-soft-white">Rs. {order.totalPrice}</p>
                     </div>
                 </div>
 
-                {/* Contact & Payment */}
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
-                        <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20 shrink-0">
-                                <Phone className="w-5 h-5 text-blue-400" />
-                            </div>
-                            <div>
-                                <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-0.5">Contact</p>
-                                <p className="text-sm font-bold text-white tracking-wider">{order.shippingAddress?.phoneNumber}</p>
-                            </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white/[0.02] p-3 rounded-xl border border-white/5">
+                    {/* Address */}
+                    <div className="flex items-start gap-3">
+                        <MapPin className="w-4 h-4 text-soft-white/60 shrink-0 mt-1" />
+                        <div className="flex-1">
+                            <p className="text-sm font-bold text-soft-white leading-tight">
+                                {order.shippingAddress?.address}
+                            </p>
+                            {order.shippingAddress?.area && (
+                                <p className="text-[11px] font-bold text-soft-white/60 mt-1 uppercase tracking-wider">{order.shippingAddress.area}</p>
+                            )}
                         </div>
-                        <a 
-                            href={`https://wa.me/${order.shippingAddress?.phoneNumber?.replace(/[^0-9]/g, '')}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="w-10 h-10 rounded-full bg-near text-charcoal flex items-center justify-center shadow-lg active:scale-90 transition-all"
-                        >
-                            <Zap className="w-4 h-4 fill-charcoal" />
-                        </a>
                     </div>
 
-                    <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
-                        <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center border border-gold/20 shrink-0">
-                                {order.paymentMethod === 'cod' ? <Banknote className="w-5 h-5 text-gold" /> : <CreditCard className="w-5 h-5 text-gold" />}
-                            </div>
-                            <div>
-                                <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-0.5">Payment</p>
-                                <p className="text-sm font-bold text-gold uppercase tracking-wider">{order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Prepaid'}</p>
-                            </div>
+                    {/* Contact */}
+                    <div className="flex items-start gap-3 sm:border-l sm:border-white/5 sm:pl-4">
+                        <Phone className="w-4 h-4 text-soft-white/60 shrink-0 mt-1" />
+                        <div className="flex-1">
+                            <p className="text-base font-bold text-soft-white tracking-wider">{order.shippingAddress?.phoneNumber}</p>
                         </div>
-                        <div className="text-right">
-                            <p className="text-lg font-serif font-black text-white">Rs. {order.totalPrice}</p>
+                        <div className="flex items-center gap-2 shrink-0">
+                            <a
+                                href={`tel:${order.shippingAddress?.phoneNumber?.replace(/[^0-9+]/g, '')}`}
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-8 h-8 rounded-lg bg-white/5 text-soft-white/80 flex items-center justify-center border border-white/10 hover:bg-white/10 hover:text-white transition-all active:scale-95"
+                            >
+                                <Phone className="w-3.5 h-3.5" />
+                            </a>
+                            <a
+                                href={`https://wa.me/${order.shippingAddress?.phoneNumber?.replace(/[^0-9]/g, '')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-8 h-8 rounded-lg bg-green-500/10 text-green-500 flex items-center justify-center border border-green-500/20 hover:bg-green-500 hover:text-charcoal transition-all active:scale-95"
+                            >
+                                <Zap className="w-3.5 h-3.5" />
+                            </a>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Large Action Button */}
-            {action && (
-                <div className="flex flex-col gap-3">
-                    {order.status === 'ARRIVED' && order.paymentMethod === 'cod' && (
-                        <div className="bg-near/10 border border-near/20 p-4 rounded-xl mb-1">
-                            <p className="text-[10px] font-black text-near uppercase tracking-widest flex items-center gap-2">
-                                <Banknote size={14} /> Payment Required: Rs. {order.totalPrice}
+                {/* COD Warning */}
+                {order.status === 'ARRIVED' && (order.paymentMethod === 'cod' || order.paymentMethod === 'COD') && (
+                    <div className={`p-3 rounded-xl flex items-center gap-3 border ${cashCollected ? 'glass border-green-500/20' : 'glass-gold border-gold/20'}`}>
+                        {cashCollected ? <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" /> : <Banknote className="w-5 h-5 text-gold shrink-0" />}
+                        <div>
+                            <p className={`text-[11px] font-bold tracking-wide ${cashCollected ? 'text-green-500' : 'text-gold'}`}>
+                                {cashCollected ? `Rs. ${order.totalPrice} Collected` : `Collect Cash: Rs. ${order.totalPrice}`}
                             </p>
                         </div>
-                    )}
-                    <button 
-                        onClick={() => onAction(order._id, action.type)}
-                        disabled={actionLoading}
-                        className={`${action.class} relative overflow-hidden group/btn active:scale-95 transition-all`}
-                    >
-                        {actionLoading ? (
-                            <div className="w-5 h-5 border-2 border-charcoal/30 border-t-charcoal rounded-full animate-spin"></div>
-                        ) : (
-                            <>
-                                <div className="absolute inset-0 bg-white/10 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></div>
-                                {action.icon}
-                                <span className="relative z-10">{action.label}</span>
-                                <ChevronRight className="w-4 h-4 ml-auto opacity-30 group-hover/btn:translate-x-1 transition-transform relative z-10" />
-                            </>
+                    </div>
+                )}
+
+                {/* Bottom Section — Compact Action Buttons */}
+                {action && (
+                    <div className="pt-3 flex justify-end items-center gap-3 border-t border-white/5 mt-1">
+                        {['PICKED_UP', 'ARRIVED'].includes(order.status) && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    const lat = order.shippingAddress?.lat;
+                                    const lng = order.shippingAddress?.lng;
+                                    if (lat && lng) {
+                                        window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`, '_blank');
+                                    } else {
+                                        window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.shippingAddress?.address)}&travelmode=driving`, '_blank');
+                                    }
+                                }}
+                                className="px-4 py-1.5 rounded-md font-bold transition-all text-gold border border-gold/20 hover:bg-gold/10 active:scale-95 text-[10px] uppercase tracking-widest flex items-center gap-2"
+                            >
+                                <Navigation className="w-3 h-3" /> Navigate
+                            </button>
                         )}
-                    </button>
-                </div>
-            )}
+                        {order.status === 'READY_FOR_DELIVERY' && (
+                            <button
+                                onClick={(e) => { e.stopPropagation(); /* Future reject logic */ }}
+                                className="px-5 py-2 rounded-md font-bold transition-all text-soft-white/40 border border-white/10 hover:bg-white/5 active:scale-95 text-[10px] uppercase tracking-widest"
+                            >
+                                Reject
+                            </button>
+                        )}
+                        <button
+                            onClick={() => onAction(order._id, action.type)}
+                            disabled={actionLoading}
+                            className="btn-gold px-5 py-1.5 flex items-center justify-center gap-2 relative overflow-hidden group/btn text-[10px] shadow-none"
+                        >
+                            {actionLoading ? (
+                                <div className="w-4 h-4 border-2 border-charcoal/30 border-t-charcoal rounded-full animate-spin" />
+                            ) : (
+                                <>
+                                    {action.icon}
+                                    <span className="relative z-10 uppercase tracking-widest">{action.label}</span>
+                                </>
+                            )}
+                        </button>
+                    </div>
+                )}
+            </div>
         </motion.div>
     );
 };
 
 export default OrderCard;
-
-

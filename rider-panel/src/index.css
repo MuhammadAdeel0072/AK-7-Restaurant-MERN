@@ -8,9 +8,6 @@
   --color-gold: #D4AF37;
   --color-soft-white: #E0E0E0;
   --color-crimson: #dc143c;
-  --color-near: #10b981;
-  --color-medium: #f59e0b;
-  --color-far: #ef4444;
   
   --font-sans: 'Outfit', sans-serif;
   --font-serif: 'Playfair Display', serif;
@@ -28,8 +25,6 @@
   }
 }
 
-/* UI Components matching Admin/Chef */
-
 .glass {
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(12px);
@@ -43,31 +38,12 @@
   border: 1px solid rgba(212, 175, 55, 0.1);
 }
 
-.card-minimal {
-  background: #1A1A1A;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 1.5rem;
-  transition: all 0.2s ease;
-}
-
-.card-minimal:active {
-  transform: scale(0.98);
-}
-
-.btn-primary-large {
-  @apply bg-gold text-charcoal w-full py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.15em] shadow-xl shadow-gold/10 active:scale-95 transition-all flex items-center justify-center gap-3;
-}
-
-.btn-secondary-large {
-  @apply bg-white/5 text-white w-full py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.15em] border border-white/10 active:scale-95 transition-all flex items-center justify-center gap-3;
-}
-
-.btn-success-large {
-  @apply bg-near text-charcoal w-full py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.15em] shadow-xl shadow-near/10 active:scale-95 transition-all flex items-center justify-center gap-3;
-}
-
 .btn-gold {
-  @apply bg-gold text-charcoal px-6 py-2 rounded-xl font-black transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(212,175,55,0.3)] uppercase tracking-widest text-[10px];
+  @apply bg-gold text-charcoal px-6 py-2 rounded-md font-bold transition-all hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(212,175,55,0.3)];
+}
+
+.btn-close-gold {
+  @apply p-2 rounded-xl transition-all duration-300 bg-white/5 text-soft-white/50 hover:bg-gold hover:text-charcoal active:scale-95;
 }
 
 /* Map Overrides */

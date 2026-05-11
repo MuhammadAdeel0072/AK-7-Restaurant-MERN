@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, MapPin, Package, Phone, HelpCircle } from 'lucide-react';
+import { MapPin, Package, Phone, Truck, UserCheck, Clock, AlertCircle } from 'lucide-react';
 import { useOrderTracking } from '../hooks/useOrderTracking';
 import OrderStatusStepper from '../components/OrderStatusStepper';
 import ETAIndicator from '../components/ETAIndicator';
@@ -27,7 +27,7 @@ const TrackOrderPage = () => {
         return (
             <div className="container mx-auto px-6 py-32 text-center max-w-xl">
                 <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-red-500/20">
-                    <HelpCircle className="w-10 h-10 text-red-500" />
+                    <AlertCircle className="w-10 h-10 text-red-500" />
                 </div>
                 <h2 className="text-3xl font-black text-white mb-4 tracking-tight">{error}</h2>
                 <Link to="/orders" className="text-gold font-black uppercase tracking-widest text-[10px] hover:underline">
@@ -40,21 +40,19 @@ const TrackOrderPage = () => {
     if (!order) return null;
 
     return (
-        <div className="container mx-auto px-6 py-12 max-w-4xl">
+        <div className="container mx-auto px-6 md:px-24 py-24 max-w-5xl">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 gap-8">
                 <div>
-                    <Link to="/orders" className="flex items-center gap-2 text-white/40 hover:text-white transition-all text-[10px] font-black uppercase tracking-[0.3em] mb-6 group">
-                        <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" /> Back to History
-                    </Link>
-                    <h1 className="text-5xl font-serif font-black text-white">
-                        Order #{order.orderNumber || order._id.slice(-8).toUpperCase()}
+                    <h1 className="text-3xl font-serif font-black text-white tracking-tighter">
+                        Track <span className="text-gold">Order</span>
                     </h1>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-soft-white/40 mt-1 italic">Real-time status tracking</p>
                 </div>
                 
                 <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/10">
                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Live Tracking Active</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Live Signal Active</span>
                 </div>
             </div>
 
@@ -168,15 +166,8 @@ const TrackOrderPage = () => {
                 </div>
             </div>
 
-            {/* Help Footer */}
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-6 px-10 text-center sm:text-left">
-                <p className="text-[10px] font-black uppercase tracking-widest text-white/20">
-                    Issues with your order? Reach out to our concierge at <span className="text-white/40">+92 300 0000000</span>
-                </p>
-                <Link to="/help" className="text-[10px] font-black uppercase tracking-widest text-gold hover:underline">
-                    Visit Help Center
-                </Link>
-            </div>
+            {/* Footer space */}
+            <div className="h-20"></div>
         </div>
     );
 };
