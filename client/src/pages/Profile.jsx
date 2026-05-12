@@ -269,7 +269,7 @@ const Profile = () => {
                                             className="bg-gold hover:bg-yellow-400 text-charcoal px-10 py-5 rounded-[2rem] text-xs font-black uppercase tracking-[0.2em] transition-all shadow-xl shadow-gold/20 flex items-center gap-3 disabled:opacity-50 active:scale-95"
                                         >
                                             {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                                            Save Changes
+                                            UPDATE
                                         </button>
                                     </div>
                                 </div>

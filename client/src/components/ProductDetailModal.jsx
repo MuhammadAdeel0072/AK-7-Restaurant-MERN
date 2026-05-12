@@ -202,7 +202,7 @@ const ProductDetailModal = ({ product, isOpen, onClose }) => {
                                                 Rs. {(selectedVariant ? selectedVariant.price : product.price) * qty}
                                             </span>
                                         )}
-                                        <p className="text-2xl font-black text-white tracking-tighter">Rs. {Math.round(calculateCurrentPrice())}</p>
+                                        <p className="text-2xl font-black text-white tracking-tighter">Rs Total {Math.round(calculateCurrentPrice())}</p>
                                     </div>
                                 </div>
                             </div>

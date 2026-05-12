@@ -27,6 +27,7 @@ const Orders = () => {
         pickup, 
         arrive, 
         deliver,
+        collect,
         batchToRoute,
         location,
         routeInfo
@@ -40,12 +41,19 @@ const Orders = () => {
     const handleAction = async (orderId, type) => {
         // Step 1: COD Cash Collection (local only, no API call)
         if (type === 'collect') {
-            setCollectedOrders(prev => new Set([...prev, orderId]));
-            const order = myOrders.find(o => o._id === orderId);
-            toast.success(`Rs. ${order?.totalPrice || 0} collected successfully! ✅`, {
-                duration: 3000,
-                style: { background: '#121212', color: '#D4AF37', border: '1px solid #D4AF37' }
-            });
+            setActionLoading(true);
+            try {
+                await collect(orderId);
+                setCollectedOrders(prev => new Set([...prev, orderId]));
+                toast.success(`Cash collected successfully! ✅`, {
+                    duration: 3000,
+                    style: { background: '#121212', color: '#D4AF37', border: '1px solid #D4AF37' }
+                });
+            } catch (error) {
+                toast.error(error.response?.data?.message || `Collection failed ❌`);
+            } finally {
+                setActionLoading(false);
+            }
             return;
         }
 
@@ -293,6 +301,7 @@ const Orders = () => {
                                                 order={order}
                                                 onAction={handleAction}
                                                 actionLoading={actionLoading}
+                                                cashCollected={order.codCollected || collectedOrders.has(order._id)}
                                             />
                                         </div>
                                     ))}

@@ -278,7 +278,7 @@ const StaffManagement = () => {
                     <SelectField label="Role" value={editForm.role} onChange={v => setEditForm(p => ({ ...p, role: v }))} options={ROLES} icon={Briefcase} />
                     <SelectField label="Status" value={editForm.status} onChange={v => setEditForm(p => ({ ...p, status: v }))} options={STATUSES} icon={Activity} />
                     <button onClick={handleEdit} className="btn-gold w-full mt-4 flex items-center justify-center gap-2">
-                      <Save className="w-4 h-4" /> Save Changes
+                      <Save className="w-4 h-4" /> UPDATE
                     </button>
                   </div>
                 </>
@@ -717,7 +717,7 @@ const AddStaffTab = ({ onSuccess }) => {
     if (!validate()) return;
     setSubmitting(true);
     try {
-      await api.post('/staff', {
+      const { data } = await api.post('/staff', {
         name: form.name.trim(),
         email: form.email.trim(),
         phone: form.phone.trim(),
@@ -727,7 +727,12 @@ const AddStaffTab = ({ onSuccess }) => {
         joiningDate: form.joiningDate || new Date().toISOString(),
         shifts: form.shift ? DAYS.map(d => ({ day: d, shift: form.shift })) : []
       });
-      toast.success('Staff member added successfully!');
+      
+      if (data.requiresOnboarding) {
+        toast.success('Staff created. OTP sent to their phone/email for setup.', { duration: 6000, icon: '📩' });
+      } else {
+        toast.success('Existing account linked successfully!', { icon: '🔗' });
+      }
       onSuccess();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to add staff member');

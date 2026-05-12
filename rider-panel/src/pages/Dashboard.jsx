@@ -15,6 +15,8 @@ import OrderCard from '../components/OrderCard';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 
+import { BrandLogo } from '../components/BrandingUtils';
+
 const Dashboard = () => {
     const { t } = useTranslation();
     const {
@@ -27,18 +29,19 @@ const Dashboard = () => {
         accept,
         pickup,
         arrive,
+        collect,
         deliver,
         batchToRoute,
         routeInfo
     } = useRider();
 
-    const [actionLoading, setActionLoading] = useState(false);
+    const [loadingOrders, setLoadingOrders] = useState({});
 
     // Filter active missions for the dashboard
     const activeOrders = myOrders.filter(o => ['ASSIGNED', 'ACCEPTED', 'PICKED_UP', 'ARRIVED'].includes(o.status));
 
     const handleAction = async (orderId, type) => {
-        setActionLoading(true);
+        setLoadingOrders(prev => ({ ...prev, [orderId]: true }));
         const loadingToast = toast.loading(`Processing: ${type.toUpperCase()}...`);
         try {
             switch (type) {
@@ -47,6 +50,7 @@ const Dashboard = () => {
                 case 'accept': await accept(orderId); break;
                 case 'pickup': await pickup(orderId); break;
                 case 'arrive': await arrive(orderId); break;
+                case 'collect': await collect(orderId); break;
                 case 'deliver': await deliver(orderId); break;
                 default: throw new Error("Invalid protocol type");
             }
@@ -56,7 +60,7 @@ const Dashboard = () => {
             toast.dismiss(loadingToast);
             toast.error(error.response?.data?.message || `Action failed: ${type.toUpperCase()} ❌`);
         } finally {
-            setActionLoading(false);
+            setLoadingOrders(prev => ({ ...prev, [orderId]: false }));
         }
     };
 
@@ -77,22 +81,21 @@ const Dashboard = () => {
             animate={{ opacity: 1 }}
             className="space-y-6 md:space-y-8 pb-24 max-w-7xl mx-auto px-4 pt-6"
         >
-            <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                <header>
-                    <h1 className="text-2xl md:text-4xl font-serif font-black text-soft-white tracking-tighter">
-                        Rider <span className="text-gold">Dashboard</span>
-                    </h1>
-                </header>
+            <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pb-4 border-b border-white/5">
+                <div>
+                    <BrandLogo size="lg" className="mb-2" />
+                    <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.4em] mt-2">Operational Command Center</p>
+                </div>
 
-                <div className="flex grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                     {mainCards.map((card, idx) => (
-                        <div key={idx} className="glass p-4 md:p-5 rounded-2xl border border-white/5 flex items-center gap-4">
-                            <div className={`p-3 rounded-xl bg-white/5 ${card.color}`}>
+                        <div key={idx} className="glass p-4 md:p-5 rounded-2xl border border-white/5 flex items-center gap-4 hover:border-gold/20 transition-all duration-500">
+                            <div className={`p-3 rounded-xl bg-white/5 ${card.color} shadow-inner`}>
                                 <card.icon className="w-5 h-5" />
                             </div>
                             <div>
-                                <p className="text-soft-white/40 text-[10px] font-bold uppercase tracking-widest">{card.title}</p>
-                                <h3 className="text-xl font-bold font-sans text-soft-white mt-0.5">{card.value}</h3>
+                                <p className="text-soft-white/40 text-[9px] font-black uppercase tracking-widest leading-none">{card.title}</p>
+                                <h3 className="text-xl font-bold font-sans text-soft-white mt-1.5">{card.value}</h3>
                             </div>
                         </div>
                     ))}
@@ -131,7 +134,7 @@ const Dashboard = () => {
                                             <OrderCard
                                                 order={order}
                                                 onAction={handleAction}
-                                                actionLoading={actionLoading}
+                                                actionLoading={loadingOrders[order._id]}
                                             />
                                         </div>
                                     </div>
@@ -151,41 +154,55 @@ const Dashboard = () => {
                             )}
                         </AnimatePresence>
                     </div>
-                </section>
-
-                {/* Available Queue Section */}
+                </section>                {/* Available Queue Section */}
                 <section className="lg:col-span-5 space-y-8">
-                    <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-soft-white/60 flex items-center gap-3">
-                        <ShoppingBag className="w-5 h-5 text-gold" /> Ready Orders
-                    </h2>
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-soft-white/60 flex items-center gap-3">
+                            <ShoppingBag className="w-5 h-5 text-gold" /> Ready Orders
+                        </h2>
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                            <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Live Queue</span>
+                        </div>
+                    </div>
 
-                    <div className="space-y-6 max-h-[800px] overflow-y-auto no-scrollbar pr-2">
+                    <div className="space-y-4 max-h-[800px] overflow-y-auto no-scrollbar pr-2">
                         <AnimatePresence mode="popLayout">
                             {availableOrders.length === 0 ? (
                                 <motion.div
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
-                                    className="p-12 glass rounded-[2rem] border border-white/5 text-center shadow-inner"
+                                    className="p-12 glass rounded-[2.5rem] border border-dashed border-white/5 text-center shadow-inner flex flex-col items-center justify-center bg-white/[0.01]"
                                 >
-                                    <CheckCircle className="w-12 h-12 text-gold/5 mx-auto mb-6" />
-                                    <p className="text-[10px] text-white/20 font-black uppercase tracking-widest leading-none">Scanning for orders...</p>
+                                    <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-6 border border-white/5 rotate-12">
+                                        <Zap className="w-8 h-8 text-white/5" />
+                                    </div>
+                                    <p className="text-[10px] text-white/20 font-black uppercase tracking-[0.3em] leading-none mb-2">Network Scanning</p>
+                                    <p className="text-[9px] text-white/10 font-bold uppercase tracking-widest">Awaiting dispatch signals...</p>
                                 </motion.div>
                             ) : (
                                 availableOrders.map((order) => (
-                                    <div key={order._id} className="relative group">
+                                    <motion.div 
+                                        key={order._id} 
+                                        className="relative group"
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.95 }}
+                                    >
                                         {order.onRoute && (
-                                            <div className="absolute -top-3 -right-2 z-20">
-                                                <div className="bg-near text-charcoal text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-xl flex items-center gap-1.5 border border-white/20">
-                                                    <Zap size={10} className="fill-charcoal" /> On Route
+                                            <div className="absolute -top-2 -right-1 z-20">
+                                                <div className="bg-emerald-500 text-charcoal text-[7px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-widest shadow-xl flex items-center gap-1 border border-white/20">
+                                                    <Zap size={8} className="fill-charcoal" /> On Route
                                                 </div>
                                             </div>
                                         )}
                                         <OrderCard
                                             order={order}
                                             onAction={(id) => handleAction(id, order.onRoute ? 'batch' : 'claim')}
-                                            actionLoading={actionLoading}
+                                            actionLoading={loadingOrders[order._id]}
+                                            compact={true}
                                         />
-                                    </div>
+                                    </motion.div>
                                 ))
                             )}
                         </AnimatePresence>

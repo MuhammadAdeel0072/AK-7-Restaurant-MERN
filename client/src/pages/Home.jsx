@@ -112,7 +112,7 @@ const Home = () => {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { id: 'hungry', label: "I'm Very Hungry", emoji: "😋", color: "from-orange-500/20 to-crimson/20" },
+              { id: 'hungry', label: "I'm Very Hungry", emoji: "😋", color: "from-orange-500/20 to-gold/20" },
               { id: 'budget', label: "Budget Meal", emoji: "💸", color: "from-green-500/20 to-emerald-500/20" },
               { id: 'quick', label: "Quick Snack", emoji: "🍕", color: "from-blue-500/20 to-indigo-500/20" },
               { id: 'premium', label: "Premium Dinner", emoji: "❤️", color: "from-gold/20 to-yellow-500/20" }
@@ -159,7 +159,7 @@ const Home = () => {
                       <div className="h-48 rounded-2xl overflow-hidden mb-4 relative shrink-0">
                         <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                         <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-transparent to-transparent opacity-80"></div>
-                        <div className="absolute top-3 right-3 bg-charcoal/80 backdrop-blur-xl px-3 py-1.5 rounded-xl text-gold font-black text-xs border border-white/10 shadow-lg">Rs. {item.price}</div>
+                        <div className="absolute top-3 right-3 bg-charcoal/80 backdrop-blur-xl px-3 py-1.5 rounded-xl text-gold font-black text-xs border border-white/10 shadow-lg">Rs Total {item.price}</div>
                         <div className="absolute bottom-3 left-3 flex gap-1">
                           {item.tags?.slice(0, 2).map(tag => (
                             <span key={tag} className="bg-gold/20 text-gold border border-gold/20 px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest backdrop-blur-md">{tag}</span>
@@ -183,7 +183,7 @@ const Home = () => {
       {/* Subscription Banner */}
       <section className="relative py-12 px-6 overflow-hidden">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-gradient-to-r from-gold/20 via-charcoal to-crimson/20 border border-gold/30 rounded-[3rem] p-10 md:p-16 relative overflow-hidden group shadow-[0_30px_60px_rgba(0,0,0,0.4)]">
+          <div className="bg-gradient-to-r from-gold/20 via-charcoal to-gold/20 border border-gold/30 rounded-[3rem] p-10 md:p-16 relative overflow-hidden group shadow-[0_30px_60px_rgba(0,0,0,0.4)]">
             <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-gold/10 rounded-full blur-[100px] group-hover:bg-gold/20 transition-all duration-700"></div>
             <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12">
               <div className="lg:w-2/3 text-center lg:text-left">
@@ -271,7 +271,7 @@ const Home = () => {
 
                     {/* Availability indicators */}
                     {order.orderItems.some(i => !i.isAvailable) && (
-                      <p className="text-[10px] text-crimson/70 font-bold mb-3 uppercase tracking-widest">
+                      <p className="text-[10px] text-gold font-bold mb-3 uppercase tracking-widest">
                         ⚠ Some items may be unavailable
                       </p>
                     )}

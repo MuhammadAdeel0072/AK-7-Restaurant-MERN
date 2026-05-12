@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {
   getActiveOrders,
+  getOrderById,
   getReadyOrders,
   updateOrderStatus,
   updateItemStatus,
@@ -15,6 +16,7 @@ router.use(protect, isChef);
 
 // Get active orders and kitchen stats
 router.get('/orders', getActiveOrders);
+router.get('/orders/:id', getOrderById);
 router.get('/ready-orders', getReadyOrders);
 router.get('/stats', getKitchenStats);
 

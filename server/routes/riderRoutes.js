@@ -10,6 +10,7 @@ const {
     pickupOrder,
     arrivedAtDestination,
     confirmDelivery,
+    collectCash,
     getRiderStats,
     updateRiderLocation
 } = require('../controllers/riderController');
@@ -29,6 +30,7 @@ router.post('/claim/:orderId', claimOrder);
 router.post('/accept/:orderId', acceptOrder);
 router.post('/pickup/:orderId', pickupOrder);
 router.post('/arrived/:orderId', arrivedAtDestination);
+router.post('/collect-cash/:orderId', collectCash);
 router.post('/delivered/:orderId', confirmDelivery);
 router.post('/location', updateRiderLocation);
 

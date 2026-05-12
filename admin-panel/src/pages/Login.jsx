@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Coffee, Lock, User, ShieldCheck, XCircle } from 'lucide-react';
+import { BrandLogo } from '../components/BrandingUtils';
 
 const Login = () => {
     const { login } = useAuth();
@@ -39,7 +40,7 @@ const Login = () => {
                     <div className="w-16 h-16 bg-gold/10 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-gold/20 rotate-3 group-hover:rotate-6 transition-transform">
                         <Coffee className="text-gold" size={32} />
                     </div>
-                    <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Dine<span className="text-gold">Xis</span></h1>
+                    <BrandLogo size="md" className="mb-2" />
                     <p className="text-xs font-medium text-white/40 uppercase tracking-[0.3em]">Admin Login</p>
                 </div>
 
@@ -108,7 +109,15 @@ const Login = () => {
                         )}
                     </button>
 
-
+                    <div className="flex justify-center pt-2">
+                        <button 
+                            type="button"
+                            onClick={() => navigate('/setup-account')}
+                            className="text-[10px] font-bold text-white/40 hover:text-gold uppercase tracking-[0.2em] transition-colors"
+                        >
+                            First time here? <span className="text-gold/60 underline decoration-gold/20 underline-offset-4">Sign-up</span>
+                        </button>
+                    </div>
                 </form>
 
                 <div className="mt-10 pt-6 border-t border-white/5 flex items-center justify-center gap-4 text-[9px] font-bold text-white/20 uppercase tracking-widest">

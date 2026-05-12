@@ -50,6 +50,14 @@ const userSchema = new mongoose.Schema({
         enum: ['Bronze', 'Silver', 'Gold', 'Platinum'],
         default: 'Bronze'
     },
+    isOnboarded: {
+        type: Boolean,
+        default: true // Existing users are onboarded by default
+    },
+    isActive: {
+        type: Boolean,
+        default: true
+    },
     resetPasswordOTP: { type: String },
     resetPasswordExpires: { type: Date }
 }, {

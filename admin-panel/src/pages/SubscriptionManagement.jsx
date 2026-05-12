@@ -85,14 +85,14 @@ const SubscriptionManagement = () => {
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
-    const loadingToast = toast.loading('Saving changes...');
+    const loadingToast = toast.loading('Updating changes...');
     try {
       const { data } = await api.put(`/subscriptions/admin/${selectedSub._id}`, editForm);
-      toast.success('Saved successfully', { id: loadingToast });
+      toast.success('Updated successfully', { id: loadingToast });
       fetchSubscriptions();
       setIsEditModalOpen(false);
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Save failed', { id: loadingToast });
+      toast.error(error.response?.data?.message || 'Update failed', { id: loadingToast });
     }
   };
 
@@ -597,7 +597,7 @@ const SubscriptionManagement = () => {
                     type="submit"
                     className="flex-1 py-5 rounded-[2rem] bg-gold text-charcoal font-black text-[10px] uppercase tracking-widest transition-all shadow-xl active:scale-95"
                   >
-                    Save Changes
+                    UPDATE
                   </button>
                 </div>
               </form>

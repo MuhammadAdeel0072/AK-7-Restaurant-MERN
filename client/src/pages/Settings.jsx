@@ -244,7 +244,7 @@ const Settings = () => {
                         disabled={isSavingName}
                         className="w-full bg-gold text-charcoal font-black py-6 rounded-[2rem] uppercase tracking-[0.3em] text-xs transition-all hover:bg-yellow-400 hover:scale-[1.01] active:scale-95 disabled:opacity-50 shadow-2xl shadow-gold/10"
                     >
-                        {isSavingName ? 'Saving...' : 'Save Changes'}
+                        {isSavingName ? 'UPDATING...' : 'UPDATE'}
                     </button>
                 </Section>
 

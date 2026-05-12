@@ -254,7 +254,7 @@ const Menu = () => {
 
                   <div className="absolute top-4 right-4 flex flex-col gap-2">
                     {deal && (
-                      <div className="bg-crimson text-white px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-lg border border-crimson/50 whitespace-nowrap">
+                      <div className="bg-gold text-charcoal px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-lg border border-gold/50 whitespace-nowrap">
                         {deal.discountPercentage > 0
                           ? `${deal.discountPercentage}% OFF`
                           : `Rs. ${deal.discountAmount} OFF`
@@ -262,7 +262,7 @@ const Menu = () => {
                       </div>
                     )}
                     {product.isBestSeller && (
-                      <div className="bg-crimson text-white px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest shadow-lg border border-white/10">
+                      <div className="bg-gold text-charcoal px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest shadow-lg border border-white/10">
                         Popular
                       </div>
                     )}
@@ -283,10 +283,10 @@ const Menu = () => {
                       {deal ? (
                         <>
                           <span className="text-gray-500 font-bold text-xs line-through shrink-0">Rs. {product.price}</span>
-                          <span className="text-gold font-black text-lg tracking-tighter shrink-0">Rs. {Math.round(discountedPrice)}</span>
+                          <span className="text-gold font-black text-lg tracking-tighter shrink-0">Rs {Math.round(discountedPrice)}</span>
                         </>
                       ) : (
-                        <span className="text-gold font-black text-lg tracking-tighter shrink-0">{product.hasVariants && product.variants?.length > 0 ? `From Rs. ${product.price}` : `Rs. ${product.price}`}</span>
+                        <span className="text-gold font-black text-lg tracking-tighter shrink-0">Rs {product.price}</span>
                       )}
                     </div>
                   </div>

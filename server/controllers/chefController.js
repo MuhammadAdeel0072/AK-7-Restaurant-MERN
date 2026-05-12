@@ -15,6 +15,21 @@ const getActiveOrders = asyncHandler(async (req, res) => {
   res.json(orders);
 });
 
+// @desc    Get single order details for chef
+// @route   GET /api/chef/orders/:id
+// @access  Private/Chef
+const getOrderById = asyncHandler(async (req, res) => {
+  const order = await Order.findById(req.params.id)
+    .populate('user', 'firstName lastName email');
+
+  if (order) {
+    res.json(order);
+  } else {
+    res.status(404);
+    throw new Error('Order not found');
+  }
+});
+
 // @desc    Get orders ready for pickup/delivery
 // @route   GET /api/chef/ready-orders
 // @access  Private/Chef
@@ -176,6 +191,7 @@ const getKitchenStats = asyncHandler(async (req, res) => {
 
 module.exports = {
   getActiveOrders,
+  getOrderById,
   getReadyOrders,
   updateOrderStatus,
   updateItemStatus,

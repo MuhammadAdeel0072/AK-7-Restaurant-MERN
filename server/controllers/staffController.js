@@ -1,86 +1,21 @@
 const Staff = require('../models/Staff');
+const User = require('../models/User');
+const OTP = require('../models/OTP');
 const { emitEvent } = require('../services/socketService');
+const { sendOTPEmail } = require('../services/emailService');
 
-// GET /staff/dashboard/stats — Dashboard statistics
-const getStaffStats = async (req, res) => {
-  try {
-    const totalStaff = await Staff.countDocuments({ isDeleted: { $ne: true } });
-    const activeStaff = await Staff.countDocuments({ isDeleted: { $ne: true }, status: 'Active' });
-    const pendingSalaries = await Staff.countDocuments({ isDeleted: { $ne: true }, 'salary.isPaid': false });
-
-    // Absent today
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999);
-
-    const staffWithAttendanceToday = await Staff.find({
-      isDeleted: { $ne: true },
-      'attendance.date': { $gte: todayStart, $lte: todayEnd },
-      'attendance.status': 'Present'
-    });
-    const presentToday = staffWithAttendanceToday.length;
-    const absentToday = totalStaff - presentToday;
-
-    // Role distribution
-    const roleDistribution = await Staff.aggregate([
-      { $match: { isDeleted: { $ne: true } } },
-      { $group: { _id: '$role', count: { $sum: 1 } } },
-      { $sort: { count: -1 } }
-    ]);
-
-    // Attendance overview (last 7 days)
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const allStaff = await Staff.find({ isDeleted: { $ne: true } });
-
-    const attendanceOverview = [];
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      date.setHours(0, 0, 0, 0);
-      const dateEnd = new Date(date);
-      dateEnd.setHours(23, 59, 59, 999);
-
-      let present = 0, absent = 0, late = 0;
-      allStaff.forEach(staff => {
-        const record = staff.attendance.find(a => a.date >= date && a.date <= dateEnd);
-        if (record) {
-          if (record.status === 'Present') present++;
-          else if (record.status === 'Late') late++;
-          else absent++;
-        } else {
-          absent++;
-        }
-      });
-
-      attendanceOverview.push({
-        date: date.toISOString().split('T')[0],
-        day: date.toLocaleDateString('en-US', { weekday: 'short' }),
-        present,
-        absent,
-        late
-      });
-    }
-
-    res.json({
-      totalStaff,
-      activeStaff,
-      absentToday,
-      pendingSalaries,
-      roleDistribution,
-      attendanceOverview
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// GET /staff — List all staff (with search, filters, pagination)
+// @desc    Get all staff members
+// @route   GET /api/staff
+// @access  Private/Admin
 const getAllStaff = async (req, res) => {
   try {
-    const { search, role, status, page = 1, limit = 10 } = req.query;
-    const query = { isDeleted: { $ne: true } };
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const { search, role, status } = req.query;
+
+    let query = { isDeleted: { $ne: true } };
 
     if (search) {
       query.$or = [
@@ -89,39 +24,199 @@ const getAllStaff = async (req, res) => {
         { phone: { $regex: search, $options: 'i' } }
       ];
     }
-    if (role && role !== 'All') query.role = role;
-    if (status && status !== 'All') query.status = status;
+
+    if (role && role !== 'All') {
+      query.role = role;
+    }
+
+    if (status && status !== 'All') {
+      query.status = status;
+    }
 
     const total = await Staff.countDocuments(query);
     const staff = await Staff.find(query)
       .sort({ createdAt: -1 })
-      .skip((parseInt(page) - 1) * parseInt(limit))
-      .limit(parseInt(limit));
+      .skip(skip)
+      .limit(limit);
 
     res.json({
       staff,
-      total,
-      page: parseInt(page),
-      pages: Math.ceil(total / parseInt(limit))
+      page,
+      pages: Math.ceil(total / limit),
+      total
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// POST /staff — Create new staff member
+// @desc    Get staff dashboard stats
+// @route   GET /api/staff/dashboard/stats
+// @access  Private/Admin
+const getStaffStats = async (req, res) => {
+  try {
+    const totalStaff = await Staff.countDocuments({ isDeleted: { $ne: true } });
+    const activeStaff = await Staff.countDocuments({ isDeleted: { $ne: true }, status: 'Active' });
+    const onLeave = await Staff.countDocuments({ isDeleted: { $ne: true }, status: 'On Leave' });
+    
+    // Calculate attendance for today
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const presentToday = await Staff.countDocuments({
+      isDeleted: { $ne: true },
+      attendance: {
+        $elemMatch: {
+          date: { $gte: todayStart, $lte: todayEnd },
+          status: 'Present'
+        }
+      }
+    });
+
+    const absentToday = await Staff.countDocuments({
+      isDeleted: { $ne: true },
+      attendance: {
+        $elemMatch: {
+          date: { $gte: todayStart, $lte: todayEnd },
+          status: 'Absent'
+        }
+      }
+    });
+
+    const pendingSalaries = await Staff.countDocuments({
+      isDeleted: { $ne: true },
+      'salary.isPaid': false
+    });
+
+    // 4. Role Distribution Aggregation
+    const roleDistribution = await Staff.aggregate([
+      { $match: { isDeleted: { $ne: true } } },
+      { $group: { _id: '$role', count: { $sum: 1 } } }
+    ]);
+
+    // 5. Attendance Overview (Last 7 Days)
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    const attendanceRecords = await Staff.aggregate([
+      { $match: { isDeleted: { $ne: true } } },
+      { $unwind: '$attendance' },
+      { $match: { 'attendance.date': { $gte: sevenDaysAgo } } },
+      {
+        $group: {
+          _id: {
+            day: { $dayOfWeek: '$attendance.date' },
+            date: { $dateToString: { format: '%Y-%m-%d', date: '$attendance.date' } },
+            status: '$attendance.status'
+          },
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    // Format attendance overview for Recharts
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const attendanceOverviewMap = {};
+
+    // Initialize last 7 days
+    for (let i = 0; i < 7; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      attendanceOverviewMap[dateStr] = {
+        day: days[d.getDay()],
+        present: 0,
+        late: 0,
+        absent: 0
+      };
+    }
+
+    attendanceRecords.forEach(rec => {
+      const dateStr = rec._id.date;
+      if (attendanceOverviewMap[dateStr]) {
+        const status = rec._id.status.toLowerCase();
+        if (status === 'present') attendanceOverviewMap[dateStr].present = rec.count;
+        if (status === 'late') attendanceOverviewMap[dateStr].late = rec.count;
+        if (status === 'absent') attendanceOverviewMap[dateStr].absent = rec.count;
+      }
+    });
+
+    const attendanceOverview = Object.values(attendanceOverviewMap).reverse();
+
+    res.json({
+      totalStaff,
+      activeStaff,
+      onLeave,
+      presentToday,
+      absentToday,
+      pendingSalaries,
+      roleDistribution,
+      attendanceOverview,
+      attendanceRate: totalStaff > 0 ? Math.round((presentToday / totalStaff) * 100) : 0
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Create new staff member with unified onboarding
+// @route   POST /api/staff
+// @access  Private/Admin
 const createStaff = async (req, res) => {
   try {
     const { name, email, phone, role, salary, status, joiningDate, shifts } = req.body;
 
-    const exists = await Staff.findOne({ email, isDeleted: { $ne: true } });
-    if (exists) {
+    // 1. Check if email already exists in Staff records
+    const staffExists = await Staff.findOne({ email, isDeleted: { $ne: true } });
+    if (staffExists) {
       return res.status(400).json({ message: 'A staff member with this email already exists' });
     }
 
+    // 2. Check if a User account already exists with this email
+    let user = await User.findOne({ email: email.toLowerCase() });
+    let requiresOnboarding = false;
+
+    if (user) {
+      // Existing user: Link role and update status
+      user.role = role.toLowerCase();
+      user.isOnboarded = true; // They already have an account
+      user.isActive = true;
+      await user.save();
+      console.log(`🔗 Existing user ${email} linked to staff role: ${role}`);
+    } else {
+      // New user: Create pending account and send OTP
+      user = await User.create({
+        firstName: name.split(' ')[0] || 'Staff',
+        lastName: name.split(' ').slice(1).join(' ') || '',
+        email: email.toLowerCase(),
+        phone: phone,
+        role: role.toLowerCase(),
+        isOnboarded: false,
+        isActive: false
+      });
+      
+      requiresOnboarding = true;
+      
+      // Generate OTP
+      const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+      await OTP.deleteMany({ email: email.toLowerCase() });
+      await OTP.create({
+        email: email.toLowerCase(),
+        otp: otpCode
+      });
+
+      // Send OTP (Mock/Email fallback)
+      await sendOTPEmail(email.toLowerCase(), otpCode);
+      console.log(`\n📩 [ONBOARDING OTP] Sent to ${email}: ${otpCode}\n`);
+    }
+
+    // 3. Create the Staff management record
     const staffMember = await Staff.create({
       name,
-      email,
+      email: email.toLowerCase(),
       phone,
       role,
       salary: { base: salary || 0, bonus: 0, deductions: 0, isPaid: false },
@@ -134,8 +229,16 @@ const createStaff = async (req, res) => {
 
     emitEvent('admin', 'staffUpdate', { type: 'created', staff: staffMember });
 
-    res.status(201).json(staffMember);
+    res.status(201).json({
+      success: true,
+      message: requiresOnboarding 
+        ? 'Staff created. OTP sent to phone number for onboarding.' 
+        : 'Existing account linked successfully. Staff can login normally.',
+      staff: staffMember,
+      requiresOnboarding
+    });
   } catch (error) {
+    console.error('❌ Create Staff Error:', error.message);
     res.status(500).json({ message: error.message });
   }
 };

@@ -157,18 +157,31 @@ const getFinancialReport = asyncHandler(async (req, res) => {
     const dateQuery = getDateQuery(startDate, endDate);
 
     const orders = await Order.find({ ...dateQuery, isPaid: true });
-    const expenses = await Expense.find(dateQuery);
+    const expenses = await Expense.find(dateQuery).sort('-date');
 
-    const totalIncome = orders.reduce((acc, o) => acc + (o.totalPrice - (o.taxPrice || 0)), 0);
-    const totalExpenses = expenses.reduce((acc, e) => acc + e.amount, 0);
+    const totalIncome = orders.reduce((acc, o) => acc + (Number(o.totalPrice || 0) - Number(o.taxPrice || 0)), 0);
+    const totalExpenses = expenses.reduce((acc, e) => acc + Number(e.amount || 0), 0);
     const netProfit = totalIncome - totalExpenses;
+
+    // Group expenses by category for better insights
+    const expenseBreakdown = expenses.reduce((acc, e) => {
+        acc[e.category] = (acc[e.category] || 0) + Number(e.amount || 0);
+        return acc;
+    }, {});
 
     res.json({
         totalIncome,
         totalExpenses,
         netProfit,
+        expenseBreakdown,
         incomeData: orders.map(o => ({ id: o._id, amount: o.totalPrice, date: o.createdAt })),
-        expenseItems: expenses
+        expenseItems: expenses.map(e => ({
+            id: e._id,
+            title: e.title,
+            amount: e.amount,
+            category: e.category,
+            date: e.date || e.createdAt
+        }))
     });
 });
 
@@ -192,9 +205,9 @@ const getDailyClosingReport = asyncHandler(async (req, res) => {
 
     const dailyRevenue = orders.reduce((acc, o) => {
         if (!o.isPaid) return acc;
-        return acc + (o.totalPrice - (o.taxPrice || 0));
+        return acc + (Number(o.totalPrice || 0) - Number(o.taxPrice || 0));
     }, 0);
-    const dailyExpenses = expenses.reduce((acc, e) => acc + e.amount, 0);
+    const dailyExpenses = expenses.reduce((acc, e) => acc + Number(e.amount || 0), 0);
 
     res.json({
         period: date ? date : `${startDate || 'Start'} to ${endDate || 'End'}`,
@@ -202,8 +215,17 @@ const getDailyClosingReport = asyncHandler(async (req, res) => {
         totalSales: dailyRevenue,
         totalExpenses: dailyExpenses,
         finalProfit: dailyRevenue - dailyExpenses,
-        orders: orders.map(o => ({ id: o._id, number: o.orderNumber, amount: o.totalPrice, status: o.status })),
-        expenses: expenses.map(e => ({ title: e.title, amount: e.amount, category: e.category }))
+        orders: orders.map(o => ({ 
+            id: o._id, 
+            number: o.orderNumber, 
+            amount: o.totalPrice, 
+            status: o.isPaid ? 'PAID' : 'PENDING' 
+        })),
+        expenses: expenses.map(e => ({ 
+            title: e.title, 
+            amount: e.amount, 
+            category: e.category 
+        }))
     });
 });
 

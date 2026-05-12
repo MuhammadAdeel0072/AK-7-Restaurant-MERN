@@ -36,14 +36,31 @@ const PlanEditor = () => {
     { label: '2 Months', value: '2M', weeks: 8 },
   ];
 
-  const timeOptions = [
-    { label: '12:00 PM', value: '12:00' },
-    { label: '02:00 PM', value: '14:00' },
-    { label: '04:00 PM', value: '16:00' },
-    { label: '06:00 PM', value: '18:00' },
-    { label: '08:00 PM', value: '20:00' },
-    { label: '10:00 PM', value: '22:00' },
-  ];
+  const getAvailableTimes = (day) => {
+    const dayConfig = restaurantSchedule.find(d => d.day === day);
+    if (!dayConfig || !dayConfig.isOpen) return [];
+
+    const times = [];
+    const parseTime = (t) => {
+        const [h, m] = t.split(':').map(Number);
+        return h * 60 + m;
+    };
+
+    let startMinutes = parseTime(dayConfig.openTime);
+    let endMinutes = parseTime(dayConfig.closeTime);
+
+    if (endMinutes <= startMinutes) endMinutes += 1440; // Add 24 hours for midnight crossing
+
+    for (let m = startMinutes; m <= endMinutes; m += 30) {
+        const h = Math.floor(m / 60) % 24;
+        const mins = m % 60;
+        const timeStr = `${String(h).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        const displayH = h % 12 || 12;
+        times.push({ label: `${displayH}:${String(mins).padStart(2, '0')} ${ampm}`, value: timeStr });
+    }
+    return times;
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -134,10 +151,13 @@ const PlanEditor = () => {
       delete newSchedule[day];
       setSchedule(newSchedule);
     } else {
+      const availableTimes = getAvailableTimes(day);
+      const defaultTime = availableTimes.length > 0 ? availableTimes[0].value : '20:00';
+      
       setSelectedDays([...selectedDays, day]);
       setSchedule({
         ...schedule,
-        [day]: { time: '20:00', items: [] }
+        [day]: { time: defaultTime, items: [] }
       });
     }
   };
@@ -338,7 +358,7 @@ const PlanEditor = () => {
             <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" /> Back to Plans
           </Link>
           <h1 className="text-3xl md:text-4xl font-serif font-bold text-white mb-2">
-            {id ? 'Edit' : 'Start'} <span className="text-gold">Food Plan</span>
+            {id ? 'Edit' : 'Start'} Food Plan
           </h1>
           <p className="text-gold/60 font-black uppercase tracking-widest text-[10px] mt-2">Tailor your weekly gourmet schedule</p>
         </div>
@@ -471,19 +491,27 @@ const PlanEditor = () => {
                             exit={{ opacity: 0, scale: 0.95 }}
                             className="bg-white/[0.02] border border-white/5 rounded-[2.5rem] overflow-hidden backdrop-blur-xl flex flex-col hover:border-gold/30 transition-all group h-full shadow-lg"
                         >
-                            <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.01]">
-                            <h3 className="text-2xl font-serif font-black text-white">{day}</h3>
-                            <div className="flex items-center gap-3">
-                                <select
-                                value={schedule[day]?.time}
-                                onChange={(e) => handleTimeChange(day, e.target.value)}
-                                className="bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest text-gold outline-none focus:border-gold/50 cursor-pointer"
-                                >
-                                {timeOptions.map(opt => (
-                                    <option key={opt.value} value={opt.value} className="bg-charcoal text-white">{opt.label}</option>
-                                ))}
-                                </select>
-                            </div>
+                            <div className="p-8 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/[0.01]">
+                                <div>
+                                    <h3 className="text-2xl font-serif font-black text-white">{day}</h3>
+                                    {restaurantSchedule.find(d => d.day === day) && (
+                                        <p className="text-[9px] font-black text-gold/40 uppercase tracking-widest mt-1">
+                                            Open: {restaurantSchedule.find(d => d.day === day).openTime} - {restaurantSchedule.find(d => d.day === day).closeTime}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Delivery:</span>
+                                    <select
+                                        value={schedule[day]?.time}
+                                        onChange={(e) => handleTimeChange(day, e.target.value)}
+                                        className="bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest text-gold outline-none focus:border-gold/50 cursor-pointer"
+                                    >
+                                        {getAvailableTimes(day).map(opt => (
+                                            <option key={opt.value} value={opt.value} className="bg-charcoal text-white">{opt.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
 
                             <div className="p-8 flex-grow flex flex-col">

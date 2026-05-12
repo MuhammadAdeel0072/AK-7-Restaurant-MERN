@@ -8,6 +8,7 @@ import Orders from './pages/Orders';
 import OrderDetails from './pages/OrderDetails';
 import Profile from './pages/Profile';
 import Login from './pages/Login';
+import StaffSetup from './pages/StaffSetup';
 import { RiderProvider } from './context/RiderContext';
 import { Toaster } from 'react-hot-toast';
 
@@ -57,6 +58,7 @@ function App() {
             />
             <Routes>
                 <Route path="/login" element={<Login />} />
+                <Route path="/setup-account" element={<StaffSetup />} />
 
                 <Route path="/" element={
                     <AuthGuard>

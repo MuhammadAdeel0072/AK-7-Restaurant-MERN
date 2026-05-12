@@ -178,6 +178,7 @@ const claimOrder = asyncHandler(async (req, res) => {
     emitEvent(null, 'riderAssigned', updatedOrder);
     emitEvent(order.user.toString(), 'riderAssigned', updatedOrder);
     emitEvent('admin', 'orderUpdate', updatedOrder);
+    emitEvent(order.user.toString(), 'orderUpdate', updatedOrder);
 
     res.json(updatedOrder);
 });
@@ -197,6 +198,7 @@ const acceptOrder = asyncHandler(async (req, res) => {
 
     const updatedOrder = await order.save();
     emitEvent(null, 'orderUpdate', updatedOrder);
+    emitEvent(order.user.toString(), 'orderUpdate', updatedOrder);
     res.json(updatedOrder);
 });
 
@@ -218,6 +220,7 @@ const pickupOrder = asyncHandler(async (req, res) => {
     emitEvent(null, 'orderOutForDelivery', updatedOrder);
     emitEvent(order.user.toString(), 'orderOutForDelivery', updatedOrder);
     emitEvent('admin', 'orderUpdate', updatedOrder);
+    emitEvent(order.user.toString(), 'orderUpdate', updatedOrder);
     
     res.json(updatedOrder);
 });
@@ -233,6 +236,31 @@ const arrivedAtDestination = asyncHandler(async (req, res) => {
 
     const updatedOrder = await order.save();
     emitEvent(null, 'orderUpdate', updatedOrder);
+    emitEvent(order.user.toString(), 'orderUpdate', updatedOrder);
+    res.json(updatedOrder);
+});
+
+// @desc    Rider confirms COD collection
+const collectCash = asyncHandler(async (req, res) => {
+    const order = await Order.findById(req.params.orderId);
+    if (!order) {
+        res.status(404);
+        throw new Error('Order not found');
+    }
+
+    if (order.rider?.toString() !== req.user._id.toString()) {
+        res.status(403);
+        throw new Error('Unauthorized collection attempt');
+    }
+
+    order.codCollected = true;
+    order.isPaid = true;
+    order.paidAt = Date.now();
+    order.statusHistory.push({ status: 'CASH_COLLECTED', timestamp: Date.now() });
+
+    const updatedOrder = await order.save();
+    emitEvent(null, 'orderUpdate', updatedOrder);
+    emitEvent(order.user.toString(), 'orderUpdate', updatedOrder);
     res.json(updatedOrder);
 });
 
@@ -243,7 +271,8 @@ const confirmDelivery = asyncHandler(async (req, res) => {
 
     const { cashCollected } = req.body;
 
-    if (order.paymentMethod === 'cod' && !cashCollected) {
+    const isCOD = order.paymentMethod?.toLowerCase() === 'cod';
+    if (isCOD && !cashCollected && !order.codCollected) {
         res.status(400);
         throw new Error('Cash collection confirmation required for COD');
     }
@@ -262,6 +291,7 @@ const confirmDelivery = asyncHandler(async (req, res) => {
     
     emitEvent(null, 'orderDelivered', updatedOrder);
     emitEvent(order.user.toString(), 'orderDelivered', updatedOrder);
+    emitEvent(order.user.toString(), 'orderUpdate', updatedOrder);
     emitEvent('admin', 'orderUpdate', updatedOrder);
     
     res.json(updatedOrder);
@@ -331,6 +361,7 @@ module.exports = {
     pickupOrder,
     arrivedAtDestination,
     confirmDelivery,
+    collectCash,
     getRiderStats,
     updateRiderLocation
 };

@@ -67,7 +67,7 @@ const MealSchedule = () => {
       await api.put('/schedule', { weeklySchedule: schedule });
       toast.success('Restaurant schedule updated');
     } catch (error) {
-      toast.error('Failed to save schedule');
+      toast.error('Failed to update schedule');
     } finally {
       setSaving(false);
     }
@@ -88,10 +88,10 @@ const MealSchedule = () => {
     <div className="space-y-10">
       <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
         <div>
-          <h1 className="text-4xl font-serif font-black text-white mb-2 uppercase tracking-tight">
-            Meal <span className="text-gold">Operations</span>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-black text-soft-white tracking-tighter">
+            Meal <span className="text-gold">Operation</span>
           </h1>
-          <p className="text-gold/40 text-[10px] font-black uppercase tracking-[0.4em]">Schedule & Customer Controller</p>
+          <p className="text-soft-white/50 mt-1 sm:mt-2 uppercase text-[7px] sm:text-[9px] md:text-[10px] font-bold tracking-[0.2em]">Schedule & Customer Controller</p>
         </div>
 
         <button
@@ -100,7 +100,7 @@ const MealSchedule = () => {
           className="bg-gold text-charcoal px-10 py-5 rounded-2xl font-black text-xs uppercase tracking-[0.3em] shadow-xl shadow-gold/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 flex items-center gap-3"
         >
           {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          SAVE CONFIGURATION
+          UPDATE
         </button>
       </header>
 

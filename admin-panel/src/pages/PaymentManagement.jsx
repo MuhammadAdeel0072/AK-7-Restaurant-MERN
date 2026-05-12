@@ -150,7 +150,7 @@ const PaymentManagement = () => {
             className="btn-gold px-8 sm:px-10 py-3 sm:py-4 flex items-center gap-2 sm:gap-3 disabled:opacity-50 group text-xs sm:text-sm"
           >
             {saving ? <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" /> : <Save className="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform" />}
-            <span>{saving ? 'UPDATING...' : 'SAVE CONFIGURATION'}</span>
+            <span>{saving ? 'UPDATING...' : 'UPDATE'}</span>
           </button>
         </div>
       </form>

@@ -17,8 +17,8 @@ export const Logo = ({ size = 'md', className = '' }) => {
     return (
         <div className={`flex flex-col items-center ${className}`}>
             <h1 className={`${s.brand} font-serif font-black tracking-tighter leading-none`}>
-                <span className="text-gold">Dine</span>
-                <span className="text-crimson">Xis</span>
+                <span className="text-white">Dine</span>
+                <span className="text-gold">Xis</span>
             </h1>
             <span className={`${s.tag} font-black uppercase tracking-[0.35em] text-soft-white/40 mt-1`}>
                 Premium Smart Dining
@@ -39,8 +39,8 @@ export const InlineLogo = ({ size = 'md', className = '' }) => {
 
     return (
         <span className={`${s.brand} font-serif font-black tracking-tighter ${className}`}>
-            <span className="text-gold">Dine</span>
-            <span className="text-crimson">Xis</span>
+            <span className="text-white">Dine</span>
+            <span className="text-gold">Xis</span>
         </span>
     );
 };
@@ -59,8 +59,8 @@ export const BrandedHeader = ({ size = 'lg', subtitle = 'Premium Smart Dining', 
     return (
         <div className={`text-center ${className}`}>
             <h1 className={`${s.brand} font-serif font-black tracking-tighter leading-none`}>
-                <span className="text-gold">Dine</span>
-                <span className="text-crimson">Xis</span>
+                <span className="text-white">Dine</span>
+                <span className="text-gold">Xis</span>
             </h1>
             {subtitle && (
                 <p className={`${s.tag} font-black uppercase tracking-[0.35em] text-soft-white/40 mt-2`}>

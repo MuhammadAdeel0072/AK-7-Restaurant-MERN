@@ -18,7 +18,8 @@ const OrderCard = ({
     onAction,
     actionLoading,
     isNearby,
-    cashCollected
+    cashCollected = order.codCollected,
+    compact = false
 }) => {
     if (!order || !order._id) return null;
 
@@ -66,7 +67,7 @@ const OrderCard = ({
                     type: 'arrive'
                 };
             case 'ARRIVED': {
-                const isCOD = order.paymentMethod === 'cod' || order.paymentMethod === 'COD';
+                const isCOD = order.paymentMethod?.toLowerCase() === 'cod';
                 if (isCOD && !cashCollected) {
                     return {
                         label: `Collect Rs. ${order.totalPrice}`,
@@ -88,6 +89,57 @@ const OrderCard = ({
     const action = getMainAction();
     const statusBadge = getStatusBadge();
 
+    if (compact) {
+        return (
+            <motion.div
+                layout
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="glass rounded-[1.5rem] border border-white/5 p-4 flex flex-col gap-3 relative overflow-hidden hover:border-gold/30 transition-all duration-500 group cursor-pointer"
+                onClick={() => onAction(order._id, action.type)}
+            >
+                {/* Compact Header: Area & Distance */}
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center border border-gold/20 shrink-0">
+                            <MapPin className="w-4 h-4 text-gold" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-bold text-soft-white leading-tight">
+                                {order.shippingAddress?.area || 'Nearby'}
+                            </p>
+                            <p className="text-[10px] font-bold text-soft-white/40 uppercase tracking-widest">{distInfo.label} • {order.distance || '0'} KM</p>
+                        </div>
+                    </div>
+                    <div className="text-right">
+                        <p className="text-base font-bold text-soft-white">Rs. {order.totalPrice}</p>
+                    </div>
+                </div>
+
+                {/* Footer: Status & Action */}
+                <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                    <span className={`px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border ${statusBadge.style}`}>
+                        {statusBadge.label}
+                    </span>
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onAction(order._id, action.type); }}
+                        disabled={actionLoading}
+                        className="bg-gold hover:bg-yellow-400 text-charcoal px-4 py-1.5 rounded-lg flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 text-[10px] font-black uppercase tracking-[0.1em] shadow-lg shadow-gold/10"
+                    >
+                        {actionLoading ? (
+                            <div className="w-3 h-3 border-2 border-charcoal/30 border-t-charcoal rounded-full animate-spin" />
+                        ) : (
+                            <>
+                                {action.icon}
+                                <span>{action.label}</span>
+                            </>
+                        )}
+                    </button>
+                </div>
+            </motion.div>
+        );
+    }
+
     return (
         <motion.div
             layout
@@ -104,7 +156,7 @@ const OrderCard = ({
                     {order.distance || '0'} KM
                 </span>
                 <span className={`px-2.5 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest border border-white/10 bg-white/5 text-soft-white/60 ml-auto`}>
-                    {order.paymentMethod === 'cod' ? 'COD' : 'Prepaid'}
+                    {order.paymentMethod?.toLowerCase() === 'cod' ? 'COD' : 'Prepaid'}
                 </span>
             </div>
 
@@ -168,7 +220,7 @@ const OrderCard = ({
                 </div>
 
                 {/* COD Warning */}
-                {order.status === 'ARRIVED' && (order.paymentMethod === 'cod' || order.paymentMethod === 'COD') && (
+                {order.status === 'ARRIVED' && (order.paymentMethod?.toLowerCase() === 'cod') && (
                     <div className={`p-3 rounded-xl flex items-center gap-3 border ${cashCollected ? 'glass border-green-500/20' : 'glass-gold border-gold/20'}`}>
                         {cashCollected ? <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" /> : <Banknote className="w-5 h-5 text-gold shrink-0" />}
                         <div>

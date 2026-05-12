@@ -24,8 +24,8 @@ const AuthModal = ({ onClose }) => {
                     <X size={24} />
                 </button>
 
-                <h2 id="auth-title" className="text-4xl font-serif font-black text-gold tracking-wider mb-2">
-                    Dine<span className="text-crimson">Xis</span>
+                <h2 id="auth-title" className="text-4xl font-serif font-black tracking-tighter mb-2">
+                    <span className="text-white">Dine</span><span className="text-gold">Xis</span>
                 </h2>
                 <p className="text-[10px] text-white/40 font-black uppercase tracking-[0.2em] mb-10">Premium Smart Dining</p>
 

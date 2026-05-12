@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api, { socket } from '../services/api';
 import { ShoppingBag, DollarSign, Users, TrendingUp, Calendar, Pause, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { BrandLogo } from '../components/BrandingUtils';
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
@@ -90,9 +91,7 @@ const Dashboard = () => {
       className="space-y-6 md:space-y-10"
     >
       <header>
-        <h1 className="text-3xl md:text-5xl font-serif font-black mb-1 md:mb-2 tracking-tighter italic transition-all duration-700">
-          <span className="text-gold">Dine</span><span className="text-crimson ml-1">Xis</span>
-        </h1>
+        <BrandLogo size="lg" className="mb-2" />
         <p className="text-soft-white/40 tracking-[0.4em] uppercase text-[8px] md:text-[10px] font-black">Culinary Control Center</p>
       </header>
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getKitchenStats } from '../services/api';
 import socket from '../services/socket';
 import { motion } from 'framer-motion';
@@ -12,6 +12,7 @@ import {
     Utensils,
     Timer
 } from 'lucide-react';
+import { BrandLogo } from '../components/BrandingUtils';
 
 const Dashboard = () => {
     const [stats, setStats] = useState({
@@ -25,7 +26,11 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const isFetchingRef = useRef(false);
+
     const fetchStats = async () => {
+        if (isFetchingRef.current) return;
+        isFetchingRef.current = true;
         try {
             setError(null);
             const data = await getKitchenStats();
@@ -41,9 +46,12 @@ const Dashboard = () => {
             }
         } catch (error) {
             console.error('Failed to fetch stats', error);
-            setError('Failed to fetch stats');
+            if (!stats.totalToday) {
+                setError('Failed to fetch stats');
+            }
         } finally {
             setLoading(false);
+            isFetchingRef.current = false;
         }
     };
 
@@ -63,12 +71,16 @@ const Dashboard = () => {
             };
 
             socket.on('orderUpdate', handleUpdate);
-            socket.on('incomingOrder', handleUpdate);
+            socket.on('orderUpdated', handleUpdate);
+            socket.on('newOrder', handleUpdate);
+            socket.on('NEW_ORDER', handleUpdate);
 
             return () => {
                 if (debounceTimer) clearTimeout(debounceTimer);
                 socket.off('orderUpdate', handleUpdate);
-                socket.off('incomingOrder', handleUpdate);
+                socket.off('orderUpdated', handleUpdate);
+                socket.off('newOrder', handleUpdate);
+                socket.off('NEW_ORDER', handleUpdate);
             };
         }
     }, []);
@@ -94,9 +106,7 @@ const Dashboard = () => {
         >
             <header className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl md:text-5xl font-serif font-black mb-1 md:mb-2 tracking-tighter italic">
-                        <span className="text-gold">Dine</span><span className="text-crimson">Xis</span>
-                    </h1>
+                    <BrandLogo size="lg" className="mb-2" />
                     <p className="text-soft-white/40 tracking-[0.4em] uppercase text-[8px] md:text-[10px] font-black italic">Kitchen Intelligence Center</p>
                 </div>
                 <div className="flex items-center gap-3">

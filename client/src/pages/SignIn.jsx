@@ -185,9 +185,9 @@ const SignIn = () => {
                 <div className="p-8 border-b border-white/10 text-center">
                     <h2 className="text-4xl font-serif font-black text-gold tracking-wider uppercase">
                         {step === 'phone' ? (
-                            <>SIGN <span className="text-crimson">IN</span></>
+                            <>SIGN <span className="text-gold">IN</span></>
                         ) : (
-                            <>VERIFY <span className="text-crimson">OTP</span></>
+                            <>VERIFY <span className="text-gold">OTP</span></>
                         )}
                     </h2>
                     <p className="text-xs text-soft-white/60 font-bold uppercase tracking-widest mt-1">

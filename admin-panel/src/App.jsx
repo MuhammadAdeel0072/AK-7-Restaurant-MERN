@@ -13,6 +13,7 @@ import UserManagement from './pages/UserManagement';
 import ReportManagement from './pages/ReportManagement';
 import MealSchedule from './pages/MealSchedule';
 import Login from './pages/Login';
+import StaffSetup from './pages/StaffSetup';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Toaster } from 'react-hot-toast';
 
@@ -38,6 +39,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/setup-account" element={<StaffSetup />} />
 
             <Route path="/" element={
               <ProtectedRoute>

@@ -11,7 +11,9 @@ const {
   deleteUserAccount,
   forgotPassword,
   resetPassword,
-  changePassword 
+  changePassword,
+  verifyStaffOTP,
+  setupStaffPassword
 } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
 const { otpSendLimiter, otpVerifyLimiter } = require('../middleware/otpMiddleware');
@@ -25,6 +27,10 @@ router.post('/register', registerUser);
 router.post('/login', authUser);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
+
+// Staff Onboarding
+router.post('/staff/verify-otp', otpVerifyLimiter, verifyStaffOTP);
+router.post('/staff/setup-password', setupStaffPassword);
 
 // Protected routes
 router.use(protect);

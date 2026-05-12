@@ -76,16 +76,16 @@ const SignUp = () => {
                 )}
 
                 <div className="p-8 border-b border-white/10 text-center">
-                    <h2 className="text-4xl font-serif font-black text-gold tracking-wider">SIGN <span className="text-crimson">UP</span></h2>
+                    <h2 className="text-4xl font-serif font-black text-white tracking-wider uppercase">SIGN <span className="text-gold">UP</span></h2>
                     <p className="text-xs text-soft-white/60 font-bold uppercase tracking-widest mt-1">Join DineXis</p>
                 </div>
 
                 <div className="p-8">
                     {error && (
                         <div className="mb-6 p-4 bg-crimson/10 border-l-4 border-crimson rounded-r-xl flex items-start gap-3">
-                            <AlertCircle size={20} className="text-crimson shrink-0 mt-0.5" />
+                            <AlertCircle size={20} className="text-gold shrink-0 mt-0.5" />
                             <div>
-                                <p className="text-xs font-black text-crimson uppercase tracking-widest mb-1">Attention required</p>
+                                <p className="text-xs font-black text-gold uppercase tracking-widest mb-1">Attention required</p>
                                 <p className="text-sm font-medium text-red-200">{error}</p>
                             </div>
                         </div>

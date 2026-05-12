@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api',
+  // Use relative path to leverage Vite proxy in development
+  // In production, the backend and frontend are usually served from the same origin or via env var
+  baseURL: import.meta.env.VITE_API_URL || '/api',
 });
 
 // Add JWT Interceptor
@@ -12,7 +14,6 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
-
 
 export const getActiveOrders = async () => {
     const { data } = await api.get('/chef/orders');

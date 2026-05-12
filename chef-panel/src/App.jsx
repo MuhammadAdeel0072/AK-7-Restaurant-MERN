@@ -7,6 +7,7 @@ import ReadyQueue from "./pages/ReadyQueue";
 import Alerts from "./pages/Alerts";
 import Settings from "./pages/Settings";
 import Login from "./pages/Login";
+import StaffSetup from "./pages/StaffSetup";
 
 import { AlertProvider } from "./context/AlertContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
@@ -41,6 +42,7 @@ function App() {
       />
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/setup-account" element={<StaffSetup />} />
         
         <Route element={
           <ProtectedRoute>

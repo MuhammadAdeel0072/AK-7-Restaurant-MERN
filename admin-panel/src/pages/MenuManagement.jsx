@@ -278,12 +278,13 @@ const MenuManagement = () => {
       }
       toast.dismiss(loadingToast);
       toast.success(editingItem ? 'Product updated successfully âœ…' : 'Product added successfully âœ…');
+      toast.success(editingItem ? 'Product updated successfully ✅' : 'Product added successfully ✅');
       socket.emit('adminAction', { type: 'menuUpdate' });
       fetchItems();
       handleCloseModal();
     } catch (error) {
       toast.dismiss();
-      toast.error(error.response?.data?.message || 'Failed to save product âŒ');
+      toast.error(error.response?.data?.message || 'Failed to save product ❌');
       console.error('Failed to save item', error);
     }
   };
@@ -660,7 +661,7 @@ const MenuManagement = () => {
                     className="flex-1 sm:flex-none btn-gold px-12 py-3 text-sm md:text-lg flex items-center justify-center gap-3 rounded-2xl"
                   >
                     <Save className="w-5 h-5 md:w-6 md:h-6" />
-                    <span>{editingItem ? 'Update Item' : 'Save Item'}</span>
+                    <span>{editingItem ? 'UPDATE' : 'CREATE'}</span>
                   </button>
                 </div>
               </form>
@@ -765,7 +766,7 @@ const MenuManagement = () => {
                                   <button
                                     onClick={handleUpdateCategory}
                                     className="p-2 bg-green-500/20 hover:bg-green-500/30 text-green-500 rounded-lg transition-all"
-                                    title="Save changes"
+                                    title="Update changes"
                                   >
                                     <Check className="w-4 h-4" />
                                   </button>

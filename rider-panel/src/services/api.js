@@ -60,6 +60,11 @@ export const confirmDelivery = async (orderId, payload = {}) => {
     return data;
 };
 
+export const confirmCODCollection = async (orderId) => {
+    const { data } = await api.post(`/rider/collect-cash/${orderId}`);
+    return data;
+};
+
 export const updateLocation = async (orderId, lat, lng) => {
     const { data } = await api.post('/rider/location', { orderId, lat, lng });
     return data;

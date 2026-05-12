@@ -184,9 +184,13 @@ const Checkout = () => {
                       if (!phoneNumber || !address) {
                         return toast.error('Both fields are required');
                       }
-                      if (phoneNumber.length < 10) {
-                        return toast.error('Check your phone number');
+                      
+                      // Enhanced Phone Validation (Pakistan Standard: 03XXXXXXXXX)
+                      const phoneRegex = /^03\d{9}$/;
+                      if (!phoneRegex.test(phoneNumber.replace(/\s/g, ''))) {
+                        return toast.error('Please enter a valid 11-digit phone number (e.g., 03001234567)');
                       }
+
                       nextStep();
                     }}
                     className="mt-12 w-full bg-gold text-charcoal font-black py-5 rounded-[2rem] flex items-center justify-center gap-3 uppercase tracking-[0.2em] text-xs shadow-2xl shadow-gold/20 hover:bg-yellow-400 active:scale-95 transition-all"

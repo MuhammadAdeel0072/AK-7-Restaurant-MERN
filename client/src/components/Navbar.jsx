@@ -65,8 +65,9 @@ const Navbar = () => {
     <>
       <nav className="bg-charcoal/80 backdrop-blur-md border-b border-gold/30 sticky top-0 z-50 px-4 md:px-8 py-4 flex justify-between items-center transition-all duration-300">
         {/* Logo */}
-        <Link to="/" className="text-2xl md:text-3xl font-serif font-bold text-gold tracking-wider z-50">
-          Dine<span className="text-crimson">Xis</span>
+        <Link to="/" className="flex items-center z-50 group">
+          <span className="text-2xl md:text-3xl font-serif font-black text-white tracking-tighter">Dine</span>
+          <span className="text-2xl md:text-3xl font-serif font-black text-gold tracking-tighter">Xis</span>
         </Link>
 
         {/* Desktop Nav links */}
@@ -96,7 +97,7 @@ const Navbar = () => {
               </span>
             )}
             {totalPrice > 0 && (
-              <span className="hidden sm:block text-gold font-bold text-sm">Rs.{totalPrice.toFixed(0)}</span>
+              <span className="hidden sm:block text-gold font-bold text-sm">Rs {totalPrice.toFixed(0)}</span>
             )}
           </Link>
 
@@ -298,7 +299,7 @@ const Navbar = () => {
                 <AlertTriangle className="w-10 h-10 text-red-500" />
               </div>
 
-              <h2 className="text-4xl font-serif font-black text-white mb-4">Sign Out?</h2>
+              <h2 className="text-4xl font-serif font-black text-white tracking-wider uppercase">SIGN <span className="text-gold">OUT?</span></h2>
               <p className="text-gray-500 mb-10 text-sm leading-relaxed px-4">Your current gourmet session and preferences will be secured. Re-authentication will be required for future orders.</p>
 
               <div className="flex gap-4 mt-8 px-2">

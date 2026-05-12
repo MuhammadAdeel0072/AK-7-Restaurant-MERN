@@ -17,7 +17,6 @@ const OrderStatusStepper = ({ currentStatus }) => {
         const stageMap = {
             'PENDING': 0,
             'RECEIVED': 0,
-            'ACCEPTED': 0,
             'CONFIRMED': 0,
             'PREPARING': 0,
             'COOKING': 0,
@@ -25,10 +24,13 @@ const OrderStatusStepper = ({ currentStatus }) => {
             'READY': 1,
             'PACKED': 1,
             'ASSIGNED': 2,
+            'ACCEPTED': 2,
             'RIDER_ASSIGNED': 2,
+            'PICKED_UP': 3,
             'OUT_FOR_DELIVERY': 3,
             'DISPATCHED': 3,
-            'PICKED_UP': 3,
+            'ARRIVED': 3,
+            'CASH_COLLECTED': 3,
             'DELIVERED': 4,
             'COMPLETED': 4
         };

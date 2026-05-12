@@ -22,7 +22,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     { title: 'Menu', path: '/menu', icon: Utensils },
     { title: 'Deals', path: '/deals', icon: Tag },
     { title: 'Orders', path: '/orders', icon: ShoppingBag },
-    { title: 'Meal Schedule', path: '/schedule', icon: Calendar },
+    { title: 'Meal Operation', path: '/schedule', icon: Calendar },
     { title: 'Reservations', path: '/reservations', icon: Calendar },
     { title: 'Payments', path: '/payments', icon: CreditCard },
     { title: 'Staff', path: '/staff', icon: Users },

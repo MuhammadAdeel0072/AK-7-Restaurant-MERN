@@ -110,7 +110,6 @@ const ReportManagement = () => {
     const tabs = [
         { id: 'sales', name: 'Sales', icon: TrendingUp },
         { id: 'staff', name: 'Staff', icon: Users },
-        { id: 'inventory', name: 'Inventory', icon: Package },
         { id: 'finance', name: 'Financial', icon: DollarSign },
         { id: 'daily', name: 'Daily Closing', icon: FileText },
     ];
@@ -170,18 +169,7 @@ const ReportManagement = () => {
                         ]) : []}
                     />
                 );
-            case 'inventory':
-                return (
-                    <Table
-                        headers={['Item Name', 'In Stock', 'Used Stock', 'Status']}
-                        rows={Array.isArray(reportData) ? reportData.map(i => [
-                            i.name,
-                            i.available,
-                            i.used,
-                            <span className={i.isLowStock ? 'text-crimson' : 'text-emerald-400'}>{i.status}</span>
-                        ]) : []}
-                    />
-                );
+
             case 'finance':
                 return (
                     <div className="space-y-10">

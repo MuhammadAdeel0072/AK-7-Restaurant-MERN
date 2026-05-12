@@ -270,6 +270,12 @@ const authUser = asyncHandler(async (req, res, next) => {
     throw new Error('Invalid email or password');
   }
 
+  // Check if account is active and onboarded (for staff)
+  if (!user.isActive || !user.isOnboarded) {
+    res.status(401);
+    throw new Error('Your account is not fully setup or is inactive. Please complete onboarding or contact admin.');
+  }
+
   // Verify password field exists and is valid
   if (!user.password || typeof user.password !== 'string') {
     console.error(`❌ Login Error: User found but password field is corrupted for ${email}`);
@@ -547,6 +553,88 @@ const changePassword = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Verify Staff Onboarding OTP
+// @route   POST /api/auth/staff/verify-otp
+// @access  Public
+const verifyStaffOTP = asyncHandler(async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    res.status(400);
+    throw new Error('Email and OTP are required');
+  }
+
+  const otpRecord = await OTP.findOne({ email: email.toLowerCase(), otp });
+
+  if (!otpRecord) {
+    res.status(401);
+    throw new Error('Invalid or expired OTP');
+  }
+
+  const user = await User.findOne({ email: email.toLowerCase() });
+  if (!user) {
+    res.status(404);
+    throw new Error('User account not found');
+  }
+
+  if (user.isOnboarded) {
+    res.status(400);
+    throw new Error('Account already setup. Please login normally.');
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'OTP verified successfully. You can now set your password.'
+  });
+});
+
+// @desc    Setup Staff Password and Activate Account
+// @route   POST /api/auth/staff/setup-password
+// @access  Public
+const setupStaffPassword = asyncHandler(async (req, res) => {
+  const { email, otp, password } = req.body;
+
+  if (!email || !otp || !password) {
+    res.status(400);
+    throw new Error('All fields are required');
+  }
+
+  // Double check OTP
+  const otpRecord = await OTP.findOne({ email: email.toLowerCase(), otp });
+  if (!otpRecord) {
+    res.status(401);
+    throw new Error('Verification failed. Please try again.');
+  }
+
+  const user = await User.findOne({ email: email.toLowerCase() });
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  // Update password and status
+  user.password = password;
+  user.isOnboarded = true;
+  user.isActive = true;
+  await user.save();
+
+  // Delete OTP
+  await OTP.deleteOne({ _id: otpRecord._id });
+
+  const token = generateToken(user._id);
+
+  res.status(200).json({
+    success: true,
+    message: 'Account setup successfully! You can now log in.',
+    _id: user._id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    role: user.role,
+    token
+  });
+});
+
 module.exports = {
   sendOTP,
   verifyOTP,
@@ -561,5 +649,7 @@ module.exports = {
   clearCart,
   forgotPassword,
   resetPassword,
-  changePassword
+  changePassword,
+  verifyStaffOTP,
+  setupStaffPassword
 };

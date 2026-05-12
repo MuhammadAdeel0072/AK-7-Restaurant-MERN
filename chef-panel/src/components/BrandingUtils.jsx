@@ -22,10 +22,10 @@ export const BrandLogo = ({
   if (variant === 'minimal') {
     return (
       <div className={`inline-flex items-baseline gap-1 ${className}`}>
-        <span className={`${sizes.dine} font-serif font-black italic tracking-tighter text-gold`}>
+        <span className={`${sizes.dine} font-serif font-black tracking-tighter text-white`}>
           Dine
         </span>
-        <span className={`${sizes.xis} font-serif font-black italic tracking-tighter text-crimson`}>
+        <span className={`${sizes.xis} font-serif font-black tracking-tighter text-gold`}>
           Xis
         </span>
       </div>
@@ -36,10 +36,10 @@ export const BrandLogo = ({
     return (
       <div className={`flex flex-col ${className}`}>
         <div className="inline-flex items-baseline gap-1">
-          <span className={`${sizes.dine} font-serif font-bold text-gold`}>
+          <span className={`${sizes.dine} font-serif font-bold text-white`}>
             Dine
           </span>
-          <span className={`${sizes.xis} font-serif font-bold text-crimson`}>
+          <span className={`${sizes.xis} font-serif font-bold text-gold`}>
             Xis
           </span>
         </div>
@@ -54,10 +54,10 @@ export const BrandLogo = ({
   return (
     <div className={`flex flex-col ${className}`}>
       <div className="inline-flex items-baseline gap-1">
-        <span className={`${sizes.dine} font-serif font-black italic tracking-tighter text-gold`}>
+        <span className={`${sizes.dine} font-serif font-black tracking-tighter text-white`}>
           Dine
         </span>
-        <span className={`${sizes.xis} font-serif font-black italic tracking-tighter text-crimson`}>
+        <span className={`${sizes.xis} font-serif font-black tracking-tighter text-gold`}>
           Xis
         </span>
       </div>
@@ -73,10 +73,10 @@ export const BrandLogo = ({
 // Typography hooks and utilities
 export const typographyClasses = {
   // Main headers
-  heading1: 'text-5xl md:text-6xl font-serif font-black italic tracking-tighter text-soft-white',
-  heading2: 'text-4xl md:text-5xl font-serif font-black italic tracking-tighter text-soft-white',
-  heading3: 'text-3xl md:text-4xl font-serif font-bold italic tracking-tight text-soft-white',
-  heading4: 'text-2xl md:text-3xl font-serif font-bold italic text-soft-white',
+  heading1: 'text-5xl md:text-6xl font-serif font-black tracking-tighter text-soft-white',
+  heading2: 'text-4xl md:text-5xl font-serif font-black tracking-tighter text-soft-white',
+  heading3: 'text-3xl md:text-4xl font-serif font-bold tracking-tight text-soft-white',
+  heading4: 'text-2xl md:text-3xl font-serif font-bold text-soft-white',
   
   // Section headers
   sectionHead: 'text-lg md:text-xl font-serif font-bold text-gold mb-6 md:mb-8 flex items-center gap-3',
@@ -94,7 +94,7 @@ export const typographyClasses = {
   
   // Accents
   accentGold: 'text-gold font-semibold',
-  accentCrimson: 'text-crimson font-semibold',
+  accentWhite: 'text-white font-semibold',
   accentBold: 'font-black uppercase tracking-wider',
   
   // Menu/Navigation
@@ -139,7 +139,7 @@ export const Typography = {
 
 // Accent text wrapper
 export const AccentText = ({ children, color = 'gold', className = '' }) => {
-  const colorClass = color === 'crimson' ? typographyClasses.accentCrimson : typographyClasses.accentGold;
+  const colorClass = color === 'white' ? typographyClasses.accentWhite : typographyClasses.accentGold;
   return <span className={`${colorClass} ${className}`}>{children}</span>;
 };
 

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useProfile } from './AuthContext';
-import { connectSocket, disconnectSocket, subscribeToOrderUpdates, unsubscribeFromOrderUpdates, subscribeToAdminActions, unsubscribeFromAdminActions } from '../services/socketService';
+import socket, { connectSocket, disconnectSocket, subscribeToOrderUpdates, unsubscribeFromOrderUpdates, subscribeToAdminActions, unsubscribeFromAdminActions } from '../services/socketService';
 import toast from 'react-hot-toast';
 
 const SocketContext = createContext();
@@ -29,6 +29,9 @@ export const SocketProvider = ({ children }) => {
         });
 
         setNotifications((prev) => [{ ...data, message, timestamp: new Date() }, ...prev]);
+        
+        // Trigger site-wide update to refresh components (Orders, OrderHistory, etc)
+        setSiteUpdate({ type: 'orderUpdate', ...data, timestamp: new Date() });
       });
 
       subscribeToAdminActions((data) => {
@@ -52,7 +55,7 @@ export const SocketProvider = ({ children }) => {
   }, [isSignedIn, profile]);
 
   return (
-    <SocketContext.Provider value={{ notifications, siteUpdate }}>
+    <SocketContext.Provider value={{ notifications, siteUpdate, socket }}>
       {children}
     </SocketContext.Provider>
   );
